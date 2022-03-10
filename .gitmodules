@@ -6,3 +6,7 @@
 	path = iam26-backend
 	url = https://github.com/yangkequn/iam26-backend
 	branch = main
+[submodule "user"]
+	path = GoUser
+	url = https://github.com/yangkequn/GoUser
+	branch = iam26
