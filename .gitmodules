@@ -1,0 +1,8 @@
+[submodule "www"]
+	path = iam26-www
+	url = https://github.com/yangkequn/iam26-www
+	branch = main
+[submodule "backend"]
+	path = iam26-backend
+	url = https://github.com/yangkequn/iam26-backend
+	branch = main
