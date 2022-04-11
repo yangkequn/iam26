@@ -1,0 +1,14 @@
+Name: iam26-api
+Host: 0.0.0.0
+Port: 8890
+Timeout: 60000
+
+Auth:
+  AccessSecret: nE>[N<2DK6P[9uns
+  AccessExpire: 7200
+DBPostgresql:
+  Connection: "host=iox10.vm user=postgres password=postgres dbname=iam26 port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+Redis:
+  Addr: "docker.vm:6379"
+  Password: ""
+  DB: 0

@@ -1,0 +1,92 @@
+service iam26-api {
+	@handler ActGet
+	get /act(FormId) returns (ActItem)
+	@handler MeasureGet
+	get /measure(FormId) returns (MeasureItem)
+	@handler GoalGet
+	get /goal(FormId) returns (GoalItem)
+}
+
+@server(
+	jwt: Auth
+)
+service iam26-api {
+	
+	@handler ActPut
+	put /act(ActItem) returns (ActItem)
+	@handler ActListGet
+	get /actList returns (List)
+	@handler ActRecommendGet
+	get /actRecommend(TextRequest) returns (ActItem)
+	
+	@handler MeasurePut
+	put /measure(MeasureItem) returns (MeasureItem)
+	@handler MeasureListGet
+	get /measureList returns (List)
+	@handler MeasureRecommendGet
+	get /measureRecommend(TextRequest) returns (List)
+	
+	@handler TraceGet
+	get /trace returns ([]TraceItem)
+	@handler TraceItemPut
+	put /traceItem(TraceItem) returns (TraceItem)
+	@handler TraceItemDel
+	delete /traceItem(TraceItem) returns (TraceItem)
+	
+	@handler GoalPut
+	put /goal(GoalItem) returns (GoalItem)
+	@handler GoalDel
+	delete /goal(GoalItem) returns (GoalItem)
+	@handler GoalListGet
+	get /goalList returns (List)
+	@handler GoalRecommendGet
+	get /goalRecommend(TextRequest) returns (List)
+	
+}
+
+type TextRequest {
+	Text string `form:"text,optional"`
+}
+type FormId {
+	Id string `form:"id"`
+}
+type List {
+	List []string `json:"list"`
+}
+
+type ActItem {
+	ActId      string  `json:"actId"`
+	Name       string  `json:"name"`
+	Unit       string  `json:"unit"`
+	Detail     string  `json:"detail"`
+	Popularity int64   `json:"popularity,optional"`
+	Score      float32 `json:"score,optional"`
+	Mine       bool    `json:"mine"`
+}
+type MeasureItem {
+	MeasureId  string  `json:"measureId"`
+	Name       string  `json:"name"`
+	Unit       string  `json:"unit"`
+	Detail     string  `json:"detail"`
+	Popularity int64   `json:"popularity,optional"`
+	Score      float32 `json:"score,optional"`
+	Mine       bool    `json:"mine"`
+}
+type GoalItem {
+	Id         string `json:"id"`
+	Name       string `json:"name"`
+	Detail     string `json:"detail"`
+	Risk       string `json:"risk"`
+	Benifites  string `json:"benifites"`
+	Popularity int64  `json:"popularity"`
+	Mine       bool   `json:"mine"` //if this goal is setted as my goal
+
+}
+type TraceItem {
+	TraceId   string  `json:"traceId"`
+	ActId     string  `json:"actId"`
+	MeasureId string  `json:"measureId"`
+	Value     float64 `json:"value"`
+	Memo      string  `json:"memo"`
+	Time      int64   `json:"time"`
+}
