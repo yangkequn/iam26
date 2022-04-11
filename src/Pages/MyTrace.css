@@ -1,0 +1,35 @@
+.insert {
+    justify-content: space-between;
+    min-width: 70%;
+    align-self: flex-start;
+}
+
+.trace {
+    background-color: #cecece;
+    color: white;
+    justify-content: space-between;
+    border-bottom: #333 solid 1px;
+    margin: auto;
+    width: calc(100% - 40px);
+    margin-right: 40px;
+    margin-left: 0px;
+}
+
+.traceMeasure {
+    margin-left: 40px;
+    margin-right: 0px;
+    /* flex-direction: row-reverse; */
+    background-color: #cecece;
+}
+
+.traceIcon {
+    width: "fit-content";
+    margin: 0 0.5em 0 0.5em;
+    color: lightgoldenrodyellow
+}
+
+.traceText {
+    align-self: flex-start;
+    min-width: 200px;
+    margin: 0 0.5em 0 0.5em;
+}
