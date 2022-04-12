@@ -11,7 +11,6 @@ import (
 
 type ServiceContext struct {
 	Config           config.Config
-	UserModel        md.UserModel
 	ActModel         md.ActModel
 	ActListModel     md.ActListModel
 	MeasureModel     md.MeasureModel
@@ -21,6 +20,7 @@ type ServiceContext struct {
 	TraceListModel   md.TraceListModel
 	TraceItemModel   md.TraceItemModel
 	RedisClient      *redis.Client
+	UserModel        md.UserModel
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -33,7 +33,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	return &ServiceContext{
 		Config:           c,
 		RedisClient:      redis.NewClient(redisOptions),
-		UserModel:        md.NewUserModel(connPostGres),
 		ActModel:         md.NewActModel(connPostGres),
 		ActListModel:     md.NewActListModel(connPostGres),
 		MeasureModel:     md.NewMeasureModel(connPostGres),
@@ -42,5 +41,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		TraceItemModel:   md.NewTraceItemModel(connPostGres),
 		GoalModel:        md.NewGoalModel(connPostGres),
 		GoalListModel:    md.NewGoalListModel(connPostGres),
+		UserModel:        md.NewUserModel(connPostGres),
 	}
 }

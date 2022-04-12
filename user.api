@@ -1,0 +1,122 @@
+service iam26-api {
+	//retriev user JWT token
+	//获得用户JWT令牌
+	@handler UserJWTGet
+	get /userJwt (jwtReq) returns (jwtRsp)
+	//获得用户头像
+	@handler UserAvatarGet
+	get /userAvatar (accountID) 
+	//获得用户昵称
+	@handler UserGet
+	get /user (accountID) returns (NameRsp)
+	//退出登录
+	@handler UserSignOutGet
+	get /userSignOut  
+	//查询账号是否已经被注册
+	@handler UserAccountOccupiedGet
+	get /userAccountOccupied (accountOccupiedReq) returns (accountOccupiedRsb)
+	//user sign up
+	//用户注册
+	@handler UserSignUpPost
+	post /userSignUp (signUpReq) returns (errorRsb)
+	//user login
+	//用户登录
+	@handler UserLoginPost
+	post /userLogin (loginReq) returns (errorRsb)
+	//reset password
+	//重置密码
+	@handler UserPasswordPost
+	post /userResetPassword (resetReq) returns (errorRsb)
+	//sent user check code, to phone or email
+	//发送注册短信验证码,修改账号邮箱验证码
+	@handler UserSentSMSPost
+	post /userSentSMS (sentCheckCodeReq) returns (errorRsb)
+}
+
+@server(
+	jwt: Auth
+)
+service iam26-api {
+	@handler UserProfileGet
+	get /userProfile returns (myProfileReturn)
+	
+	@handler UserProfilePut
+	put /userProfile (myProfileChangeReq) returns (errorRsb)
+	
+	@handler UserAvatarPut
+	put /userAvatar  
+}
+
+type (
+	loginReq {
+		CountryCode string `json:"countryCode"`
+		Account     string `json:"account"`
+		Password    string `json:"password"`
+	}
+	sentCheckCodeReq {
+		CountryCode string `json:"countryCode"`
+		Phone       string `json:"phone"`
+	}
+	signUpReq {
+		CountryCode string `json:"countryCode"`
+		Account     string `json:"account"`
+		Phone       string `json:"phone"`
+		Password    string `json:"password"`
+		SMSCode     int    `json:"SMSCode"`
+	}
+	resetReq {
+		CountryCode string `json:"countryCode"`
+		Account     string `json:"account"`
+		Password    string `json:"password"`
+		CheckCode   int    `json:"checkCode"`
+	}
+	errorRsb {
+		Error string `json:"error"`
+	}
+	jwtReq {
+		Width       uint16 `form:"width"`
+		Height      uint16 `form:"height"`
+		AvailWidth  uint16 `form:"availWidth"`
+		AvailHeight uint16 `form:"availHeight"`
+		OuterHeight uint16 `form:"outerHeight"`
+		OuterWidth  uint16 `form:"outerWidth"`
+		InnerHeight uint16 `form:"innerHeight"`
+		InnerWidth  uint16 `form:"innerWidth"`
+	}
+	jwtRsp {
+		Jwt              string `json:"jwt"`
+		Id               string `json:"id"`
+		Sub              string `json:"sub"`
+		TemporaryAccount bool   `json:"temporaryAccount"`
+	}
+	accountOccupiedReq {
+		Name string `form:"name"`
+	}
+	accountOccupiedRsb {
+		Error string `json:"error"`
+	}
+	accountID {
+		Id string `form:"id"`
+	}
+	NameRsp {
+		Name string `json:"name"`
+	}
+)
+type (
+	jwtReturn {
+		Jwt string `json:"jwt"`
+	}
+	myProfileReturn {
+		Succ         bool   `json:"succ"`
+		CountryCode  string `json:"countryCode"`
+		Phone        string `json:"phone"`
+		Nick         string `json:"nickName"`
+		Introduction string `json:"introduction"`
+		Avatar       string `json:"avatar"`
+		RealName     string `json:"realName"`
+	}
+	myProfileChangeReq {
+		ChannelName  string `form:"channelName"`
+		LoginAccount string `form:"loginAccount"`
+	}
+)
