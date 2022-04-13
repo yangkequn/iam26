@@ -44,13 +44,15 @@ func (l *ActPutLogic) ActPut(req *types.ActItem) (resp *types.ActItem, err error
 	//create new act with req
 	if newAct {
 		id = GoTools.Sum64String(req.Name + req.Unit)
-		act, err = l.svcCtx.ActModel.FindOne(id)
-		if NoRowsInResultSet(err) {
-			act = &model.Act{Author: uid, Id: id, Name: req.Name, Unit: req.Unit, Detail: req.Detail}
-			_, err = l.svcCtx.ActModel.Insert(act)
-		}
-	} else {
-		act, err = l.svcCtx.ActModel.FindOne(id)
+	}
+
+	if act, err = l.svcCtx.ActModel.FindOne(id); err != nil && !NoRowsInResultSet(err) {
+		return nil, err
+	}
+
+	if err != nil && NoRowsInResultSet(err) {
+		act = &model.Act{Author: uid, Id: id, Name: req.Name, Unit: req.Unit, Detail: req.Detail}
+		_, err = l.svcCtx.ActModel.Insert(act)
 	}
 
 	//authority check
@@ -88,10 +90,14 @@ func (l *ActPutLogic) ActPut(req *types.ActItem) (resp *types.ActItem, err error
 	var actIdString string = GoTools.Int64ToString(act.Id)
 	if !strings.Contains(actList.List, actIdString) && GoTools.NonRedundantMerge(&actList.List, actIdString, true) {
 		l.svcCtx.ActListModel.Update(l.ctx, actList)
+		act.Popularity += 1
+		l.svcCtx.ActModel.Update(act)
 	}
+
+	// milvus index
 	if !newAct {
-		err = milvus.ActCollection.RemoveByKey(l.ctx, act.Id)
-		if err != nil {
+		//remove former act
+		if err = milvus.ActCollection.RemoveByKey(l.ctx, act.Id); err != nil {
 			return ConvertActToResponse(act, true), nil
 		}
 	}

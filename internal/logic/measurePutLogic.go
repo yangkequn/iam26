@@ -43,14 +43,13 @@ func (l *MeasurePutLogic) MeasurePut(req *types.MeasureItem) (resp *types.Measur
 	if newMeasure {
 		id = GoTools.Sum64String(req.Name + req.Unit)
 	}
-	if measure, err = l.svcCtx.MeasureModel.FindOne(id); err != nil {
-		if NoRowsInResultSet(err) {
-			measure = &model.Measure{Author: uid, Id: id, Name: req.Name, Unit: req.Unit, Detail: req.Detail, Popularity: 1}
-			_, err = l.svcCtx.MeasureModel.Insert(measure)
-		}
-	}
-	if err != nil || measure == nil {
+	if measure, err = l.svcCtx.MeasureModel.FindOne(id); err != nil && !NoRowsInResultSet(err) {
 		return nil, err
+	}
+	//is measure not created
+	if err != nil && NoRowsInResultSet(err) {
+		measure = &model.Measure{Author: uid, Id: id, Name: req.Name, Unit: req.Unit, Detail: req.Detail}
+		_, err = l.svcCtx.MeasureModel.Insert(measure)
 	}
 
 	//authority check
@@ -84,12 +83,14 @@ func (l *MeasurePutLogic) MeasurePut(req *types.MeasureItem) (resp *types.Measur
 	var measureIdString string = GoTools.Int64ToString(measure.Id)
 	if !strings.Contains(measureList.List, measureIdString) && GoTools.NonRedundantMerge(&measureList.List, measureIdString, true) {
 		l.svcCtx.MeasureListModel.Update(l.ctx, measureList)
+		measure.Popularity += 1
+		l.svcCtx.MeasureModel.Update(measure)
 	}
 
 	//remove redundant measure id from milvus collection
 	if !newMeasure {
-		err = milvus.MeasureCollection.RemoveByKey(l.ctx, measure.Id)
-		if err != nil {
+		//remove former measure
+		if err = milvus.MeasureCollection.RemoveByKey(l.ctx, measure.Id); err != nil {
 			return ConvertMeasureToResponse(measure, true), nil
 		}
 	}
