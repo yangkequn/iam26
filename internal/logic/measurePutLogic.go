@@ -80,8 +80,8 @@ func (l *MeasurePutLogic) MeasurePut(req *types.MeasureItem) (resp *types.Measur
 		}
 	}
 	//step2. append measure id to list
-	var measureIdString string = GoTools.Int64ToString(measure.Id)
-	if !strings.Contains(measureList.List, measureIdString) && GoTools.NonRedundantMerge(&measureList.List, measureIdString, true) {
+	var measureId string = GoTools.Int64ToString(measure.Id)
+	if !strings.Contains(measureList.List, measureId) && GoTools.NonRedundantMerge(&measureList.List, measureId, true) {
 		l.svcCtx.MeasureListModel.Update(l.ctx, measureList)
 		measure.Popularity += 1
 		l.svcCtx.MeasureModel.Update(measure)
