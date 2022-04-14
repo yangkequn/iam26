@@ -75,9 +75,9 @@ func (l *UserLoginPostLogic) UserLoginPost(r *http.Request, w http.ResponseWrite
 	} else if len(uidTemporary) > 0 {
 		//make sure it's temporary account, not root account
 		//这里有bug,如果只是两个不同人的账号，而不是临时账号，不应该做合并的操作
-		u, err = l.svcCtx.UserModel.FindOne(l.ctx, uidTemporary)
-		if err == nil && u.Password != 0 {
-			ConvertTemporaryAccountToFormalAccount(l.ctx, l.svcCtx, uidTemporary, u.Id)
+		uT, errT := l.svcCtx.UserModel.FindOne(l.ctx, uidTemporary)
+		if errT == nil && uT.Password != 0 {
+			ConvertTemporaryAccountToFormalAccount(l.ctx, l.svcCtx, uidTemporary, uT.Id)
 		}
 	}
 

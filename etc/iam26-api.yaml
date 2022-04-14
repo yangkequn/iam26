@@ -12,3 +12,4 @@ Redis:
   Addr: "docker.vm:6379"
   Password: ""
   DB: 0
+UseAnonymousAccount: false

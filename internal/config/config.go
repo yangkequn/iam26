@@ -16,4 +16,5 @@ type Config struct {
 		Password string
 		DB       int
 	}
+	UseAnonymousAccount bool
 }

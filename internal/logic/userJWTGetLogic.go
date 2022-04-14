@@ -54,7 +54,7 @@ func createTemporaryAccount() *model.User {
 	return &u
 }
 func (l *UserJWTGetLogic) UserJWTGet(req *types.JwtReq, r *http.Request, w http.ResponseWriter) (resp *types.JwtRsp, err error) {
-	fail := types.JwtRsp{Jwt: "", Sub: ""}
+	fail := types.JwtRsp{Jwt: "", Sub: "", Id: "", TemporaryAccount: false}
 
 	//todo 这段代码不能删除，后续需要恢复统计用户客户端分布等信息
 	//wz := &model.WebZone{OuterWidth: req.OuterWidth, OuterHeight: req.OuterHeight, InnerHeight: req.InnerHeight, InnerWidth: req.InnerWidth}
@@ -77,6 +77,11 @@ func (l *UserJWTGetLogic) UserJWTGet(req *types.JwtReq, r *http.Request, w http.
 
 	cookie, err := r.Cookie("Authorization")
 	if err != nil || cookie == nil || cookie.Value == "" {
+		//if not use Anonymous, just return no account
+		if !l.svcCtx.Config.UseAnonymousAccount {
+			return &fail, nil
+		}
+
 		//匿名临时账号
 		u := createTemporaryAccount()
 
