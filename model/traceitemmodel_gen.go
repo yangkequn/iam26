@@ -25,9 +25,10 @@ var (
 type (
 	traceItemModel interface {
 		Insert(ctx context.Context, data *TraceItem) (sql.Result, error)
-		FindOne(ctx context.Context, id int64) (*TraceItem, error)
+		FindAll(ctx context.Context) ([]*TraceItem, error)
+		FindOne(ctx context.Context, id string) (*TraceItem, error)
 		Update(ctx context.Context, data *TraceItem) error
-		Delete(ctx context.Context, id int64) error
+		Delete(ctx context.Context, id string) error
 	}
 
 	defaultTraceItemModel struct {
@@ -36,10 +37,10 @@ type (
 	}
 
 	TraceItem struct {
-		Id         int64     `db:"id"`
+		Id         string    `db:"id"`
 		UserId     string    `db:"user_id"`
-		ActId      int64     `db:"act_id"`
-		MeasureId  int64     `db:"measure_id"`
+		ActId      string     `db:"act_id"`
+		MeasureId  string    `db:"measure_id"`
 		Value      float64   `db:"value"`       // act value or measured value
 		CreateTime time.Time `db:"create_time"` // create time
 		Memo       string    `db:"memo"`        // annotation
@@ -61,7 +62,20 @@ func (m *defaultTraceItemModel) Insert(ctx context.Context, data *TraceItem) (sq
 	return ret, err
 }
 
-func (m *defaultTraceItemModel) FindOne(ctx context.Context, id int64) (*TraceItem, error) {
+func (m *defaultTraceItemModel) FindAll(ctx context.Context) ([]*TraceItem, error) {
+	query := fmt.Sprintf("select %s from %s ", traceItemRows, m.table)
+	var resp []*TraceItem
+	err := m.conn.QueryRowsCtx(ctx, &resp, query)
+	switch err {
+	case nil:
+		return resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+func (m *defaultTraceItemModel) FindOne(ctx context.Context, id string) (*TraceItem, error) {
 	query := fmt.Sprintf("select %s from %s where id = $1 limit 1", traceItemRows, m.table)
 	var resp TraceItem
 	err := m.conn.QueryRowCtx(ctx, &resp, query, id)
@@ -81,7 +95,7 @@ func (m *defaultTraceItemModel) Update(ctx context.Context, data *TraceItem) err
 	return err
 }
 
-func (m *defaultTraceItemModel) Delete(ctx context.Context, id int64) error {
+func (m *defaultTraceItemModel) Delete(ctx context.Context, id string) error {
 	query := fmt.Sprintf("delete from %s where id = $1", m.table)
 	_, err := m.conn.ExecCtx(ctx, query, id)
 	return err

@@ -28,18 +28,13 @@ func NewTraceItemDelLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Trac
 
 func (l *TraceItemDelLogic) TraceItemDel(req *types.TraceItem) (resp *types.TraceItem, err error) {
 	var (
-		Id        int64
 		uid       string
 		traceItem *model.TraceItem
 		traceList *model.TraceList
 	)
 
-	// id shout not be 0,or error
-	if Id = GoTools.StringToInt64(req.TraceId); Id == 0 {
-		return nil, fmt.Errorf("id is required")
-	}
 	// check if the record exists
-	if traceItem, err = l.svcCtx.TraceItemModel.FindOne(l.ctx, Id); err != nil {
+	if traceItem, err = l.svcCtx.TraceItemModel.FindOne(l.ctx, req.TraceId); err != nil {
 		return nil, err
 	}
 
@@ -49,7 +44,7 @@ func (l *TraceItemDelLogic) TraceItemDel(req *types.TraceItem) (resp *types.Trac
 	}
 
 	// delete traceItem from db
-	if err = l.svcCtx.TraceItemModel.Delete(l.ctx, Id); err != nil {
+	if err = l.svcCtx.TraceItemModel.Delete(l.ctx, req.TraceId); err != nil {
 		return nil, err
 	}
 
@@ -65,6 +60,6 @@ func (l *TraceItemDelLogic) TraceItemDel(req *types.TraceItem) (resp *types.Trac
 	}
 
 	// unset traceItem.TraceId
-	traceItem.Id = 0
+	traceItem.Id = ""
 	return ConvertTraceItemModel2TraceItem(traceItem), nil
 }

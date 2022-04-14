@@ -36,10 +36,9 @@ func (l *TraceItemPutLogic) TraceItemPut(req *types.TraceItem) (resp *types.Trac
 		return nil, errUid
 	}
 
-	ActId, MeasureId, TraceItemId := GoTools.StringToInt64(req.ActId), GoTools.StringToInt64(req.MeasureId), GoTools.StringToInt64(req.TraceId)
-	if ActId^MeasureId == 0 {
+	if len(req.ActId) == 0 && len(req.MeasureId) == 0 {
 		return nil, fmt.Errorf("MeasureId id or ActId is required")
-	} else if MeasureId != 0 && ActId != 0 {
+	} else if len(req.ActId) > 0 && len(req.MeasureId) > 0 {
 		return nil, fmt.Errorf("only one of MeasureId or ActId is required")
 	}
 
@@ -55,12 +54,13 @@ func (l *TraceItemPutLogic) TraceItemPut(req *types.TraceItem) (resp *types.Trac
 	}
 	traceItem := &model.TraceItem{}
 	// TraceItemId ==0 means create new record
-	if TraceItemId == 0 {
+	if req.TraceId == "0" {
+		req.TraceId = GoTools.Int64ToString(rand.Int63())
 		//set traceItem according to req
-		traceItem.Id = rand.Int63()
+		traceItem.Id = req.TraceId
 		traceItem.UserId = uid
-		traceItem.ActId = ActId
-		traceItem.MeasureId = MeasureId
+		traceItem.ActId = req.ActId
+		traceItem.MeasureId = req.MeasureId
 		traceItem.Value = req.Value
 		traceItem.Time = time.Unix(req.Time, 0)
 
@@ -71,17 +71,17 @@ func (l *TraceItemPutLogic) TraceItemPut(req *types.TraceItem) (resp *types.Trac
 		}
 
 		//append to TraceItem Ids
-		GoTools.NonRedundantMerge(&trace.List, GoTools.Int64ToString(traceItem.Id), true)
+		GoTools.NonRedundantMerge(&trace.List, traceItem.Id, true)
 		l.svcCtx.TraceListModel.Update(l.ctx, trace)
 
 	} else {
 		//existing record,update traceItem
-		traceItem, err = l.svcCtx.TraceItemModel.FindOne(l.ctx, TraceItemId)
+		traceItem, err = l.svcCtx.TraceItemModel.FindOne(l.ctx, req.TraceId)
 		if err != nil {
 			return nil, err
 		}
-		traceItem.ActId = ActId
-		traceItem.MeasureId = MeasureId
+		traceItem.ActId = req.ActId
+		traceItem.MeasureId = req.MeasureId
 		traceItem.Value = req.Value
 		traceItem.Memo = req.Memo
 		traceItem.Time = time.Unix(req.Time, 0)
@@ -112,22 +112,12 @@ func Encode(data []byte) (ids []int64) {
 }
 func ConvertTraceItemModel2TraceItem(traceItem *model.TraceItem) *types.TraceItem {
 	ret := &types.TraceItem{
-		TraceId:   GoTools.Int64ToString(traceItem.Id),
-		ActId:     GoTools.Int64ToString(traceItem.ActId),
-		MeasureId: GoTools.Int64ToString(traceItem.MeasureId),
+		TraceId:   traceItem.Id,
+		ActId:     traceItem.ActId,
+		MeasureId: traceItem.MeasureId,
 		Value:     traceItem.Value,
 		Time:      traceItem.Time.Unix(),
 		Memo:      traceItem.Memo,
-	}
-	//actId, measureId, 为0 的，返回空值，用以指示ID不使用
-	if traceItem.ActId == 0 {
-		ret.ActId = ""
-	}
-	if traceItem.MeasureId == 0 {
-		ret.MeasureId = ""
-	}
-	if traceItem.Id == 0 {
-		ret.TraceId = ""
 	}
 	return ret
 }

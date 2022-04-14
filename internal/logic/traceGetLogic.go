@@ -40,7 +40,7 @@ func (l *TraceGetLogic) TraceGet() (resp []types.TraceItem, err error) {
 
 	// get all items from db
 	for _, id := range itemIDs {
-		item, err := l.svcCtx.TraceItemModel.FindOne(l.ctx, GoTools.StringToInt64(id))
+		item, err := l.svcCtx.TraceItemModel.FindOne(l.ctx, id)
 		if err != nil {
 			return nil, err
 		}
@@ -52,17 +52,17 @@ func (l *TraceGetLogic) TraceGet() (resp []types.TraceItem, err error) {
 		// convert items to types.TraceItem array
 		resp = append(resp, types.TraceItem{
 			TraceId:   id,
-			ActId:     GoTools.Int64ToString(item.ActId),
-			MeasureId: GoTools.Int64ToString(item.MeasureId),
+			ActId:     item.ActId,
+			MeasureId: item.MeasureId,
 			Value:     item.Value,
 			Time:      item.Time.Unix(),
 			Memo:      item.Memo,
 		})
 		//actId, measureId, 为0 的，返回空值，用以指示ID不使用
-		if item.ActId == 0 {
+		if len(item.ActId) == 0 {
 			resp[len(resp)-1].ActId = ""
 		}
-		if item.MeasureId == 0 {
+		if len(item.MeasureId) == 0 {
 			resp[len(resp)-1].MeasureId = ""
 		}
 	}
