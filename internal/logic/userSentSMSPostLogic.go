@@ -52,11 +52,15 @@ func SendEmail(account string, Code string) (err error) {
 	// todo :fullfill code here
 }
 func (l *UserSentSMSPostLogic) UserSentSMSPost(req *types.SentCheckCodeReq) (resp *types.ErrorRsb, err error) {
-	// todo: add your logic here and delete this line
+	var (
+		id string
+	)
 
 	// var errPhoneOccupied error = errors.New("phone")
 
-	id := model.AccountToID(req.CountryCode + req.Phone)
+	if id, err = model.AccountToID(req.CountryCode + req.Phone); err != nil {
+		return &types.ErrorRsb{Error: err.Error()}, nil
+	}
 	u, err := l.svcCtx.UserModel.FindOne(l.ctx, id)
 	//判断用户是否已经注册过了
 	if u != nil && err == nil {

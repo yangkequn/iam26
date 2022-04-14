@@ -25,11 +25,11 @@ func NewUserAccountOccupiedGetLogic(ctx context.Context, svcCtx *svc.ServiceCont
 }
 
 func (l *UserAccountOccupiedGetLogic) UserAccountOccupiedGet(req *types.AccountOccupiedReq) (resp *types.AccountOccupiedRsb, err error) {
-	id := model.AccountToID(req.Name)
-	if id == 0 {
-		return &types.AccountOccupiedRsb{Error: "账号无效"}, nil
+	id, err := model.AccountToID(req.Name)
+	if err != nil {
+		return &types.AccountOccupiedRsb{Error: err.Error()}, nil
 	}
-	if u, err := l.svcCtx.UserModel.FindOne(l.ctx, id); err == nil && u.Id != 0 {
+	if _, err := l.svcCtx.UserModel.FindOne(l.ctx, id); err == nil {
 		return &types.AccountOccupiedRsb{Error: "账号已经存在"}, nil
 	}
 	return &types.AccountOccupiedRsb{Error: ""}, nil

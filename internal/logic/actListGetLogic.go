@@ -27,7 +27,7 @@ func NewActListGetLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ActLis
 
 func (l *ActListGetLogic) ActListGet() (resp *types.List, err error) {
 	var (
-		uid     int64
+		uid     string
 		actList *model.ActList
 	)
 

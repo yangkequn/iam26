@@ -7,7 +7,6 @@ import (
 	"iam26/internal/svc"
 	"iam26/internal/types"
 
-	"github.com/yangkequn/GoTools"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -26,12 +25,7 @@ func NewUserAvatarGetLogic(ctx context.Context, w http.ResponseWriter, svcCtx *s
 }
 
 func (l *UserAvatarGetLogic) UserAvatarGet(w http.ResponseWriter, req *types.AccountID) error {
-	uid := GoTools.StringToInt64(req.Id)
-	if uid == 0 {
-		return nil
-	}
-
-	u, er := l.svcCtx.UserModel.FindOne(l.ctx, uid)
+	u, er := l.svcCtx.UserModel.FindOne(l.ctx, req.Id)
 	if er != nil {
 		return er
 	}

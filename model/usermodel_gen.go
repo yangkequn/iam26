@@ -25,9 +25,9 @@ var (
 type (
 	userModel interface {
 		Insert(ctx context.Context, data *User) (sql.Result, error)
-		FindOne(ctx context.Context, id int64) (*User, error)
+		FindOne(ctx context.Context, id string) (*User, error)
 		Update(ctx context.Context, data *User) error
-		Delete(ctx context.Context, id int64) error
+		Delete(ctx context.Context, id string) error
 	}
 
 	defaultUserModel struct {
@@ -36,8 +36,6 @@ type (
 	}
 
 	User struct {
-		Id           int64     `db:"id"`
-		RootId       int64     `db:"root_id"` // account  should point to root account if not use phone
 		Account      string    `db:"account"`
 		Nick         string    `db:"nick"`
 		CountryPhone string    `db:"country_phone"`
@@ -47,6 +45,8 @@ type (
 		CreateTime   time.Time `db:"create_time"`
 		UpdateTime   time.Time `db:"update_time"`
 		Avatar       string    `db:"avatar"`
+		Id           string    `db:"id"`
+		RootId       string    `db:"root_id"` // account  should point to root account if not use phone
 	}
 )
 
@@ -59,11 +59,11 @@ func newUserModel(conn sqlx.SqlConn) *defaultUserModel {
 
 func (m *defaultUserModel) Insert(ctx context.Context, data *User) (sql.Result, error) {
 	query := fmt.Sprintf("insert into %s (%s) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)", m.table, userRowsExpectAutoSet)
-	ret, err := m.conn.ExecCtx(ctx, query, data.Id, data.RootId, data.Account, data.Nick, data.CountryPhone, data.Password, data.Salt, data.Introduction, data.Avatar)
+	ret, err := m.conn.ExecCtx(ctx, query, data.Account, data.Nick, data.CountryPhone, data.Password, data.Salt, data.Introduction, data.Avatar, data.Id, data.RootId)
 	return ret, err
 }
 
-func (m *defaultUserModel) FindOne(ctx context.Context, id int64) (*User, error) {
+func (m *defaultUserModel) FindOne(ctx context.Context, id string) (*User, error) {
 	query := fmt.Sprintf("select %s from %s where id = $1 limit 1", userRows, m.table)
 	var resp User
 	err := m.conn.QueryRowCtx(ctx, &resp, query, id)
@@ -79,11 +79,11 @@ func (m *defaultUserModel) FindOne(ctx context.Context, id int64) (*User, error)
 
 func (m *defaultUserModel) Update(ctx context.Context, data *User) error {
 	query := fmt.Sprintf("update %s set %s where id = $1", m.table, userRowsWithPlaceHolder)
-	_, err := m.conn.ExecCtx(ctx, query, data.Id, data.RootId, data.Account, data.Nick, data.CountryPhone, data.Password, data.Salt, data.Introduction, data.Avatar)
+	_, err := m.conn.ExecCtx(ctx, query, data.Id, data.Account, data.Nick, data.CountryPhone, data.Password, data.Salt, data.Introduction, data.Avatar, data.RootId)
 	return err
 }
 
-func (m *defaultUserModel) Delete(ctx context.Context, id int64) error {
+func (m *defaultUserModel) Delete(ctx context.Context, id string) error {
 	query := fmt.Sprintf("delete from %s where id = $1", m.table)
 	_, err := m.conn.ExecCtx(ctx, query, id)
 	return err

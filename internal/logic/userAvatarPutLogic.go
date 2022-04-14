@@ -11,7 +11,6 @@ import (
 	"iam26/internal/svc"
 
 	"github.com/nfnt/resize"
-	"github.com/yangkequn/GoTools"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -56,10 +55,9 @@ func CompressImageResource(data []byte) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 func (l *UserAvatarPutLogic) UserAvatarPut(r *http.Request) error {
-	Uid := l.ctx.Value("uid").(string)
-	uid := GoTools.StringToInt64(Uid)
-	if uid == 0 {
-		return nil
+	uid, err := UID(l.ctx)
+	if err != nil {
+		return err
 	}
 
 	file, fileHeader, err := r.FormFile("avatar")
@@ -80,15 +78,13 @@ func (l *UserAvatarPutLogic) UserAvatarPut(r *http.Request) error {
 	if errUser != nil {
 		return errUser
 	}
-	if u.Id > 0 {
-		compressed, errCompress := CompressImageResource(avatarBytes)
-		//_,err:=base64.StdEncoding.Decode(dst,req.Avatar)
-		if errCompress != nil {
-			return errCompress
-		}
-		u.Avatar = string(compressed)
-		l.svcCtx.UserModel.Update(l.ctx, u)
-		return nil
+	//save avatar
+	compressed, errCompress := CompressImageResource(avatarBytes)
+	//_,err:=base64.StdEncoding.Decode(dst,req.Avatar)
+	if errCompress != nil {
+		return errCompress
 	}
+	u.Avatar = string(compressed)
+	l.svcCtx.UserModel.Update(l.ctx, u)
 	return nil
 }

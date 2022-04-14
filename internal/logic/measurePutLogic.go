@@ -33,7 +33,7 @@ func (l *MeasurePutLogic) MeasurePut(req *types.MeasureItem) (resp *types.Measur
 		measure    *model.Measure
 		id         int64 = GoTools.StringToInt64(req.MeasureId)
 		newMeasure bool  = id == 0
-		uid        int64
+		uid        string
 	)
 	//login is required, get user id from jwt token
 	if uid, err = UID(l.ctx); err != nil {
@@ -43,13 +43,13 @@ func (l *MeasurePutLogic) MeasurePut(req *types.MeasureItem) (resp *types.Measur
 	if newMeasure {
 		id = GoTools.Sum64String(req.Name + req.Unit)
 	}
-	if measure, err = l.svcCtx.MeasureModel.FindOne(id); err != nil && !NoRowsInResultSet(err) {
+	if measure, err = l.svcCtx.MeasureModel.FindOne(l.ctx, id); err != nil && !NoRowsInResultSet(err) {
 		return nil, err
 	}
 	//is measure not created
 	if err != nil && NoRowsInResultSet(err) {
 		measure = &model.Measure{Author: uid, Id: id, Name: req.Name, Unit: req.Unit, Detail: req.Detail}
-		_, err = l.svcCtx.MeasureModel.Insert(measure)
+		_, err = l.svcCtx.MeasureModel.Insert(l.ctx, measure)
 	}
 
 	//authority check
@@ -63,7 +63,7 @@ func (l *MeasurePutLogic) MeasurePut(req *types.MeasureItem) (resp *types.Measur
 	if len(req.Detail) > 0 {
 		measure.Detail = req.Detail
 	}
-	go l.svcCtx.MeasureModel.Update(measure)
+	go l.svcCtx.MeasureModel.Update(l.ctx, measure)
 
 	//append measure id to user's measure list
 	//step1. open or create measure list
@@ -83,8 +83,8 @@ func (l *MeasurePutLogic) MeasurePut(req *types.MeasureItem) (resp *types.Measur
 	var measureId string = GoTools.Int64ToString(measure.Id)
 	if !strings.Contains(measureList.List, measureId) && GoTools.NonRedundantMerge(&measureList.List, measureId, true) {
 		l.svcCtx.MeasureListModel.Update(l.ctx, measureList)
-		measure.Popularity += 1
-		l.svcCtx.MeasureModel.Update(measure)
+		measure.UseCounter += 1
+		l.svcCtx.MeasureModel.Update(l.ctx, measure)
 	}
 
 	//remove redundant measure id from milvus collection

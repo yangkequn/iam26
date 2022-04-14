@@ -29,7 +29,8 @@ func NewGoalDelLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GoalDelLo
 
 func (l *GoalDelLogic) GoalDel(req *types.GoalItem) (resp *types.GoalItem, err error) {
 	var (
-		uid, Id  int64
+		Id       int64
+		uid      string
 		item     *model.Goal
 		goalList *model.GoalList
 	)
@@ -48,7 +49,6 @@ func (l *GoalDelLogic) GoalDel(req *types.GoalItem) (resp *types.GoalItem, err e
 	}
 	//update goal's popularity
 	item.Popularity--
-
 	if item.Popularity == 0 {
 		//ensure: the user is the owner
 		if item.Author != uid {

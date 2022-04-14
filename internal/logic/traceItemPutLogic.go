@@ -65,7 +65,7 @@ func (l *TraceItemPutLogic) TraceItemPut(req *types.TraceItem) (resp *types.Trac
 		traceItem.Time = time.Unix(req.Time, 0)
 
 		// insert new record
-		_, err = l.svcCtx.TraceItemModel.Insert(traceItem)
+		_, err = l.svcCtx.TraceItemModel.Insert(l.ctx, traceItem)
 		if err != nil {
 			return nil, err
 		}
@@ -76,7 +76,7 @@ func (l *TraceItemPutLogic) TraceItemPut(req *types.TraceItem) (resp *types.Trac
 
 	} else {
 		//existing record,update traceItem
-		traceItem, err = l.svcCtx.TraceItemModel.FindOne(TraceItemId)
+		traceItem, err = l.svcCtx.TraceItemModel.FindOne(l.ctx, TraceItemId)
 		if err != nil {
 			return nil, err
 		}
@@ -86,7 +86,7 @@ func (l *TraceItemPutLogic) TraceItemPut(req *types.TraceItem) (resp *types.Trac
 		traceItem.Memo = req.Memo
 		traceItem.Time = time.Unix(req.Time, 0)
 		//update record
-		err = l.svcCtx.TraceItemModel.Update(traceItem)
+		err = l.svcCtx.TraceItemModel.Update(l.ctx, traceItem)
 		if err != nil {
 			return nil, err
 		}

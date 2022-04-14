@@ -32,19 +32,19 @@ func (l *ActGetLogic) ActGet(r *http.Request, req *types.FormId) (resp *types.Ac
 		return nil, fmt.Errorf("act id is required")
 	}
 	reqId := GoTools.StringToInt64(req.Id)
-	act, err := l.svcCtx.ActModel.FindOne(reqId)
+	act, err := l.svcCtx.ActModel.FindOne(l.ctx, reqId)
 	if err != nil {
 		return nil, err
 	}
 
 	// Check if this Act is used by user
 	var (
-		uid     int64
+		uid     string
 		actList *model.ActList
 	)
-	uid = GoTools.GetUserIDFromCookie(r, l.svcCtx.Config.Auth.AccessSecret)
-	if uid == 0 {
-		return ConvertActToResponse(act, false), nil
+	uid, err = GetUserIDFromCookie(r, l.svcCtx.Config.Auth.AccessSecret)
+	if err != nil {
+		return ConvertActToResponse(act, false), err
 	}
 	if actList, err = l.svcCtx.ActListModel.FindOne(l.ctx, uid); err != nil {
 		return ConvertActToResponse(act, false), nil
@@ -59,7 +59,7 @@ func ConvertActToResponse(act *model.Act, mine bool) (resp *types.ActItem) {
 		Name:       act.Name,
 		Unit:       act.Unit,
 		Detail:     act.Detail,
-		Popularity: act.Popularity,
+		Popularity: act.UseCounter,
 		Score:      0,
 		Mine:       mine,
 	}

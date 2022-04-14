@@ -40,7 +40,7 @@ func (l *TraceGetLogic) TraceGet() (resp []types.TraceItem, err error) {
 
 	// get all items from db
 	for _, id := range itemIDs {
-		item, err := l.svcCtx.TraceItemModel.FindOne(GoTools.StringToInt64(id))
+		item, err := l.svcCtx.TraceItemModel.FindOne(l.ctx, GoTools.StringToInt64(id))
 		if err != nil {
 			return nil, err
 		}

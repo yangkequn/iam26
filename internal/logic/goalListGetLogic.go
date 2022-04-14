@@ -27,7 +27,7 @@ func NewGoalListGetLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GoalL
 
 func (l *GoalListGetLogic) GoalListGet() (resp *types.List, err error) {
 	var (
-		uid      int64
+		uid      string
 		goalList *model.GoalList
 	)
 

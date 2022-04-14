@@ -30,19 +30,19 @@ func NewMeasureGetLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Measur
 }
 
 func (l *MeasureGetLogic) MeasureGet(r *http.Request, req *types.FormId) (resp *types.MeasureItem, err error) {
+	var (
+		uid         string
+		measureList *model.MeasureList
+	)
 	id := GoTools.StringToInt64(req.Id)
-	measure, err := l.svcCtx.MeasureModel.FindOne(id)
+	measure, err := l.svcCtx.MeasureModel.FindOne(l.ctx, id)
 	if err != nil {
 		return nil, err
 	}
 	// Check if this Measure is used by user
-	var (
-		uid         int64
-		measureList *model.MeasureList
-	)
-	uid = GoTools.GetUserIDFromCookie(r, l.svcCtx.Config.Auth.AccessSecret)
-	if uid == 0 {
-		return ConvertMeasureToResponse(measure, false), nil
+	uid, err = GetUserIDFromCookie(r, l.svcCtx.Config.Auth.AccessSecret)
+	if err != nil {
+		return ConvertMeasureToResponse(measure, false), err
 	}
 	if measureList, err = l.svcCtx.MeasureListModel.FindOne(l.ctx, uid); err != nil {
 		return ConvertMeasureToResponse(measure, false), nil
@@ -57,7 +57,7 @@ func ConvertMeasureToResponse(measure *model.Measure, mine bool) (resp *types.Me
 		Name:       measure.Name,
 		Unit:       measure.Unit,
 		Detail:     measure.Detail,
-		Popularity: measure.Popularity,
+		Popularity: measure.UseCounter,
 		Score:      0,
 		Mine:       mine,
 	}

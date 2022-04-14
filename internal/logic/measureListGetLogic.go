@@ -27,7 +27,7 @@ func NewMeasureListGetLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Me
 
 func (l *MeasureListGetLogic) MeasureListGet() (resp *types.List, err error) {
 	var (
-		uid         int64
+		uid         string
 		measureList *model.MeasureList
 	)
 	if uid, err = UID(l.ctx); err != nil {

@@ -30,7 +30,7 @@ func NewGoalGetLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GoalGetLo
 func (l *GoalGetLogic) GoalGet(r *http.Request, req *types.FormId) (resp *types.GoalItem, err error) {
 	var (
 		IsMyGoal bool = false
-		uid      int64
+		uid      string
 		goalList *model.GoalList
 	)
 	id := GoTools.StringToInt64(req.Id)
@@ -39,13 +39,13 @@ func (l *GoalGetLogic) GoalGet(r *http.Request, req *types.FormId) (resp *types.
 		return nil, err
 	}
 	//get uid from cookie
-	uid = GoTools.GetUserIDFromCookie(r, l.svcCtx.Config.Auth.AccessSecret)
+	if uid, err = GetUserIDFromCookie(r, l.svcCtx.Config.Auth.AccessSecret); err != nil {
+		return ConvertGoalModel2GoalItem(goal, false), err
+	}
 	//check if this goal is mine
-	if uid != 0 {
-		goalList, err = l.svcCtx.GoalListModel.FindOne(l.ctx, uid)
-		if err == nil && strings.Contains(goalList.List, req.Id) {
-			IsMyGoal = true
-		}
+	goalList, err = l.svcCtx.GoalListModel.FindOne(l.ctx, uid)
+	if err == nil && strings.Contains(goalList.List, req.Id) {
+		IsMyGoal = true
 	}
 
 	return ConvertGoalModel2GoalItem(goal, IsMyGoal), nil

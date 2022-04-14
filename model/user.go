@@ -3,6 +3,7 @@ package model
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 	"hash/crc64"
 	"net/http"
 	"strings"
@@ -97,16 +98,18 @@ type Screen struct {
 
 var Crc64ISOTable *crc64.Table = crc64.MakeTable(crc64.ISO)
 
-func AccountToID(account string) int64 {
+var ErrBadAccountName = errors.New("bad account name")
+
+func AccountToID(account string) (string, error) {
 	//去除0打头的国家编号
 	for len(account) > 8 && account[0] == '0' {
 		account = account[1:]
 	}
 	if len(account) == 0 {
-		return int64(0)
+		return "", ErrBadAccountName
 	}
 	id := int64(crc64.Checksum([]byte(account), Crc64ISOTable))
-	return int64(id)
+	return GoTools.Int64ToString(id), nil
 }
 
 func (u *User) ToJWTCookie(secret string) (*http.Cookie, error) {
@@ -115,7 +118,7 @@ func (u *User) ToJWTCookie(secret string) (*http.Cookie, error) {
 	claims := make(jwt.MapClaims)
 	claims["exp"] = iat + 3600*int64(expireHours)
 	claims["iat"] = iat
-	claims["id"] = GoTools.Int64ToString(u.Id)
+	claims["id"] = u.Id
 	claims["sub"] = u.Nick
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	// SecretKey 用于对用户数据进行签名，不能暴露

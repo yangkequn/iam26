@@ -28,7 +28,8 @@ func NewTraceItemDelLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Trac
 
 func (l *TraceItemDelLogic) TraceItemDel(req *types.TraceItem) (resp *types.TraceItem, err error) {
 	var (
-		uid, Id   int64
+		Id        int64
+		uid       string
 		traceItem *model.TraceItem
 		traceList *model.TraceList
 	)
@@ -38,7 +39,7 @@ func (l *TraceItemDelLogic) TraceItemDel(req *types.TraceItem) (resp *types.Trac
 		return nil, fmt.Errorf("id is required")
 	}
 	// check if the record exists
-	if traceItem, err = l.svcCtx.TraceItemModel.FindOne(Id); err != nil {
+	if traceItem, err = l.svcCtx.TraceItemModel.FindOne(l.ctx, Id); err != nil {
 		return nil, err
 	}
 
@@ -48,7 +49,7 @@ func (l *TraceItemDelLogic) TraceItemDel(req *types.TraceItem) (resp *types.Trac
 	}
 
 	// delete traceItem from db
-	if err = l.svcCtx.TraceItemModel.Delete(Id); err != nil {
+	if err = l.svcCtx.TraceItemModel.Delete(l.ctx, Id); err != nil {
 		return nil, err
 	}
 

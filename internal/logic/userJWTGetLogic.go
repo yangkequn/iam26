@@ -39,8 +39,8 @@ func createTemporaryAccount() *model.User {
 		return nil
 	}
 	u := model.User{
-		Id:           rid,
-		RootId:       0,
+		Id:           GoTools.Int64ToString(rid),
+		RootId:       "",
 		Account:      "iam26_" + strconv.FormatInt(rid&0xFFFF, 16),
 		Nick:         "iam26_" + strconv.FormatInt(rid&0xFFFF, 16),
 		CountryPhone: "",
@@ -90,7 +90,7 @@ func (l *UserJWTGetLogic) UserJWTGet(req *types.JwtReq, r *http.Request, w http.
 			return nil, errInsert
 		}
 		http.SetCookie(w, cookie)
-		return &types.JwtRsp{Jwt: cookie.Value, Sub: u.Nick, Id: GoTools.Int64ToString(u.Id), TemporaryAccount: true}, nil
+		return &types.JwtRsp{Jwt: cookie.Value, Sub: u.Nick, Id: u.Id, TemporaryAccount: true}, nil
 	}
 
 	//Screen
@@ -105,8 +105,8 @@ func (l *UserJWTGetLogic) UserJWTGet(req *types.JwtReq, r *http.Request, w http.
 		return &fail, nil
 	}
 
-	id := GoTools.StringToInt64(claims["id"].(string))
-	if id == 0 {
+	id := claims["id"].(string)
+	if len(id) == 0 {
 		return &fail, nil
 	}
 	user, err := l.svcCtx.UserModel.FindOne(l.ctx, id)
@@ -125,5 +125,5 @@ func (l *UserJWTGetLogic) UserJWTGet(req *types.JwtReq, r *http.Request, w http.
 	//	model.PQ.Model(&user).Save(&user)
 	//}
 	isTemporaryAccount := len(user.CountryPhone) == 0
-	return &types.JwtRsp{Jwt: Jwt, Sub: user.Nick, Id: GoTools.Int64ToString(user.Id), TemporaryAccount: isTemporaryAccount}, nil
+	return &types.JwtRsp{Jwt: Jwt, Sub: user.Nick, Id: user.Id, TemporaryAccount: isTemporaryAccount}, nil
 }

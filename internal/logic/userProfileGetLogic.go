@@ -30,7 +30,7 @@ func (l *UserProfileGetLogic) UserProfileGet() (resp *types.MyProfileReturn, err
 		return nil, uErr
 	}
 	u, err := l.svcCtx.UserModel.FindOne(l.ctx, uid)
-	if u.Id == 0 || err != nil {
+	if err != nil {
 		return &types.MyProfileReturn{Succ: false}, nil
 	}
 	countryPhone := strings.Split(u.CountryPhone, "|")

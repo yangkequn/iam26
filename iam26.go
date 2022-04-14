@@ -17,11 +17,11 @@ var configFile = flag.String("f", "etc/iam26-api.yaml", "the config file")
 
 func main() {
 
-	fmt.Print(GoTools.Int64ToString(379280355662387671))
-	flag.Parse()
-
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
+	Ids := []int64{379280147579327191, 8649728471681226879, 379280355662387671}
+	strs := GoTools.Int64ArrayToStringArray(Ids)
+	fmt.Println(strs)
 
 	ctx := svc.NewServiceContext(c)
 	server := rest.MustNewServer(c.RestConf)

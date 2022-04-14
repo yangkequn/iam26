@@ -7,7 +7,6 @@ import (
 	"iam26/internal/svc"
 	"iam26/internal/types"
 
-	"github.com/yangkequn/GoTools"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -26,13 +25,9 @@ func NewUserGetLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UserGetLo
 }
 
 func (l *UserGetLogic) UserGet(w http.ResponseWriter, req *types.AccountID) (resp *types.NameRsp, err error) {
-	id := GoTools.StringToInt64(req.Id)
-	if id == 0 {
-		return &types.NameRsp{Name: ""}, nil
-	}
-	user, err := l.svcCtx.UserModel.FindOne(l.ctx, id)
+	user, err := l.svcCtx.UserModel.FindOne(l.ctx, req.Id)
 	w.Header().Add("Cache-Control", "public,max-age=86400")
-	if err == nil && user.Id != 0 {
+	if err == nil {
 		return &types.NameRsp{Name: user.Nick}, nil
 	}
 	return &types.NameRsp{Name: ""}, nil

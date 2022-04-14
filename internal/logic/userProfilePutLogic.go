@@ -5,6 +5,7 @@ import (
 
 	"iam26/internal/svc"
 	"iam26/internal/types"
+	"iam26/model"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -24,12 +25,12 @@ func NewUserProfilePutLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Us
 }
 
 func (l *UserProfilePutLogic) UserProfilePut(req *types.MyProfileChangeReq) (resp *types.ErrorRsb, err error) {
-	uid, uErr := UID(l.ctx)
-	if uErr != nil {
-		return nil, uErr
+	uid, ok := l.ctx.Value("id").(string)
+	if !ok {
+		return nil, model.ErrLoginNeeded
 	}
 	u, err := l.svcCtx.UserModel.FindOne(l.ctx, uid)
-	if err != nil && u.Id != 0 {
+	if err == nil {
 		u.Nick = req.ChannelName
 		u.Account = req.LoginAccount
 		l.svcCtx.UserModel.Update(l.ctx, u)
