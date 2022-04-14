@@ -8,6 +8,7 @@ import (
 	"iam26/internal/handler"
 	"iam26/internal/svc"
 
+	"github.com/yangkequn/GoTools"
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"
 )
@@ -15,6 +16,8 @@ import (
 var configFile = flag.String("f", "etc/iam26-api.yaml", "the config file")
 
 func main() {
+
+	fmt.Print(GoTools.Int64ToString(379280355662387671))
 	flag.Parse()
 
 	var c config.Config

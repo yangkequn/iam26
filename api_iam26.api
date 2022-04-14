@@ -25,6 +25,11 @@ service iam26-api {
 	get /measureList returns (List)
 	@handler MeasureRecommendGet
 	get /measureRecommend(TextRequest) returns (List)
+
+	@handler MeasureIndexGet
+	get /measureIndex(MeasureIndex) returns (MeasureIndex)
+	@handler MeasureIndexItemPut
+	put /measureIndexItem(MeasureIndexItem) returns (MeasureIndexItem)
 	
 	@handler TraceGet
 	get /trace returns ([]TraceItem)
@@ -72,6 +77,17 @@ type MeasureItem {
 	Score      float32 `json:"score,optional"`
 	Mine       bool    `json:"mine"`
 }
+type MeasureIndexItem{
+	Id string `json:"id"`
+	UserId string `json:"userId"`
+	Value float32 `json:"value"`
+}
+type MeasureIndex{
+	Id string `json:"id"`
+	UserId string `json:"userId"`
+	List []string `json:"list"`
+}
+
 type GoalItem {
 	Id         string `json:"id"`
 	Name       string `json:"name"`

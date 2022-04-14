@@ -30,7 +30,6 @@ func (l *MeasureListGetLogic) MeasureListGet() (resp *types.List, err error) {
 		uid         int64
 		measureList *model.MeasureList
 	)
-
 	if uid, err = UID(l.ctx); err != nil {
 		return nil, err
 	}
