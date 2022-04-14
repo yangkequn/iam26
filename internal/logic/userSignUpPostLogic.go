@@ -32,12 +32,17 @@ func NewUserSignUpPostLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Us
 }
 
 func (l *UserSignUpPostLogic) UserSignUpPost(r *http.Request, w http.ResponseWriter, req *types.SignUpReq) (resp *types.ErrorRsb, err error) {
+	var (
+		uid string
+	)
 	req.Account = strings.ToLower(req.Account)
 	CountryPhone := req.CountryCode + "|" + req.Phone
 	for len(CountryPhone) > 1 && CountryPhone[0] == '0' {
 		CountryPhone = CountryPhone[1:]
 	}
-	uid := model.AccountToID(CountryPhone)
+	if uid, err = model.AccountToID(CountryPhone); err != nil {
+		return &types.ErrorRsb{Error: err.Error()}, nil
+	}
 	//判断用户是否已经注册过了
 	user, err := l.svcCtx.UserModel.FindOne(l.ctx, uid)
 	if err == nil || user != nil {
@@ -68,11 +73,14 @@ func (l *UserSignUpPostLogic) UserSignUpPost(r *http.Request, w http.ResponseWri
 	}
 	l.svcCtx.UserModel.Insert(l.ctx, &u)
 
-	u = model.User{Id: model.AccountToID(u.Account), Account: req.Account, RootId: u.Id}
+	if uid, err = model.AccountToID(u.Account); err != nil {
+		return &types.ErrorRsb{Error: err.Error()}, nil
+	}
+	u = model.User{Id: uid, Account: req.Account, RootId: u.Id}
 	l.svcCtx.UserModel.Insert(l.ctx, &u)
 
-	uidTemporary := GoTools.GetUserIDFromCookie(r, l.svcCtx.Config.Auth.AccessSecret)
-	if uidTemporary != 0 {
+	uidTemporary, err := GetUserIDFromCookie(r, l.svcCtx.Config.Auth.AccessSecret)
+	if err == nil {
 		ConvertTemporaryAccountToFormalAccount(l.ctx, l.svcCtx, uidTemporary, u.Id)
 	}
 	return &types.ErrorRsb{Error: ""}, nil

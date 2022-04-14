@@ -30,26 +30,25 @@ func NewGoalPutLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GoalPutLo
 func (l *GoalPutLogic) GoalPut(req *types.GoalItem) (resp *types.GoalItem, err error) {
 	var (
 		goal     *model.Goal     = nil
-		id, uid  int64           = GoTools.StringToInt64(req.Id), 0
+		uid      string          = ""
 		goalList *model.GoalList = nil
-		newGoal  bool            = id == 0
+		newGoal  bool            = req.Id == "0"
 	)
 	//ensure: 1.login is required, 2.  the user is the owner
 	if uid, err = UID(l.ctx); err != nil {
 		return nil, err
 	}
 	if newGoal {
-		id = rand.Int63()
 		//store goal id to req.id, for later use
-		req.Id = GoTools.Int64ToString(id)
+		req.Id = GoTools.Int64ToString(rand.Int63())
 		//Poularity is 0. if ref by another goal list ,increase the poularity
-		goal = &model.Goal{Id: id, Popularity: 0}
+		goal = &model.Goal{Id: req.Id, Popularity: 0}
 		_, err = l.svcCtx.GoalModel.Insert(l.ctx, goal)
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		goal, err = l.svcCtx.GoalModel.FindOne(l.ctx, id)
+		goal, err = l.svcCtx.GoalModel.FindOne(l.ctx, req.Id)
 	}
 	if err != nil {
 		return nil, err
