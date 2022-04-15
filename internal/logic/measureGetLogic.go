@@ -10,8 +10,6 @@ import (
 
 	"iam26/model"
 
-	"github.com/yangkequn/GoTools"
-
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -34,8 +32,7 @@ func (l *MeasureGetLogic) MeasureGet(r *http.Request, req *types.FormId) (resp *
 		uid         string
 		measureList *model.MeasureList
 	)
-	id := GoTools.StringToInt64(req.Id)
-	measure, err := l.svcCtx.MeasureModel.FindOne(l.ctx, id)
+	measure, err := l.svcCtx.MeasureModel.FindOne(l.ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +50,7 @@ func (l *MeasureGetLogic) MeasureGet(r *http.Request, req *types.FormId) (resp *
 // Convert type model.Measure to type types.MeasureItem
 func ConvertMeasureToResponse(measure *model.Measure, mine bool) (resp *types.MeasureItem) {
 	resp = &types.MeasureItem{
-		MeasureId:  GoTools.Int64ToString(measure.Id),
+		MeasureId:  measure.Id,
 		Name:       measure.Name,
 		Unit:       measure.Unit,
 		Detail:     measure.Detail,

@@ -25,9 +25,10 @@ var (
 type (
 	measureModel interface {
 		Insert(ctx context.Context, data *Measure) (sql.Result, error)
-		FindOne(ctx context.Context, id int64) (*Measure, error)
+		FindOne(ctx context.Context, id string) (*Measure, error)
+		FindAll(ctx context.Context) ([]*Measure, error)
 		Update(ctx context.Context, data *Measure) error
-		Delete(ctx context.Context, id int64) error
+		Delete(ctx context.Context, id string) error
 	}
 
 	defaultMeasureModel struct {
@@ -36,11 +37,10 @@ type (
 	}
 
 	Measure struct {
-		Id         int64     `db:"id"`
+		Id         string    `db:"id"`
 		Name       string    `db:"name"`
 		Unit       string    `db:"unit"`
 		Detail     string    `db:"detail"`
-		Meaning    string    `db:"meaning"`
 		CreateTime time.Time `db:"create_time"`
 		UpdateTime time.Time `db:"update_time"`
 		UseCounter int64     `db:"use_counter"`
@@ -56,12 +56,12 @@ func newMeasureModel(conn sqlx.SqlConn) *defaultMeasureModel {
 }
 
 func (m *defaultMeasureModel) Insert(ctx context.Context, data *Measure) (sql.Result, error) {
-	query := fmt.Sprintf("insert into %s (%s) values ($1, $2, $3, $4, $5, $6, $7)", m.table, measureRowsExpectAutoSet)
-	ret, err := m.conn.ExecCtx(ctx, query, data.Id, data.Name, data.Unit, data.Detail, data.Meaning, data.UseCounter, data.Author)
+	query := fmt.Sprintf("insert into %s (%s) values ($1, $2, $3, $4, $5, $6)", m.table, measureRowsExpectAutoSet)
+	ret, err := m.conn.ExecCtx(ctx, query, data.Id, data.Name, data.Unit, data.Detail, data.UseCounter, data.Author)
 	return ret, err
 }
 
-func (m *defaultMeasureModel) FindOne(ctx context.Context, id int64) (*Measure, error) {
+func (m *defaultMeasureModel) FindOne(ctx context.Context, id string) (*Measure, error) {
 	query := fmt.Sprintf("select %s from %s where id = $1 limit 1", measureRows, m.table)
 	var resp Measure
 	err := m.conn.QueryRowCtx(ctx, &resp, query, id)
@@ -74,14 +74,27 @@ func (m *defaultMeasureModel) FindOne(ctx context.Context, id int64) (*Measure, 
 		return nil, err
 	}
 }
+func (m *defaultMeasureModel) FindAll(ctx context.Context) ([]*Measure, error) {
+	query := fmt.Sprintf("select %s from %s ", measureRows, m.table)
+	var resp []*Measure
+	err := m.conn.QueryRowsCtx(ctx, &resp, query)
+	switch err {
+	case nil:
+		return resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
 
 func (m *defaultMeasureModel) Update(ctx context.Context, data *Measure) error {
 	query := fmt.Sprintf("update %s set %s where id = $1", m.table, measureRowsWithPlaceHolder)
-	_, err := m.conn.ExecCtx(ctx, query, data.Id, data.Name, data.Unit, data.Detail, data.Meaning, data.UseCounter, data.Author)
+	_, err := m.conn.ExecCtx(ctx, query, data.Id, data.Name, data.Unit, data.Detail, data.UseCounter, data.Author)
 	return err
 }
 
-func (m *defaultMeasureModel) Delete(ctx context.Context, id int64) error {
+func (m *defaultMeasureModel) Delete(ctx context.Context, id string) error {
 	query := fmt.Sprintf("delete from %s where id = $1", m.table)
 	_, err := m.conn.ExecCtx(ctx, query, id)
 	return err

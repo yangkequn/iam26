@@ -7,7 +7,6 @@ import (
 
 	"iam26/internal/svc"
 	"iam26/internal/types"
-	"iam26/milvus"
 	"iam26/model"
 
 	"github.com/yangkequn/GoTools"
@@ -31,8 +30,7 @@ func NewMeasurePutLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Measur
 func (l *MeasurePutLogic) MeasurePut(req *types.MeasureItem) (resp *types.MeasureItem, err error) {
 	var (
 		measure    *model.Measure
-		id         int64 = GoTools.StringToInt64(req.MeasureId)
-		newMeasure bool  = id == 0
+		newMeasure bool = req.MeasureId == "0"
 		uid        string
 	)
 	//login is required, get user id from jwt token
@@ -41,14 +39,14 @@ func (l *MeasurePutLogic) MeasurePut(req *types.MeasureItem) (resp *types.Measur
 	}
 
 	if newMeasure {
-		id = GoTools.Sum64String(req.Name + req.Unit)
+		req.MeasureId = GoTools.Int64ToString(GoTools.Sum64String(req.Name + req.Unit))
 	}
-	if measure, err = l.svcCtx.MeasureModel.FindOne(l.ctx, id); err != nil && !NoRowsInResultSet(err) {
+	if measure, err = l.svcCtx.MeasureModel.FindOne(l.ctx, req.MeasureId); err != nil && !NoRowsInResultSet(err) {
 		return nil, err
 	}
 	//is measure not created
 	if err != nil && NoRowsInResultSet(err) {
-		measure = &model.Measure{Author: uid, Id: id, Name: req.Name, Unit: req.Unit, Detail: req.Detail}
+		measure = &model.Measure{Author: uid, Id: req.MeasureId, Name: req.Name, Unit: req.Unit, Detail: req.Detail}
 		_, err = l.svcCtx.MeasureModel.Insert(l.ctx, measure)
 	}
 
@@ -80,24 +78,23 @@ func (l *MeasurePutLogic) MeasurePut(req *types.MeasureItem) (resp *types.Measur
 		}
 	}
 	//step2. append measure id to list
-	var measureId string = GoTools.Int64ToString(measure.Id)
-	if !strings.Contains(measureList.List, measureId) && GoTools.NonRedundantMerge(&measureList.List, measureId, true) {
+	if !strings.Contains(measureList.List, req.MeasureId) && GoTools.NonRedundantMerge(&measureList.List, req.MeasureId, true) {
 		l.svcCtx.MeasureListModel.Update(l.ctx, measureList)
 		measure.UseCounter += 1
 		l.svcCtx.MeasureModel.Update(l.ctx, measure)
 	}
 
-	//remove redundant measure id from milvus collection
-	if !newMeasure {
-		//remove former measure
-		if err = milvus.MeasureCollection.RemoveByKey(l.ctx, measure.Id); err != nil {
-			return ConvertMeasureToResponse(measure, true), nil
-		}
-	}
-	//err = milvus.MeasureContext.CreateCollection(l.ctx)
-	err = milvus.MeasureCollection.Insert(l.ctx, []*model.Measure{measure})
-	if err != nil {
-		return ConvertMeasureToResponse(measure, true), nil
-	}
+	// //remove redundant measure id from milvus collection
+	// if !newMeasure {
+	// 	//remove former measure
+	// 	if err = milvus.MeasureCollection.RemoveByKey(l.ctx, measure.Id); err != nil {
+	// 		return ConvertMeasureToResponse(measure, true), nil
+	// 	}
+	// }
+	// //err = milvus.MeasureContext.CreateCollection(l.ctx)
+	// err = milvus.MeasureCollection.Insert(l.ctx, []*model.Measure{measure})
+	// if err != nil {
+	// 	return ConvertMeasureToResponse(measure, true), nil
+	// }
 	return ConvertMeasureToResponse(measure, true), nil
 }
