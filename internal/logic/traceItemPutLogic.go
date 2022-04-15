@@ -10,7 +10,7 @@ import (
 	"iam26/internal/types"
 	"iam26/model"
 
-	"github.com/yangkequn/GoTools"
+	"github.com/yangkequn/Tool"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -31,7 +31,7 @@ func NewTraceItemPutLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Trac
 func (l *TraceItemPutLogic) TraceItemPut(req *types.TraceItem) (resp *types.TraceItem, err error) {
 
 	//login is required, get user id from jwt token
-	uid, errUid := UID(l.ctx)
+	uid, errUid := Tool.UserIdFromContext(l.ctx)
 	if errUid != nil {
 		return nil, errUid
 	}
@@ -55,7 +55,7 @@ func (l *TraceItemPutLogic) TraceItemPut(req *types.TraceItem) (resp *types.Trac
 	traceItem := &model.TraceItem{}
 	// TraceItemId ==0 means create new record
 	if req.TraceId == "0" {
-		req.TraceId = GoTools.Int64ToString(rand.Int63())
+		req.TraceId = Tool.Int64ToString(rand.Int63())
 		//set traceItem according to req
 		traceItem.Id = req.TraceId
 		traceItem.UserId = uid
@@ -71,7 +71,7 @@ func (l *TraceItemPutLogic) TraceItemPut(req *types.TraceItem) (resp *types.Trac
 		}
 
 		//append to TraceItem Ids
-		GoTools.NonRedundantMerge(&trace.List, traceItem.Id, true)
+		Tool.NonRedundantMerge(&trace.List, traceItem.Id, true)
 		l.svcCtx.TraceListModel.Update(l.ctx, trace)
 
 	} else {

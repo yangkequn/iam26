@@ -1,7 +1,6 @@
 package logic
 
 import (
-	"context"
 	"errors"
 	"net/http"
 	"reflect"
@@ -9,24 +8,6 @@ import (
 
 	"github.com/golang-jwt/jwt"
 )
-
-var ZeroUID error = errors.New("zero uid")
-
-//get user id from jwt token
-func UID(ctx context.Context) (uid string, err error) {
-	var (
-		uidInterface interface{}
-		ok           bool
-	)
-	if uidInterface = ctx.Value("id"); uidInterface == nil {
-		return "", ZeroUID
-	}
-
-	if uid, ok = ctx.Value("id").(string); ok == false {
-		return "", ZeroUID
-	}
-	return uid, nil
-}
 
 func NoRowsInResultSet(err error) bool {
 	return err != nil && strings.Index(err.Error(), "no rows in result set") > 0

@@ -13,7 +13,7 @@ import (
 	"iam26/model"
 
 	"github.com/golang-jwt/jwt"
-	"github.com/yangkequn/GoTools"
+	"github.com/yangkequn/Tool"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -39,7 +39,7 @@ func createTemporaryAccount() *model.User {
 		return nil
 	}
 	u := model.User{
-		Id:           GoTools.Int64ToString(rid),
+		Id:           Tool.Int64ToString(rid),
 		RootId:       "",
 		Account:      "iam26_" + strconv.FormatInt(rid&0xFFFF, 16),
 		Nick:         "iam26_" + strconv.FormatInt(rid&0xFFFF, 16),

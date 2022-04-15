@@ -9,7 +9,7 @@ import (
 	"iam26/internal/types"
 	"iam26/model"
 
-	"github.com/yangkequn/GoTools"
+	"github.com/yangkequn/Tool"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -33,7 +33,7 @@ func (l *GoalGetLogic) GoalGet(r *http.Request, req *types.FormId) (resp *types.
 		uid      string
 		goalList *model.GoalList
 	)
-	id := GoTools.StringToInt64(req.Id)
+	id := Tool.HashToInt64(req.Id)
 	goal, err := l.svcCtx.GoalModel.FindOne(l.ctx, id)
 	if err != nil {
 		return nil, err

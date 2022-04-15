@@ -7,6 +7,7 @@ import (
 	"iam26/internal/svc"
 	"iam26/internal/types"
 
+	"github.com/yangkequn/Tool"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -25,7 +26,7 @@ func NewUserProfileGetLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Us
 }
 
 func (l *UserProfileGetLogic) UserProfileGet() (resp *types.MyProfileReturn, err error) {
-	uid, uErr := UID(l.ctx)
+	uid, uErr := Tool.UserIdFromContext(l.ctx)
 	if uErr != nil {
 		return nil, uErr
 	}

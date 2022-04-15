@@ -8,7 +8,7 @@ import (
 	"iam26/internal/types"
 	"iam26/model"
 
-	"github.com/yangkequn/GoTools"
+	"github.com/yangkequn/Tool"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -39,7 +39,7 @@ func (l *TraceItemDelLogic) TraceItemDel(req *types.TraceItem) (resp *types.Trac
 	}
 
 	//ensure: 1.login is required, 2.  the user is the owner
-	if uid, err = UID(l.ctx); err != nil || traceItem.UserId != uid {
+	if uid, err = Tool.UserIdFromContext(l.ctx); err != nil || traceItem.UserId != uid {
 		return nil, fmt.Errorf("you are not the owner of this record")
 	}
 
@@ -53,7 +53,7 @@ func (l *TraceItemDelLogic) TraceItemDel(req *types.TraceItem) (resp *types.Trac
 		return nil, err
 	}
 	//remove id from history, and update
-	if removed := GoTools.RemoveItemFromString(&traceList.List, req.TraceId); removed {
+	if removed := Tool.RemoveItemFromString(&traceList.List, req.TraceId); removed {
 		if err = l.svcCtx.TraceListModel.Update(l.ctx, traceList); err != nil {
 			return nil, err
 		}

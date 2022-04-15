@@ -28,8 +28,10 @@ service iam26-api {
 
 	@handler MeasureIndexGet
 	get /measureIndex(MeasureIndex) returns (MeasureIndex)
+	
+	
 	@handler MeasureIndexItemPut
-	put /measureIndexItem(MeasureIndexItem) returns (MeasureIndexItem)
+	put /measureIndexItem(MeasureIndex) returns (MeasureIndex)
 	
 	@handler TraceGet
 	get /trace returns ([]TraceItem)
@@ -77,14 +79,13 @@ type MeasureItem {
 	Score      float32 `json:"score,optional"`
 	Mine       bool    `json:"mine"`
 }
-type MeasureIndexItem{
-	Id string `json:"id"`
-	UserId string `json:"userId"`
-	Value float32 `json:"value"`
-}
+//when updating a goal, the Data & Time should just be incremention 
 type MeasureIndex{
-	Id string `json:"id"`
-	UserId string `json:"userId"`
+	Id string `json:"id,optional"`
+	User string `json:"user"`
+	Type string `json:"type"`
+	Data []float32 `json:"data"`
+	Time []int64 `json:"time"` //time tick
 	List []string `json:"list"`
 }
 

@@ -9,7 +9,7 @@ import (
 	"iam26/milvus"
 	"iam26/model"
 
-	"github.com/yangkequn/GoTools"
+	"github.com/yangkequn/Tool"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -35,20 +35,20 @@ func (l *GoalPutLogic) GoalPut(req *types.GoalItem) (resp *types.GoalItem, err e
 		newGoal  bool            = req.Id == "0"
 	)
 	//ensure: 1.login is required, 2.  the user is the owner
-	if uid, err = UID(l.ctx); err != nil {
+	if uid, err = Tool.UserIdFromContext(l.ctx); err != nil {
 		return nil, err
 	}
 	if newGoal {
 		//store goal id to req.id, for later use
-		req.Id = GoTools.Int64ToString(rand.Int63())
+		req.Id = Tool.Int64ToString(rand.Int63())
 		//Poularity is 0. if ref by another goal list ,increase the poularity
-		goal = &model.Goal{Id: GoTools.StringToInt64(req.Id), Popularity: 0}
+		goal = &model.Goal{Id: Tool.StringToInt64(req.Id), Popularity: 0}
 		_, err = l.svcCtx.GoalModel.Insert(l.ctx, goal)
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		goal, err = l.svcCtx.GoalModel.FindOne(l.ctx, GoTools.StringToInt64(req.Id))
+		goal, err = l.svcCtx.GoalModel.FindOne(l.ctx, Tool.StringToInt64(req.Id))
 	}
 	if err != nil {
 		return nil, err
@@ -76,7 +76,7 @@ func (l *GoalPutLogic) GoalPut(req *types.GoalItem) (resp *types.GoalItem, err e
 
 	//1. make sure the goal is in the list
 	//2. if not, add it,and update popularity
-	if GoTools.NonRedundantMerge(&goalList.List, req.Id, true) {
+	if Tool.NonRedundantMerge(&goalList.List, req.Id, true) {
 		err = l.svcCtx.GoalListModel.Update(l.ctx, goalList)
 		if err != nil {
 			return nil, err

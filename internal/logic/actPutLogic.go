@@ -11,7 +11,7 @@ import (
 
 	"iam26/model"
 
-	"github.com/yangkequn/GoTools"
+	"github.com/yangkequn/Tool"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -32,18 +32,18 @@ func NewActPutLogic(ctx context.Context, svcCtx *svc.ServiceContext) *ActPutLogi
 func (l *ActPutLogic) ActPut(req *types.ActItem) (resp *types.ActItem, err error) {
 	var (
 		act    *model.Act
-		id     int64 = GoTools.StringToInt64(req.ActId)
+		id     int64 = Tool.StringToInt64(req.ActId)
 		newAct bool  = id == 0
 		uid    string
 	)
 	//login is required, get user id from jwt token
-	if uid, err = UID(l.ctx); err != nil {
+	if uid, err = Tool.UserIdFromContext(l.ctx); err != nil {
 		return nil, err
 	}
 
 	//create new act with req
 	if newAct {
-		id = GoTools.Sum64String(req.Name + req.Unit)
+		id = Tool.HashToInt64(req.Name + req.Unit)
 	}
 
 	if act, err = l.svcCtx.ActModel.FindOne(l.ctx, id); err != nil && !NoRowsInResultSet(err) {
@@ -87,8 +87,8 @@ func (l *ActPutLogic) ActPut(req *types.ActItem) (resp *types.ActItem, err error
 		}
 	}
 	//step2. append act id to list
-	var actIdString string = GoTools.Int64ToString(act.Id)
-	if !strings.Contains(actList.List, actIdString) && GoTools.NonRedundantMerge(&actList.List, actIdString, true) {
+	var actIdString string = Tool.Int64ToString(act.Id)
+	if !strings.Contains(actList.List, actIdString) && Tool.NonRedundantMerge(&actList.List, actIdString, true) {
 		l.svcCtx.ActListModel.Update(l.ctx, actList)
 		act.UseCounter += 1
 		l.svcCtx.ActModel.Update(l.ctx, act)

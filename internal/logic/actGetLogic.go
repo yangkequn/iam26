@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/yangkequn/GoTools"
+	"github.com/yangkequn/Tool"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -31,7 +31,7 @@ func (l *ActGetLogic) ActGet(r *http.Request, req *types.FormId) (resp *types.Ac
 	if req.Id == "" {
 		return nil, fmt.Errorf("act id is required")
 	}
-	reqId := GoTools.StringToInt64(req.Id)
+	reqId := Tool.StringToInt64(req.Id)
 	act, err := l.svcCtx.ActModel.FindOne(l.ctx, reqId)
 	if err != nil {
 		return nil, err
@@ -55,7 +55,7 @@ func (l *ActGetLogic) ActGet(r *http.Request, req *types.FormId) (resp *types.Ac
 // Convert type model.Act to type types.ActItem
 func ConvertActToResponse(act *model.Act, mine bool) (resp *types.ActItem) {
 	resp = &types.ActItem{
-		ActId:      GoTools.Int64ToString(act.Id),
+		ActId:      Tool.Int64ToString(act.Id),
 		Name:       act.Name,
 		Unit:       act.Unit,
 		Detail:     act.Detail,

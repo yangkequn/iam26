@@ -74,19 +74,6 @@ func (m *defaultMeasureModel) FindOne(ctx context.Context, id string) (*Measure,
 		return nil, err
 	}
 }
-func (m *defaultMeasureModel) FindAll(ctx context.Context) ([]*Measure, error) {
-	query := fmt.Sprintf("select %s from %s ", measureRows, m.table)
-	var resp []*Measure
-	err := m.conn.QueryRowsCtx(ctx, &resp, query)
-	switch err {
-	case nil:
-		return resp, nil
-	case sqlc.ErrNotFound:
-		return nil, ErrNotFound
-	default:
-		return nil, err
-	}
-}
 
 func (m *defaultMeasureModel) Update(ctx context.Context, data *Measure) error {
 	query := fmt.Sprintf("update %s set %s where id = $1", m.table, measureRowsWithPlaceHolder)

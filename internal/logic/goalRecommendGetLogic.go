@@ -8,7 +8,7 @@ import (
 	"iam26/milvus"
 	"iam26/model"
 
-	"github.com/yangkequn/GoTools"
+	"github.com/yangkequn/Tool"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -31,7 +31,7 @@ func (l *GoalRecommendGetLogic) GoalRecommendGet(req *types.TextRequest) (resp *
 		Ids     []int64
 		meaning []float32
 	)
-	meaning, err = GoTools.TextToMeaning(l.ctx, l.svcCtx.RedisClient, req.Text)
+	meaning, err = Tool.TextToMeaning(l.ctx, l.svcCtx.RedisClient, req.Text)
 	if err != nil {
 		return nil, err
 	}
@@ -39,14 +39,14 @@ func (l *GoalRecommendGetLogic) GoalRecommendGet(req *types.TextRequest) (resp *
 	if Ids, _, err = milvus.GoalCollection.Search(l.ctx, meaning); err != nil {
 		return nil, err
 	}
-	return &types.List{List: GoTools.Int64ArrayToStringArray(Ids)}, nil
+	return &types.List{List: Tool.Int64ArrayToStringArray(Ids)}, nil
 }
 
 //convert *model.GoalItem to *types.GoalItem
 // properties : Id,Name,Markdown,Weight,Risk,Popularity,UpdatedTime
 func ConvertGoalModel2GoalItem(item *model.Goal, mine bool) *types.GoalItem {
 	reb := &types.GoalItem{
-		Id:         GoTools.Int64ToString(item.Id),
+		Id:         Tool.Int64ToString(item.Id),
 		Name:       item.Name,
 		Detail:     item.Detail,
 		Popularity: item.Popularity,

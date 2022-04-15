@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/milvus-io/milvus-sdk-go/v2/entity"
-	"github.com/yangkequn/GoTools"
 	qmilvus "github.com/yangkequn/q-milvus-driver-for-go"
 )
 
@@ -31,7 +30,7 @@ func (v Goal) Index() (indexFieldName string, index entity.Index) {
 //BuildSearchVector: If your SearchVector is precalculated, Just return the vector
 func (v Goal) BuildSearchVector(ctx context.Context) (Vector []float32) {
 	text := fmt.Sprintf("Name:%s Detail:%s Benifites:%s Risk:%s Polularity:%d", v.Name, v.Detail, v.Risk, v.Benifites, v.Popularity)
-	Vector, _ = GoTools.TextToMeaning(ctx, RedisClient, text)
+	Vector, _ = Tool.TextToMeaning(ctx, RedisClient, text)
 	return Vector
 }
 

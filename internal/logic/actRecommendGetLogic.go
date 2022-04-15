@@ -7,7 +7,7 @@ import (
 	"iam26/internal/types"
 	"iam26/milvus"
 
-	"github.com/yangkequn/GoTools"
+	"github.com/yangkequn/Tool"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -30,7 +30,7 @@ func (l *ActRecommendGetLogic) ActRecommendGet(req *types.TextRequest) (resp *ty
 		Ids     []int64
 		meaning []float32
 	)
-	meaning, err = GoTools.TextToMeaning(l.ctx, l.svcCtx.RedisClient, req.Text)
+	meaning, err = Tool.TextToMeaning(l.ctx, l.svcCtx.RedisClient, req.Text)
 	if err != nil {
 		return nil, err
 	}
@@ -40,5 +40,5 @@ func (l *ActRecommendGetLogic) ActRecommendGet(req *types.TextRequest) (resp *ty
 	if err != nil {
 		return nil, err
 	}
-	return &types.List{List: GoTools.Int64ArrayToStringArray(Ids)}, err
+	return &types.List{List: Tool.Int64ArrayToStringArray(Ids)}, err
 }

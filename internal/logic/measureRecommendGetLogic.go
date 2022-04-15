@@ -7,7 +7,7 @@ import (
 	"iam26/internal/types"
 	"iam26/milvus"
 
-	"github.com/yangkequn/GoTools"
+	"github.com/yangkequn/Tool"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -29,12 +29,12 @@ func (l *MeasureRecommendGetLogic) MeasureRecommendGet(req *types.TextRequest) (
 	var (
 		Ids []int64
 	)
-	meaning, errM := GoTools.TextToMeaning(l.ctx, l.svcCtx.RedisClient, req.Text)
+	meaning, errM := Tool.TextToMeaning(l.ctx, l.svcCtx.RedisClient, req.Text)
 	if errM != nil {
 		return nil, errM
 	}
 
 	Ids, _, err = milvus.MeasureCollection.Search(l.ctx, meaning)
 
-	return &types.List{List: GoTools.Int64ArrayToStringArray(Ids)}, err
+	return &types.List{List: Tool.Int64ArrayToStringArray(Ids)}, err
 }

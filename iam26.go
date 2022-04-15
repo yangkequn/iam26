@@ -10,7 +10,6 @@ import (
 	"iam26/internal/handler"
 	"iam26/internal/svc"
 
-	"github.com/yangkequn/GoTools"
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"
 )
@@ -22,7 +21,7 @@ func UpgradeTable(ctx *svc.ServiceContext) {
 	if err == nil {
 		for _, v := range list {
 			id64, _ := strconv.ParseInt(v.Id, 10, 64)
-			v.Id = GoTools.Int64ToString(id64)
+			v.Id = Tool.Int64ToString(id64)
 			_, err = ctx.MeasureModel.Insert(context.Background(), v)
 			fmt.Println(v.Id)
 		}

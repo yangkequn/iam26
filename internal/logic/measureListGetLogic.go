@@ -7,7 +7,7 @@ import (
 	"iam26/internal/types"
 	"iam26/model"
 
-	"github.com/yangkequn/GoTools"
+	"github.com/yangkequn/Tool"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -30,7 +30,7 @@ func (l *MeasureListGetLogic) MeasureListGet() (resp *types.List, err error) {
 		uid         string
 		measureList *model.MeasureList
 	)
-	if uid, err = UID(l.ctx); err != nil {
+	if uid, err = Tool.UserIdFromContext(l.ctx); err != nil {
 		return nil, err
 	}
 	if measureList, err = l.svcCtx.MeasureListModel.FindOne(l.ctx, uid); err != nil {
@@ -45,5 +45,5 @@ func (l *MeasureListGetLogic) MeasureListGet() (resp *types.List, err error) {
 		}
 
 	}
-	return &types.List{List: GoTools.StringSlit(measureList.List)}, nil
+	return &types.List{List: Tool.StringSlit(measureList.List)}, nil
 }

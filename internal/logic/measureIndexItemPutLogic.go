@@ -2,10 +2,15 @@ package logic
 
 import (
 	"context"
+	"errors"
+	"strconv"
+	"strings"
 
 	"iam26/internal/svc"
 	"iam26/internal/types"
+	"iam26/model"
 
+	"github.com/yangkequn/Tool"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -23,8 +28,69 @@ func NewMeasureIndexItemPutLogic(ctx context.Context, svcCtx *svc.ServiceContext
 	}
 }
 
-func (l *MeasureIndexItemPutLogic) MeasureIndexItemPut(req *types.MeasureIndexItem) (resp *types.MeasureIndexItem, err error) {
-	// todo: add your logic here and delete this line
+// 约定：req.Data, req.List 为新的增量信息
+func (l *MeasureIndexItemPutLogic) MeasureIndexItemPut(req *types.MeasureIndex) (resp *types.MeasureIndex, err error) {
+	var (
+		indexList *model.MeasureIndex
+	)
+	if req.Id == "" {
+		req.Id = GenIndexId(req.User, req.Type)
+	}
+	// bn
+	indexList, err = l.svcCtx.MeasureIndexModel.FindOne(l.ctx, req.Id)
+	if err != nil && !NoRowsInResultSet(err) {
+		return nil, err
+	}
+	if err != nil && NoRowsInResultSet(err) {
+		indexList = &model.MeasureIndex{Id: req.Id, User: req.User, Type: req.Type}
+		_, err = l.svcCtx.MeasureIndexModel.Insert(l.ctx, indexList)
+	}
 
-	return
+	if !Tool.ValidateJwtUser(l.ctx, req.User) {
+		return nil, model.ErrAccessNotAllowed
+	}
+
+	if len(req.Data) != len(req.Time) {
+		return nil, errors.New("data length not equal time length, index table id:" + indexList.Id)
+	}
+	modified := false
+	for i, v := range req.Data {
+		//add data ,but skit data of same time point
+		if Tool.NonRedundantMerge(&indexList.Time, strconv.FormatInt(req.Time[i], 10), true) {
+			indexList.Data = strconv.FormatFloat(float64(v), 'f', 4, 32) + "," + indexList.Data
+			modified = true
+		}
+		// trim last ,
+		indexList.Data = strings.Trim(indexList.Data, ",")
+	}
+	if modified {
+		l.svcCtx.MeasureIndexModel.Update(l.ctx, indexList)
+	}
+	//if data list too long, save to another row
+	var keptNum = 256
+	if len(indexList.Data) > 4096 {
+		newIndexList := &model.MeasureIndex{
+			Id:   GenIndexId(req.User, req.Type),
+			User: req.User,
+			Type: req.Type,
+			Data: indexList.Data[keptNum:],
+			Time: indexList.Time[keptNum:],
+			List: indexList.List[keptNum:],
+		}
+		l.svcCtx.MeasureIndexModel.Insert(l.ctx, newIndexList)
+
+		indexList.Data = indexList.Data[len(indexList.Data)-keptNum:]
+		indexList.Time = indexList.Time[len(indexList.Time)-keptNum:]
+		indexList.List = strings.Trim(indexList.List+","+newIndexList.Id, ",")
+		l.svcCtx.MeasureIndexModel.Update(l.ctx, indexList)
+	}
+	return &types.MeasureIndex{
+		Id:   req.Id,
+		User: req.User,
+		List: Tool.StringSlit(indexList.List),
+		Type: req.Type,
+		Data: Tool.StringToFloat32Array(indexList.Data),
+		Time: Tool.StringToInt64Array(indexList.Time),
+	}, nil
+
 }

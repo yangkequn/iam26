@@ -11,6 +11,7 @@ import (
 	"iam26/internal/svc"
 
 	"github.com/nfnt/resize"
+	"github.com/yangkequn/Tool"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -55,7 +56,7 @@ func CompressImageResource(data []byte) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 func (l *UserAvatarPutLogic) UserAvatarPut(r *http.Request) error {
-	uid, err := UID(l.ctx)
+	uid, err := Tool.UserIdFromContext(l.ctx)
 	if err != nil {
 		return err
 	}

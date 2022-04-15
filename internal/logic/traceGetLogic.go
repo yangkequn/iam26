@@ -6,7 +6,7 @@ import (
 	"iam26/internal/svc"
 	"iam26/internal/types"
 
-	"github.com/yangkequn/GoTools"
+	"github.com/yangkequn/Tool"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -26,7 +26,7 @@ func NewTraceGetLogic(ctx context.Context, svcCtx *svc.ServiceContext) *TraceGet
 
 func (l *TraceGetLogic) TraceGet() (resp []types.TraceItem, err error) {
 	//login is required, get user id from jwt token
-	uid, errUid := UID(l.ctx)
+	uid, errUid := Tool.UserIdFromContext(l.ctx)
 	if errUid != nil {
 		return nil, errUid
 	}
@@ -36,7 +36,7 @@ func (l *TraceGetLogic) TraceGet() (resp []types.TraceItem, err error) {
 		return nil, err
 	}
 
-	itemIDs := GoTools.StringSlit(trace.List)
+	itemIDs := Tool.StringSlit(trace.List)
 
 	// get all items from db
 	for _, id := range itemIDs {

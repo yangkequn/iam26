@@ -33,16 +33,13 @@ type MeasureItem struct {
 	Mine       bool    `json:"mine"`
 }
 
-type MeasureIndexItem struct {
-	Id     string  `json:"id"`
-	UserId string  `json:"userId"`
-	Value  float32 `json:"value"`
-}
-
 type MeasureIndex struct {
-	Id     string   `json:"id"`
-	UserId string   `json:"userId"`
-	List   []string `json:"list"`
+	Id   string    `json:"id,optional"`
+	User string    `json:"user"`
+	Type string    `json:"type"`
+	Data []float32 `json:"data"`
+	Time []int64   `json:"time"` //time tick
+	List []string  `json:"list"`
 }
 
 type GoalItem struct {

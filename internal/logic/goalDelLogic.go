@@ -9,7 +9,7 @@ import (
 	"iam26/milvus"
 	"iam26/model"
 
-	"github.com/yangkequn/GoTools"
+	"github.com/yangkequn/Tool"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -36,12 +36,12 @@ func (l *GoalDelLogic) GoalDel(req *types.GoalItem) (resp *types.GoalItem, err e
 	)
 
 	//get uid
-	if uid, err = UID(l.ctx); err != nil {
+	if uid, err = Tool.UserIdFromContext(l.ctx); err != nil {
 		return nil, err
 	}
 	//never remove the goal actually if the Popularity above 1,which means the goal is in use by other users
 	//otherwise the goal will be removed
-	if Id = GoTools.StringToInt64(req.Id); Id == 0 {
+	if Id = Tool.StringToInt64(req.Id); Id == 0 {
 		return nil, fmt.Errorf("id is empty")
 	}
 	if item, err = l.svcCtx.GoalModel.FindOne(l.ctx, Id); err != nil {
@@ -78,14 +78,14 @@ func (l *GoalDelLogic) GoalDel(req *types.GoalItem) (resp *types.GoalItem, err e
 		return nil, err
 	}
 	//if goalID removed ,then update goalList; else nothing changed and do nothing
-	if GoTools.RemoveItemFromString(&goalList.List, req.Id) {
+	if Tool.RemoveItemFromString(&goalList.List, req.Id) {
 		if err = l.svcCtx.GoalListModel.Update(l.ctx, goalList); err != nil {
 			return nil, err
 		}
 	}
 
 	// id shout not be 0,or error
-	if Id = GoTools.StringToInt64(req.Id); Id == 0 {
+	if Id = Tool.StringToInt64(req.Id); Id == 0 {
 		return nil, fmt.Errorf("id is required")
 	}
 

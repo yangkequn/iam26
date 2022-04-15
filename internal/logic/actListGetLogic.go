@@ -7,7 +7,7 @@ import (
 	"iam26/internal/types"
 	"iam26/model"
 
-	"github.com/yangkequn/GoTools"
+	"github.com/yangkequn/Tool"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -31,7 +31,7 @@ func (l *ActListGetLogic) ActListGet() (resp *types.List, err error) {
 		actList *model.ActList
 	)
 
-	if uid, err = UID(l.ctx); err != nil {
+	if uid, err = Tool.UserIdFromContext(l.ctx); err != nil {
 		return nil, err
 	}
 	if actList, err = l.svcCtx.ActListModel.FindOne(l.ctx, uid); err != nil {
@@ -46,5 +46,5 @@ func (l *ActListGetLogic) ActListGet() (resp *types.List, err error) {
 		}
 
 	}
-	return &types.List{List: GoTools.StringSlit(actList.List)}, nil
+	return &types.List{List: Tool.StringSlit(actList.List)}, nil
 }

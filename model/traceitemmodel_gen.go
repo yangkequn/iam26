@@ -25,8 +25,8 @@ var (
 type (
 	traceItemModel interface {
 		Insert(ctx context.Context, data *TraceItem) (sql.Result, error)
-		FindAll(ctx context.Context) ([]*TraceItem, error)
 		FindOne(ctx context.Context, id string) (*TraceItem, error)
+		FindAll(ctx context.Context) ([]*TraceItem, error)
 		Update(ctx context.Context, data *TraceItem) error
 		Delete(ctx context.Context, id string) error
 	}
@@ -62,19 +62,6 @@ func (m *defaultTraceItemModel) Insert(ctx context.Context, data *TraceItem) (sq
 	return ret, err
 }
 
-func (m *defaultTraceItemModel) FindAll(ctx context.Context) ([]*TraceItem, error) {
-	query := fmt.Sprintf("select %s from %s ", traceItemRows, m.table)
-	var resp []*TraceItem
-	err := m.conn.QueryRowsCtx(ctx, &resp, query)
-	switch err {
-	case nil:
-		return resp, nil
-	case sqlc.ErrNotFound:
-		return nil, ErrNotFound
-	default:
-		return nil, err
-	}
-}
 func (m *defaultTraceItemModel) FindOne(ctx context.Context, id string) (*TraceItem, error) {
 	query := fmt.Sprintf("select %s from %s where id = $1 limit 1", traceItemRows, m.table)
 	var resp TraceItem

@@ -11,7 +11,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/spaolacci/murmur3"
-	"github.com/yangkequn/GoTools"
+	"github.com/yangkequn/Tool"
 )
 
 func (ua *UserAgent) IsMobile() bool {
@@ -109,7 +109,7 @@ func AccountToID(account string) (string, error) {
 		return "", ErrBadAccountName
 	}
 	id := int64(crc64.Checksum([]byte(account), Crc64ISOTable))
-	return GoTools.Int64ToString(id), nil
+	return Tool.Int64ToString(id), nil
 }
 
 func (u *User) ToJWTCookie(secret string) (*http.Cookie, error) {

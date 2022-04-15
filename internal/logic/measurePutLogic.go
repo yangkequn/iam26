@@ -9,7 +9,7 @@ import (
 	"iam26/internal/types"
 	"iam26/model"
 
-	"github.com/yangkequn/GoTools"
+	"github.com/yangkequn/Tool"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -34,12 +34,12 @@ func (l *MeasurePutLogic) MeasurePut(req *types.MeasureItem) (resp *types.Measur
 		uid        string
 	)
 	//login is required, get user id from jwt token
-	if uid, err = UID(l.ctx); err != nil {
+	if uid, err = Tool.UserIdFromContext(l.ctx); err != nil {
 		return nil, err
 	}
 
 	if newMeasure {
-		req.MeasureId = GoTools.Int64ToString(GoTools.Sum64String(req.Name + req.Unit))
+		req.MeasureId = Tool.HashToString(req.Name + req.Unit)
 	}
 	if measure, err = l.svcCtx.MeasureModel.FindOne(l.ctx, req.MeasureId); err != nil && !NoRowsInResultSet(err) {
 		return nil, err
@@ -78,7 +78,7 @@ func (l *MeasurePutLogic) MeasurePut(req *types.MeasureItem) (resp *types.Measur
 		}
 	}
 	//step2. append measure id to list
-	if !strings.Contains(measureList.List, req.MeasureId) && GoTools.NonRedundantMerge(&measureList.List, req.MeasureId, true) {
+	if !strings.Contains(measureList.List, req.MeasureId) && Tool.NonRedundantMerge(&measureList.List, req.MeasureId, true) {
 		l.svcCtx.MeasureListModel.Update(l.ctx, measureList)
 		measure.UseCounter += 1
 		l.svcCtx.MeasureModel.Update(l.ctx, measure)

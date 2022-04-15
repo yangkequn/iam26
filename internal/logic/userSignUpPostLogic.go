@@ -13,7 +13,7 @@ import (
 	"iam26/internal/types"
 	"iam26/model"
 
-	"github.com/yangkequn/GoTools"
+	"github.com/yangkequn/Tool"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -55,7 +55,7 @@ func (l *UserSignUpPostLogic) UserSignUpPost(r *http.Request, w http.ResponseWri
 
 	//生成随机的password salt
 	salt := rand.Int63()
-	passMD5 := []byte(req.Password + GoTools.Int64ToString(salt))
+	passMD5 := []byte(req.Password + Tool.Int64ToString(salt))
 	password := int64(binary.LittleEndian.Uint64(passMD5))
 
 	// New Generator: Rehuse
