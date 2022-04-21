@@ -11,7 +11,7 @@ export function Accelerometer({  multiplier = 1000, useGravity = true }: {  mult
     window.addEventListener('devicemotion', handleAcceleration)
     return () => {
       window.removeEventListener('devicemotion', handleAcceleration)
-    }
+    } 
   }) 
 
   const saveToHistory = (acceleration: IAcceleration) => { 
