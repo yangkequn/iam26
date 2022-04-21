@@ -20,7 +20,6 @@ interface GlobalContextType {
 export const GlobalContext = React.createContext<GlobalContextType | null>(null)
 
 //这两个方法会被替换成正确的方法
-let lastUseJwtTime = 0;
 
 export const GlobalContextProvider: React.FC<React.ReactNode> = ({ children }) => {
     const [LoggedIn, setLoggedIn] = useState(false)
@@ -30,21 +29,20 @@ export const GlobalContextProvider: React.FC<React.ReactNode> = ({ children }) =
 
     const [leftDrawerSize, setLeftDrawerSize] = useState(LeftDrawerSize.Short)
 
-    useEffect(() => { Jwt.UpdateJWT(false, true) }, [])
-
+    useEffect(() => {
+        const LoadJwt = (event: Event) => {
+            setLoggedIn(Jwt.Get().IsValid())
+        }
+        //check if localstorage has jwt
+        LoadJwt(null)
+        // check if jwt is expired online
+        Jwt.UpdateJWT(false, true)
+        //check if jwt is updated
+        window.addEventListener(Jwt.eventName, LoadJwt)
+        return () => window.removeEventListener(Jwt.eventName, LoadJwt)
+    })
     // if LoggedOut, update Context States
-
-    const LoadJwt = () => {
-        if (lastUseJwtTime === Jwt.LastGetJwtTime) return
-        lastUseJwtTime = Jwt.LastGetJwtTime
-        setLoggedIn(Jwt.Get().IsValid())
-    }
-    const AutoReloadJwt = () => {
-        setInterval(LoadJwt, 100)
-        return () => { };
-    };
-
-    useEffect(AutoReloadJwt, [])
+   
 
     const store = {
         LoggedIn,

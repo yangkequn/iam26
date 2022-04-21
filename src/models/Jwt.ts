@@ -10,13 +10,19 @@ export class Jwt implements IJwt {
     public static Get = (jwt = GetStorage("jwt")): Jwt => Object.assign(new Jwt(null, null, null, null), jwt) as Jwt;
     public static Clear = (): void => { SaveStorage("jwt", new Jwt("", "", "", "")); Jwt.LastGetJwtTime = new Date().getTime() + Math.random(); };
     public static Save = (data: Jwt): void => { SaveStorage("jwt", data); Jwt.LastGetJwtTime = new Date().getTime() + Math.random(); };
-    public static SaveOrClear = (data: object): void => {    
-        let jwt=new Jwt(data["sub"], data["jwt"], data["id"], data["temporaryAccount"])
+    public static SaveOrClear = (data: object): void => {
+        let jwt = new Jwt(data["sub"], data["jwt"], data["id"], data["temporaryAccount"])
         jwt.IsValid() ? Jwt.Save(jwt) : Jwt.Clear();
     }
-    public static UpdateJWT = (resetJWT: boolean = false, forceUpdate: boolean = false) => {
+    public static eventName = "login"
+    private static DispatchEvent = () => {
+        var ev = document.createEvent('CustomEvent');
+        ev.initCustomEvent(Jwt.eventName, false, false, {});
+        window.dispatchEvent(ev);
 
-        if (resetJWT) Jwt.Clear();
+    }
+    public static UpdateJWT = (resetJWT: boolean = false, forceUpdate: boolean = false) => {
+        if (resetJWT) { Jwt.Clear(); Jwt.DispatchEvent(); }
 
         //if jwt stored in local storage,then use it
         if (!forceUpdate && Jwt.Get().IsValid()) return;
@@ -25,7 +31,10 @@ export class Jwt implements IJwt {
         let s = { width: ws.width, height: ws.height, availWidth: ws.availWidth, availHeight: ws.availHeight };
         let p = { outerHeight: w.outerHeight, outerWidth: w.outerWidth, innerHeight: w.innerHeight, innerWidth: w.innerWidth };
         // @ts-ignore
-        axios.get("/api/userJwt?" + new URLSearchParams({ ...p, ...s })).then(rsb => Jwt.SaveOrClear(rsb.data)).catch(e => setLoggedTime(false));
+        axios.get("/api/userJwt?" + new URLSearchParams({ ...p, ...s }))
+            .then(rsb => { Jwt.SaveOrClear(rsb.data); Jwt.DispatchEvent(); })
+            //case local network corrupted,ignore further operation
+            //.catch(e => setLoggedTime(false));
     };
     public static SignOut = (e: any): void => !!e.response && e.response.status === 401 && Jwt.UpdateJWT(true);
 }
