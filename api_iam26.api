@@ -27,11 +27,10 @@ service iam26-api {
 	get /measureRecommend(TextRequest) returns (List)
 
 	@handler MeasureIndexGet
-	get /measureIndex(MeasureIndex) returns (MeasureIndex)
+	get /measureIndex(MeasureIndex) returns (MeasureIndex)	
 	
-	
-	@handler MeasureIndexItemPut
-	put /measureIndexItem(MeasureIndex) returns (MeasureIndex)
+	@handler measureIndexPut
+	put /measureIndex(MeasureIndex) returns (MeasureIndex)
 	
 	@handler TraceGet
 	get /trace returns ([]TraceItem)

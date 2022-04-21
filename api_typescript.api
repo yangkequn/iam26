@@ -1,0 +1,19 @@
+service iam26-api {
+}
+
+@server(
+	jwt: Auth
+)
+service iam26-api {	
+	@handler MeasureIndexItemPut
+	put /measureIndexItem(MeasureIndex) returns (MeasureIndex)
+}
+//when updating a goal, the Data & Time should just be incremention 
+type MeasureIndex{
+	Id string `json:"id,optional"`
+	User string `json:"user"`
+	Type string `json:"type"`
+	Data []float32 `json:"data"`
+	Time []int64 `json:"time"` //time tick
+	List []string `json:"list"`
+}

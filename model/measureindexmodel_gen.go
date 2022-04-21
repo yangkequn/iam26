@@ -40,11 +40,10 @@ type (
 		Type       string    `db:"type"` // type/ name of index
 		CreateTime time.Time `db:"create_time"`
 		UpdateTime time.Time `db:"update_time"`
-		TimeSpan   float64   `db:"time_span"` // unit: minutes
 		List       string    `db:"list"`
 		User       string    `db:"user"` // owner of index
 		Data       string    `db:"data"` // use float 32 array
-		Time       string    `db:"time"` // unixtime with second as unit
+		Time       string    `db:"time"` // unixtime in milli second . if value less than 30 years, that's Incremental。every group of data started with absolute time
 	}
 )
 
@@ -56,8 +55,8 @@ func newMeasureIndexModel(conn sqlx.SqlConn) *defaultMeasureIndexModel {
 }
 
 func (m *defaultMeasureIndexModel) Insert(ctx context.Context, data *MeasureIndex) (sql.Result, error) {
-	query := fmt.Sprintf("insert into %s (%s) values ($1, $2, $3, $4, $5, $6, $7)", m.table, measureIndexRowsExpectAutoSet)
-	ret, err := m.conn.ExecCtx(ctx, query, data.Id, data.Type, data.TimeSpan, data.List, data.User, data.Data, data.Time)
+	query := fmt.Sprintf("insert into %s (%s) values ($1, $2, $3, $4, $5, $6)", m.table, measureIndexRowsExpectAutoSet)
+	ret, err := m.conn.ExecCtx(ctx, query, data.Id, data.Type, data.List, data.User, data.Data, data.Time)
 	return ret, err
 }
 
@@ -77,7 +76,7 @@ func (m *defaultMeasureIndexModel) FindOne(ctx context.Context, id string) (*Mea
 
 func (m *defaultMeasureIndexModel) Update(ctx context.Context, data *MeasureIndex) error {
 	query := fmt.Sprintf("update %s set %s where id = $1", m.table, measureIndexRowsWithPlaceHolder)
-	_, err := m.conn.ExecCtx(ctx, query, data.Id, data.Type, data.TimeSpan, data.List, data.User, data.Data, data.Time)
+	_, err := m.conn.ExecCtx(ctx, query, data.Id, data.Type, data.List, data.User, data.Data, data.Time)
 	return err
 }
 

@@ -79,8 +79,7 @@ func (l *UserSignUpPostLogic) UserSignUpPost(r *http.Request, w http.ResponseWri
 	u = model.User{Id: uid, Account: req.Account, RootId: u.Id}
 	l.svcCtx.UserModel.Insert(l.ctx, &u)
 
-	uidTemporary, err := GetUserIDFromCookie(r, l.svcCtx.Config.Auth.AccessSecret)
-	if err == nil {
+	if uidTemporary, err := GetUserIDFromCookie(r, l.svcCtx.Config.Auth.AccessSecret); err == nil {
 		ConvertTemporaryAccountToFormalAccount(l.ctx, l.svcCtx, uidTemporary, u.Id)
 	}
 	return &types.ErrorRsb{Error: ""}, nil

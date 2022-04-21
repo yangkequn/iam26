@@ -27,12 +27,8 @@ func NewUserLoginPostLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Use
 	}
 }
 
-func ConvertTemporaryAccountToFormalAccount(ctx context.Context, svcCtx *svc.ServiceContext, uidTemporary string, uid string) {
+func ConvertTemporaryAccountToFormalAccount(ctx context.Context, svc *svc.ServiceContext, uidTemporary string, uid string) {
 
-	SetRootIDOnTemporaryAccount(ctx, svcCtx, uidTemporary, uid)
-}
-
-func SetRootIDOnTemporaryAccount(ctx context.Context, svc *svc.ServiceContext, uidTemporary string, uid string) {
 	uTemporary, err := svc.UserModel.FindOne(ctx, uidTemporary)
 	if err != nil {
 		return
@@ -69,10 +65,7 @@ func (l *UserLoginPostLogic) UserLoginPost(r *http.Request, w http.ResponseWrite
 	}
 
 	//把当前临时账号的内容保存到被登录账号
-	uidTemporary, err := GetUserIDFromCookie(r, l.svcCtx.Config.Auth.AccessSecret)
-	if err != nil {
-		return &types.ErrorRsb{Error: err.Error()}, nil
-	} else if len(uidTemporary) > 0 {
+	if uidTemporary, err := GetUserIDFromCookie(r, l.svcCtx.Config.Auth.AccessSecret); err == nil && len(uidTemporary) > 0 {
 		//make sure it's temporary account, not root account
 		//这里有bug,如果只是两个不同人的账号，而不是临时账号，不应该做合并的操作
 		uT, errT := l.svcCtx.UserModel.FindOne(l.ctx, uidTemporary)
