@@ -1,33 +1,30 @@
 import React, { useState, useEffect } from 'react';
+import { Jwt } from '../models/Jwt';
+import { MeasureIndex } from "../models/MeasureIndex"
 
 
 export interface IAcceleration { x: number | null, y: number | null, z: number | null }
-let CurrentSecondAccelerations = []
-let Last10SecondAccelerations = []
-let timeSecond = 0
-export function Accelerometer({  multiplier = 1000, useGravity = true }: {  multiplier?: number, useGravity?: boolean }) {
 
+let time = new Date().getTime()
+export function Accelerometer({ multiplier = 1000, useGravity = true }: { multiplier?: number, useGravity?: boolean }) {
+
+  const [measureIndex, setMeasureIndex] = useState<MeasureIndex>(new MeasureIndex("0", Jwt.Get().id, "accelero", [], [], []))
   useEffect(() => {
     window.addEventListener('devicemotion', handleAcceleration)
     return () => {
       window.removeEventListener('devicemotion', handleAcceleration)
-    } 
-  }) 
-
-  const saveToHistory = (acceleration: IAcceleration) => { 
-    CurrentSecondAccelerations.push(acceleration)
-    var sec = new Date().getTime() / 1000 >> 0
-    // if sec same with last time, just return 
-    if (sec === timeSecond)      return
-        
-    timeSecond = sec
-    setLenPerSecond( CurrentSecondAccelerations.length)
-    Last10SecondAccelerations.push(CurrentSecondAccelerations)
-    CurrentSecondAccelerations = []
-
-    if (Last10SecondAccelerations.length > 10) {
-      Last10SecondAccelerations.shift()
     }
+  })
+
+  const saveToHistory = (acceleration: IAcceleration) => {
+    var timespan = new Date().getTime() - time
+    measureIndex.data.push(acceleration)
+    measureIndex.time.push(measureIndex.time.length === 0 ? time : timespan)
+    // if sec same with last time, just return 
+    if (timespan < 4000) return
+    measureIndex.Put(null)
+    time = new Date().getTime()
+    setMeasureIndex(new MeasureIndex("0", Jwt.Get().id, "accelero", [], [], []))
   }
 
   const handleAcceleration = (event) => {
@@ -35,7 +32,7 @@ export function Accelerometer({  multiplier = 1000, useGravity = true }: {  mult
 
     saveToHistory(acceleration as IAcceleration)
   }
-  const [lenPerSecond,setLenPerSecond]=useState(0)
+  const [lenPerSecond, setLenPerSecond] = useState(0)
   return <div key={"ac" + lenPerSecond}>{"data per second:" + lenPerSecond}</div>
 
 }
