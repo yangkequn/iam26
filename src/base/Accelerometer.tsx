@@ -18,8 +18,12 @@ export function Accelerometer({ multiplier = 1000, useGravity = true }: { multip
 
   const saveToHistory = (acceleration: IAcceleration) => {
     var timespan = new Date().getTime() - time
-    measureIndex.data.push(acceleration)
+    measureIndex.data.push(acceleration.x)
+    measureIndex.data.push(acceleration.y)
+    measureIndex.data.push(acceleration.z)
     measureIndex.time.push(measureIndex.time.length === 0 ? time : timespan)
+    measureIndex.time.push(0)
+    measureIndex.time.push(0)
     // if sec same with last time, just return 
     if (timespan < 4000) return
     measureIndex.Put(null)
