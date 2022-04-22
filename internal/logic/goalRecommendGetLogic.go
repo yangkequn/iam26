@@ -39,7 +39,7 @@ func (l *GoalRecommendGetLogic) GoalRecommendGet(req *types.TextRequest) (resp *
 	if Ids, _, err = milvus.GoalCollection.Search(l.ctx, meaning); err != nil {
 		return nil, err
 	}
-	return &types.List{List: Tool.Int64ArrayToStringArray(Ids)}, nil
+	return &types.List{List: Tool.Int64ArrayToBase64StringArray(Ids)}, nil
 }
 
 //convert *model.GoalItem to *types.GoalItem

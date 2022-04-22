@@ -40,5 +40,5 @@ func (l *ActRecommendGetLogic) ActRecommendGet(req *types.TextRequest) (resp *ty
 	if err != nil {
 		return nil, err
 	}
-	return &types.List{List: Tool.Int64ArrayToStringArray(Ids)}, err
+	return &types.List{List: Tool.Int64ArrayToBase64StringArray(Ids)}, err
 }

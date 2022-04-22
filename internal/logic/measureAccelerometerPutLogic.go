@@ -25,7 +25,7 @@ func NewMeasureAccelerometerPutLogic(ctx context.Context, svcCtx *svc.ServiceCon
 	}
 }
 
-func (l *MeasureAccelerometerPutLogic) MeasureAccelerometerPut(req *types.MeasureIndex) (resp *types.MeasureIndex, err error) {
+func (l *MeasureAccelerometerPutLogic) MeasureAccelerometerPut(req *types.MeasureAccelerometer) (resp *types.MeasureAccelerometer, err error) {
 	var (
 		accelerometer *model.MeasureAccelerometer
 		uid           string
@@ -48,24 +48,24 @@ func (l *MeasureAccelerometerPutLogic) MeasureAccelerometerPut(req *types.Measur
 	}
 
 	Tool.MergeStringWithString(&accelerometer.Data, Tool.Float32ArrayToString(req.Data), false)
-	Tool.MergeStringWithString(&accelerometer.Time, Tool.Int64ArrayToString(req.Time), false)
+	Tool.MergeStringWithString(&accelerometer.Time, Tool.Int64ArrayToBase10String(req.Time), false)
 
 	//if list to long, save it to another row
 	if len(accelerometer.Data) > 1024*1024 {
-		copy := accelerometer
+		copy := *accelerometer
 		//generate random id
 		copy.Id = Tool.Int64ToString(rand.Int63())
-		go l.svcCtx.MeasureAccelerometerModel.Insert(l.ctx, copy)
+		go l.svcCtx.MeasureAccelerometerModel.Insert(l.ctx, &copy)
 		Tool.MergeStringWithString(&accelerometer.List, copy.Id, false)
 	}
 	go l.svcCtx.MeasureAccelerometerModel.Update(l.ctx, accelerometer)
 
 	//convert to response
-	resp = &types.MeasureIndex{
+	resp = &types.MeasureAccelerometer{
 		Id:   accelerometer.Id,
 		Data: Tool.StringToFloat32Array(accelerometer.Data),
 		//decode time
-		Time: Tool.UnixTimeStringToArray_ms(accelerometer.Time),
+		Time: Tool.JSTimeSequenceStringToArray(accelerometer.Time),
 		List: Tool.StringSlit(accelerometer.List),
 	}
 	return resp, nil

@@ -36,5 +36,5 @@ func (l *MeasureRecommendGetLogic) MeasureRecommendGet(req *types.TextRequest) (
 
 	Ids, _, err = milvus.MeasureCollection.Search(l.ctx, meaning)
 
-	return &types.List{List: Tool.Int64ArrayToStringArray(Ids)}, err
+	return &types.List{List: Tool.Int64ArrayToBase64StringArray(Ids)}, err
 }

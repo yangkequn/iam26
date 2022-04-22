@@ -41,7 +41,7 @@ type (
 		UpdateTime time.Time `db:"update_time"`
 		List       string    `db:"list"`
 		Data       string    `db:"data"` // use float 32 array
-		Time       string    `db:"time"` // unixtime in milli second . if value less than 30 years, that's Incremental。every group of data started with absolute time
+		Time       string    `db:"time"` // JavaScript time in ms. if value less than 1 years, that's time span。every group of data started with absolute time
 	}
 )
 
