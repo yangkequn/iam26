@@ -22,7 +22,7 @@ export class MenuStruct {
   public Variant = (): string => this.isCurrentPath() ? "contained" : "text"
 }
 
-const home = new MenuStruct("首页", "/", null, [
+const home = new MenuStruct("iam26", "/", null, [
   new MenuStruct("关于健康那些最重要的事情 / on Health made of", "/TodoListOnHealth", null, null),
 ])
 const me = new MenuStruct("开始", "/MyTrace", null, [

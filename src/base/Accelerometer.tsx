@@ -11,22 +11,28 @@ export function Accelerometer({ multiplier = 1000, useGravity = true }: { multip
   const [measureIndex, setMeasureIndex] = useState<MeasureAccelerometer>(new MeasureAccelerometer("0", [], [], []))
   useEffect(() => {
     window.addEventListener('devicemotion', handleAcceleration)
-    return () =>       window.removeEventListener('devicemotion', handleAcceleration)    
+    return () => window.removeEventListener('devicemotion', handleAcceleration)
   })
 
   const saveToHistory = (acceleration: IAcceleration) => {
-    var timespan = new Date().getTime() - time
-    measureIndex.data.push(acceleration.x)
-    measureIndex.data.push(acceleration.y)
-    measureIndex.data.push(acceleration.z)
-    measureIndex.time.push(measureIndex.time.length === 0 ? time : timespan)
-    measureIndex.time.push(0)
-    measureIndex.time.push(0)
+    var now=new Date().getTime()
+    var timespan = now- time
+    measureIndex.data.push(Number.parseFloat(acceleration.x.toFixed(5)))
+    measureIndex.data.push(Number.parseFloat(acceleration.y.toFixed(5)))
+    measureIndex.data.push(Number.parseFloat(acceleration.z.toFixed(5)))
+    measureIndex.time.push(now)
+    measureIndex.time.push(now)
+    measureIndex.time.push(now)
     // if sec same with last time, just return 
-    if (timespan < 4000) return
+    if (timespan  < 4000) return
+    //alert("measureIndex.data"+JSON.stringify(measureIndex.data))
+    time = now + 100000000000 //只上传一次
+    //压缩时间，第一个值是绝对时间戳，后续是毫秒计数的时间流逝值
+    for (let i = measureIndex.time.length-1; i >0; i--) {
+      measureIndex.time[i]=measureIndex.time[i]-measureIndex.time[i-1]
+    }
     measureIndex.Put(null)
-    time = new Date().getTime()+100000000000
-    setMeasureIndex(new MeasureAccelerometer("0",  [], [], []))
+    setMeasureIndex(new MeasureAccelerometer("0", [], [], []))
   }
 
   const handleAcceleration = (event) => {

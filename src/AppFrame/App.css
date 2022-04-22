@@ -21,6 +21,7 @@
     width: 100%;
     height: 7vh;
     align-items: center;
+    white-space: nowrap;
     justify-content: flex-start;
     font-size: calc(10px + 2vmin);
     color: white;

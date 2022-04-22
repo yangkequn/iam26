@@ -1,7 +1,7 @@
 import axios from "axios";
 import { GetStorage, SaveStorage } from '../base/Storage';
 import { Jwt } from "./Jwt";
-import {CallbackProduce, CallbackCancel, CallbackComsum} from "./Webapi.callback";
+import { CallbackProduce, CallbackCancel, CallbackComsum } from "./Webapi.callback";
 
 export const JwtRequest = (headers = {}, jwt = Jwt.Get()) => {
     if (jwt.IsValid()) headers["Authorization"] = jwt.jwt;
@@ -36,7 +36,7 @@ export const Get = (url: string, setState: Function = null, dataTransform: Funct
 export const Load = (url: string, data: object, setState: Function) => {
     JwtRequest().get(url).then(rsb => {
         Merge(rsb.data, data);
-        !!setState && setState(rsb.data)
+        if (typeof setState === "function") setState(rsb.data)
     }).catch(Jwt.SignOut);
     return null;
 };
@@ -44,19 +44,20 @@ export const Load = (url: string, data: object, setState: Function) => {
 export const Delete = (url: string, data: object, setState: Function = null) =>
     JwtRequest().delete(url, { data }).then(rsb => {
         Merge(rsb.data, data);
-        !!setState && setState(rsb.data)
+        if (typeof setState === "function") setState(rsb.data)
     }).catch(Jwt.SignOut)
 
-export const Put = (url: string, data: object, setState: Function = null) =>
+export const Put = (url: string, data: object, setState: Function = null) => {
     JwtRequest().put(url, data).then(rsb => {
         Merge(rsb.data, data);
-        !!setState && setState(rsb.data)
+        if (typeof setState === "function") setState(rsb.data)
     }).catch(Jwt.SignOut)
+}
 
 export const Post = (url: string, data: object, setState: Function = null) =>
     JwtRequest().post(url, data).then(rsb => {
         Merge(rsb.data, data);
-        !!setState && setState(rsb.data)
+        if (typeof setState === "function") setState(rsb.data)
     }).catch(Jwt.SignOut)
 //check whether 
 const ObjectOfLastState = {}
