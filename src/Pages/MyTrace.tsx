@@ -11,6 +11,7 @@ import { MeasureItem } from "../models/MeasureItem";
 import { ActItem } from "../models/ActItem";
 import { TraceItem } from "../models/TraceItem";
 import DeleteIcon from '@mui/icons-material/Delete';
+import {Accelerometer} from "../base/Accelerometer";
 
 function TraceModelItem({ item }: { item: TraceModel; }) {
 
@@ -74,14 +75,7 @@ export const MyTrace = () => {
     }
     useEffect(() => TraceModel.Get(getListCallBack), [])
 
-
-    const data = [
-        { id: 1, type: "act", name: "饮食/?分饱", value: "1", time: "2020-01-01", },
-        { id: 3, type: "act", name: "跑步/公里", value: "10", time: "2020-01-01", },
-        { id: 4, type: "measure", name: "空腹血糖", value: "6.5", time: "2020-01-01", },
-        { id: 5, type: "measure", name: "跑步/公里", value: "10", time: "2020-01-02", },
-        { id: 5, type: "measure", name: "主观满意度", value: "10", time: "2020-01-03", }
-    ]
+    const [upload, setUpload] = useState<Boolean>(false)
 
     return (
         //items table ,all columes are sortable, contains a list of items
@@ -93,6 +87,9 @@ export const MyTrace = () => {
                 <Button className="cr0" variant="contained" color="primary" startIcon={<AddIcon />} onClick={AddAction}>添加效果</Button>
                 <div style={{ width: "20%" }}></div>
             </div>
+
+        <Button onClick={e=>setUpload(!upload)}> {upload?"正在上传数据，点击停止":"点击开始上传数据"}</Button>
+        {upload&&<Accelerometer></Accelerometer>}
 
             <div className="cv0" style={{ justifyContent: "flex-start" }} >
                 {traces.map((item, i) => <TraceModelItem key={`trace-${item["traceId"]}-${item["name"]}-${item["updated"]}`} item={item} />)}

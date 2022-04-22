@@ -33,3 +33,4 @@ export class MeasureIndex implements IMeasureIndex {
     public IsNew = (): boolean => !this.id || this.id === "0"
 
 }
+

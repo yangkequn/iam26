@@ -25,7 +25,7 @@ export class MenuStruct {
 const home = new MenuStruct("首页", "/", null, [
   new MenuStruct("关于健康那些最重要的事情 / on Health made of", "/TodoListOnHealth", null, null),
 ])
-const me = new MenuStruct("我要26岁", "/MyTrace", null, [
+const me = new MenuStruct("开始", "/MyTrace", null, [
   new MenuStruct("我的追踪", "/MyTrace", null, null),
   new MenuStruct("集体调研区", "/MyTrace/similar", null, null),
   new MenuStruct("来自AI的今日建议", "/MyTrace/hiFriend", null, null),
@@ -35,7 +35,7 @@ const goals = new MenuStruct("目标", "/Goals", null, [
   new MenuStruct("我的目标", "/Goals/Mine", null, null),
   new MenuStruct("添加 / 创建", "/Goals", null, null),
 ])
-const methods = new MenuStruct("改进", "/Act", null, [
+const methods = new MenuStruct("措施", "/Act", null, [
   new MenuStruct("我常用", "/Act/Mine", null, null),
   new MenuStruct("全部列表", "/Act", null, null),
 ])
