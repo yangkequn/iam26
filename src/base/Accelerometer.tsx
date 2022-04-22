@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Jwt } from '../models/Jwt';
-import { MeasureIndex } from "../models/MeasureIndex"
+import { MeasureAccelerometer } from "../models/MeasureAccelerometer"
 
 
 export interface IAcceleration { x: number | null, y: number | null, z: number | null }
@@ -8,12 +8,10 @@ export interface IAcceleration { x: number | null, y: number | null, z: number |
 let time = new Date().getTime()
 export function Accelerometer({ multiplier = 1000, useGravity = true }: { multiplier?: number, useGravity?: boolean }) {
 
-  const [measureIndex, setMeasureIndex] = useState<MeasureIndex>(new MeasureIndex("0", Jwt.Get().id, "accelero", [], [], []))
+  const [measureIndex, setMeasureIndex] = useState<MeasureAccelerometer>(new MeasureAccelerometer("0", [], [], []))
   useEffect(() => {
     window.addEventListener('devicemotion', handleAcceleration)
-    return () => {
-      window.removeEventListener('devicemotion', handleAcceleration)
-    }
+    return () =>       window.removeEventListener('devicemotion', handleAcceleration)    
   })
 
   const saveToHistory = (acceleration: IAcceleration) => {
@@ -27,8 +25,8 @@ export function Accelerometer({ multiplier = 1000, useGravity = true }: { multip
     // if sec same with last time, just return 
     if (timespan < 4000) return
     measureIndex.Put(null)
-    time = new Date().getTime()
-    setMeasureIndex(new MeasureIndex("0", Jwt.Get().id, "accelero", [], [], []))
+    time = new Date().getTime()+100000000000
+    setMeasureIndex(new MeasureAccelerometer("0",  [], [], []))
   }
 
   const handleAcceleration = (event) => {
