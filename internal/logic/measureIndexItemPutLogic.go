@@ -32,9 +32,15 @@ func NewMeasureIndexItemPutLogic(ctx context.Context, svcCtx *svc.ServiceContext
 func (l *MeasureIndexItemPutLogic) MeasureIndexItemPut(req *types.MeasureIndex) (resp *types.MeasureIndex, err error) {
 	var (
 		indexList *model.MeasureIndex
+		uid       string
 	)
+	//如果指定了具体的指标记录ID，则直接返回
+	//login is required, get user id from jwt token
+	if uid, err = Tool.UserIdFromContext(l.ctx); err != nil {
+		return nil, model.ErrAccessNotAllowed
+	}
 	if req.Id == "" {
-		req.Id = GenIndexId(req.User, req.Type)
+		req.Id = GenIndexId(uid, req.Type)
 	}
 	// bn
 	indexList, err = l.svcCtx.MeasureIndexModel.FindOne(l.ctx, req.Id)
@@ -42,12 +48,8 @@ func (l *MeasureIndexItemPutLogic) MeasureIndexItemPut(req *types.MeasureIndex) 
 		return nil, err
 	}
 	if err != nil && NoRowsInResultSet(err) {
-		indexList = &model.MeasureIndex{Id: req.Id, User: req.User, Type: req.Type}
+		indexList = &model.MeasureIndex{Id: req.Id, User: uid, Type: req.Type}
 		_, err = l.svcCtx.MeasureIndexModel.Insert(l.ctx, indexList)
-	}
-
-	if !Tool.ValidateJwtUser(l.ctx, req.User) {
-		return nil, model.ErrAccessNotAllowed
 	}
 
 	if len(req.Data) != len(req.Time) {
@@ -70,8 +72,8 @@ func (l *MeasureIndexItemPutLogic) MeasureIndexItemPut(req *types.MeasureIndex) 
 	var keptNum = 256
 	if len(indexList.Data) > 4096 {
 		newIndexList := &model.MeasureIndex{
-			Id:   GenIndexId(req.User, req.Type),
-			User: req.User,
+			Id:   GenIndexId(uid, req.Type),
+			User: uid,
 			Type: req.Type,
 			Data: indexList.Data[keptNum:],
 			Time: indexList.Time[keptNum:],
@@ -86,7 +88,6 @@ func (l *MeasureIndexItemPutLogic) MeasureIndexItemPut(req *types.MeasureIndex) 
 	}
 	return &types.MeasureIndex{
 		Id:   req.Id,
-		User: req.User,
 		List: Tool.StringSlit(indexList.List),
 		Type: req.Type,
 		Data: Tool.StringToFloat32Array(indexList.Data),

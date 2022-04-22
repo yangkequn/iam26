@@ -31,18 +31,23 @@ func GenIndexId(user string, indexType string) string {
 func (l *MeasureIndexGetLogic) MeasureIndexGet(req *types.MeasureIndex) (resp *types.MeasureIndex, err error) {
 	var (
 		indexList *model.MeasureIndex
+		uid       string
 	)
 	//如果指定了具体的指标记录ID，则直接返回
+	//login is required, get user id from jwt token
+	if uid, err = Tool.UserIdFromContext(l.ctx); err != nil {
+		return nil, err
+	}
 	if req.Id == "" {
 		//使用用户ID和指标名称查询
-		req.Id = GenIndexId(req.User, req.Type)
+		req.Id = GenIndexId(uid, req.Type)
 	}
 
 	if indexList, err = l.svcCtx.MeasureIndexModel.FindOne(l.ctx, req.Id); err != nil {
 		return nil, err
 	}
 
-	if !Tool.ValidateJwtUser(l.ctx, req.User) {
+	if !Tool.ValidateJwtUser(l.ctx, uid) {
 		return nil, model.ErrAccessNotAllowed
 	}
 
@@ -53,7 +58,6 @@ func (l *MeasureIndexGetLogic) MeasureIndexGet(req *types.MeasureIndex) (resp *t
 	}
 	return &types.MeasureIndex{
 		Id:   req.Id,
-		User: req.User,
 		List: Tool.StringSlit(indexList.List),
 		Type: req.Type,
 		Data: data,

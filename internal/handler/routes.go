@@ -73,6 +73,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: measureIndexPutHandler(serverCtx),
 			},
 			{
+				Method:  http.MethodPut,
+				Path:    "/measureAccelerometer",
+				Handler: MeasureAccelerometerPutHandler(serverCtx),
+			},
+			{
 				Method:  http.MethodGet,
 				Path:    "/trace",
 				Handler: TraceGetHandler(serverCtx),
