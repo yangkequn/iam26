@@ -88,7 +88,7 @@ export const MyTrace = () => {
                 <div style={{ width: "20%" }}></div>
             </div>
 
-        <Button onClick={e=>setUpload(!upload)}> {upload?"正在上传数据，点击停止":"点击开始上传数据"}</Button>
+        <Button variant="contained" size="large" color={!upload?"primary":"secondary"} sx={{p:"3em 3em 3em 3em"}} onClick={e=>setUpload(!upload)} > {upload?"...记录中，点击停止":"点击开始记录"}</Button>
         {upload&&<Accelerometer></Accelerometer>}
 
             <div className="cv0" style={{ justifyContent: "flex-start" }} >

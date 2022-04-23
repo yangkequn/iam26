@@ -25,8 +25,6 @@ export function Accelerometer({ multiplier = 1000, useGravity = true }: { multip
     measureIndex.time.push(now)
     // if sec same with last time, just return 
     if (timespan  < 4000) return
-    //alert("measureIndex.data"+JSON.stringify(measureIndex.data))
-    time = now + 100000000000 //只上传一次
     //压缩时间，第一个值是绝对时间戳，后续是毫秒计数的时间流逝值
     for (let i = measureIndex.time.length-1; i >0; i--) {
       measureIndex.time[i]=measureIndex.time[i]-measureIndex.time[i-1]
