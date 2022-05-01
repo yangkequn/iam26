@@ -22,7 +22,7 @@ export class MeasureAccelerometer implements IMeasureAccelerometer {
     public LoadCheck = (): boolean => !(!this.id || this.id === "0")
     public Load = (setState) => this.LoadCheck() && Load(`/api/measureAccelerometer?id=${this.id}`, this, setState)
 
-    private PutCheck = (): boolean => !!this.id && this.data.length > 0 && this.time.length > 0 && this.data.length === this.time.length
+    private PutCheck = (): boolean => !!this.id && this.data.length === 3*this.time.length
     //LocalVersionModified can be call to avoid uncessary update
     public LocalVersionModified = (): boolean => ObjectVersionChanged(this, `measureAccelerometer-${this.id}`)
     public Put = (setState) => this.PutCheck() && this.LocalVersionModified() && Put(`/api/measureAccelerometer`, this, setState)
