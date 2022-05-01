@@ -50,7 +50,7 @@ func (l *MeasureAccelerometerPutLogic) MeasureAccelerometerPut(req *types.Measur
 	//TIME_STAMP采样每个时刻一个点
 	data := Tool.Int64ArrayToBase10String(req.Data)
 	time := Tool.Int64ArrayToBase10String(req.Time)
-	if len(data) != len(time)*3 {
+	if len(Tool.StringSlit(data)) != len(Tool.StringSlit(time))*3 {
 		return nil, fmt.Errorf("data and time length not match")
 	}
 	Tool.MergeStringWithString(&accelerometer.Data, data, false)
