@@ -25,6 +25,7 @@ var (
 type (
 	measureAccelerometerModel interface {
 		Insert(ctx context.Context, data *MeasureAccelerometer) (sql.Result, error)
+		FindAll(ctx context.Context) ([]*MeasureAccelerometer, error)
 		FindOne(ctx context.Context, id string) (*MeasureAccelerometer, error)
 		Update(ctx context.Context, data *MeasureAccelerometer) error
 		Delete(ctx context.Context, id string) error

@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"fmt"
 	"iam26/internal/svc"
 	"iam26/internal/types"
 	"iam26/model"
@@ -46,24 +47,46 @@ func (l *MeasureAccelerometerPutLogic) MeasureAccelerometerPut(req *types.Measur
 		accelerometer = &model.MeasureAccelerometer{Id: req.Id}
 		_, err = l.svcCtx.MeasureAccelerometerModel.Insert(l.ctx, accelerometer)
 	}
+	//TIME_STAMP采样每个时刻一个点
+	data := Tool.Int64ArrayToBase10String(req.Data)
+	time := Tool.Int64ArrayToBase10String(req.Time)
+	if len(data) != len(time)*3 {
+		return nil, fmt.Errorf("data and time length not match")
+	}
+	Tool.MergeStringWithString(&accelerometer.Data, data, false)
+	Tool.MergeStringWithString(&accelerometer.Time, time, false)
 
-	Tool.MergeStringWithString(&accelerometer.Data, Tool.Float32ArrayToString(req.Data), false)
-	Tool.MergeStringWithString(&accelerometer.Time, Tool.Int64ArrayToBase10String(req.Time), false)
-
-	//if list to long, save it to another row
-	if len(accelerometer.Data) > 1024*1024 {
+	//merge data to the last list, if the last list's data is not too enough
+	if len(accelerometer.Data) > 32*1024 {
+		if len(accelerometer.List) > 0 {
+			ids := Tool.StringSlit(accelerometer.List)
+			last, err := l.svcCtx.MeasureAccelerometerModel.FindOne(l.ctx, ids[len(ids)-1])
+			if err == nil && len(accelerometer.Data) < 2*1024*1024 {
+				Tool.MergeStringWithString(&last.Data, accelerometer.Data, false)
+				Tool.MergeStringWithString(&last.Time, accelerometer.Time, false)
+				accelerometer.Data = ""
+				accelerometer.Time = ""
+				l.svcCtx.MeasureAccelerometerModel.Update(l.ctx, last)
+			}
+		}
+	}
+	// try create another list to hold the data. temporary data should be short enough,to speed up reading process
+	if len(accelerometer.Data) > 32*1024 {
+		//尝试填充到上一张表，直到记录大小超过1M
 		copy := *accelerometer
 		//generate random id
 		copy.Id = Tool.Int64ToString(rand.Int63())
 		go l.svcCtx.MeasureAccelerometerModel.Insert(l.ctx, &copy)
+		accelerometer.Data = ""
+		accelerometer.Time = ""
 		Tool.MergeStringWithString(&accelerometer.List, copy.Id, false)
 	}
-	go l.svcCtx.MeasureAccelerometerModel.Update(l.ctx, accelerometer)
+	err = l.svcCtx.MeasureAccelerometerModel.Update(l.ctx, accelerometer)
 
 	//convert to response
 	resp = &types.MeasureAccelerometer{
 		Id:   accelerometer.Id,
-		Data: Tool.StringToFloat32Array(accelerometer.Data),
+		Data: Tool.Base10StringToInt64Array(accelerometer.Data),
 		//decode time
 		Time: Tool.JSTimeSequenceStringToArray(accelerometer.Time),
 		List: Tool.StringSlit(accelerometer.List),

@@ -10,6 +10,7 @@ import (
 	"iam26/internal/handler"
 	"iam26/internal/svc"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/yangkequn/Tool"
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/rest"
@@ -28,6 +29,21 @@ func UpgradeTable(ctx *svc.ServiceContext) {
 		}
 	}
 }
+func ExportAllAccelerometerToRedis(ctx *svc.ServiceContext) {
+	RedisClient := redis.NewClient(&redis.Options{
+		Addr:     "docker.vm:6379", // use default Addr
+		Password: "",               // no password set
+		DB:       14,               // use default DB
+	})
+	list, err := ctx.MeasureAccelerometerModel.FindAll(context.Background())
+	if err == nil {
+		for _, v := range list {
+			RedisClient.RPush(context.Background(), "data_raw:"+v.Id, v.Data)
+			RedisClient.RPush(context.Background(), "data_raw:"+v.Id, v.Time)
+
+		}
+	}
+}
 
 func main() {
 
@@ -37,8 +53,9 @@ func main() {
 	ctx := svc.NewServiceContext(c)
 	server := rest.MustNewServer(c.RestConf)
 	defer server.Stop()
-
 	handler.RegisterHandlers(server, ctx)
+
+	//ExportAllAccelerometerToRedis(ctx)
 
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
 	server.Start()

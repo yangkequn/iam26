@@ -90,7 +90,7 @@ type MeasureIndex{
 }
 type MeasureAccelerometer{
 	Id string `json:"id,optional"`
-	Data []float32 `json:"data"`
+	Data []int64 `json:"data"`
 	Time []int64 `json:"time"` //time tick
 	List []string `json:"list"`
 }
