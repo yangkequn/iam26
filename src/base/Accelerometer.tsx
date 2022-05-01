@@ -33,7 +33,9 @@ export function Accelerometer({ multiplier = 10, useGravity = false }: { multipl
     if (timeSpan < TimespanWanted * 1000) return
 
     // data point of each seconds should more than 40 points
-    if (timeLength < TimespanWanted * 3 * 40 || timeLength !== DataAcceleration.length) {
+    let dataPointDenseEnough=timeLength > TimespanWanted *  40
+    let DataIntegrity=(timeLength*3) === DataAcceleration.length
+    if (!dataPointDenseEnough || !DataIntegrity ) {
       SaveDataAndRestartRecording()
       return
     }
