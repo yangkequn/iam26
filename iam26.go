@@ -35,6 +35,10 @@ func ExportAllAccelerometerToRedis(ctx *svc.ServiceContext) {
 		Password: "",               // no password set
 		DB:       14,               // use default DB
 	})
+	keys, err := RedisClient.Keys(context.Background(), "*").Result()
+	for _, k := range keys {
+		RedisClient.Del(context.Background(), k)
+	}
 	list, err := ctx.MeasureAccelerometerModel.FindAll(context.Background())
 	if err == nil {
 		for _, v := range list {

@@ -73,13 +73,19 @@ func (l *MeasureAccelerometerPutLogic) MeasureAccelerometerPut(req *types.Measur
 	// try create another list to hold the data. temporary data should be short enough,to speed up reading process
 	if len(accelerometer.Data) > 32*1024 {
 		//尝试填充到上一张表，直到记录大小超过1M
-		copy := *accelerometer
-		//generate random id
-		copy.Id = Tool.Int64ToString(rand.Int63())
-		go l.svcCtx.MeasureAccelerometerModel.Insert(l.ctx, &copy)
-		accelerometer.Data = ""
-		accelerometer.Time = ""
-		Tool.MergeStringWithString(&accelerometer.List, copy.Id, false)
+
+		//copy accelerometer to another
+		accelerometer2 := &model.MeasureAccelerometer{
+			Id:   Tool.Int64ToString(rand.Int63()),
+			Data: accelerometer.Data,
+			Time: accelerometer.Time,
+		}
+		_, err = l.svcCtx.MeasureAccelerometerModel.Insert(l.ctx, accelerometer2)
+		if err == nil {
+			accelerometer.Data = ""
+			accelerometer.Time = ""
+			Tool.MergeStringWithString(&accelerometer.List, accelerometer2.Id, false)
+		}
 	}
 	err = l.svcCtx.MeasureAccelerometerModel.Update(l.ctx, accelerometer)
 
