@@ -18,11 +18,12 @@ export function Accelerometer({ multiplier = 10, useGravity = false }: { multipl
     return model
   }
   const saveToHistory = (acceleration: IAcceleration) => {
-    var now = new Date().getTime()
+    //采用高精度的时间戳，chrome测试精确到0.1ms
+    var now = performance.timing.fetchStart+(performance.now()<<0)
     DataAcceleration.push(acceleration.x * multiplier << 0)
     DataAcceleration.push(acceleration.y * multiplier << 0)
     DataAcceleration.push(acceleration.z * multiplier << 0)
-    DataTime.push(now)
+    DataTime.push(DataTime.length>0? now-DataTime[DataTime.length-1]:now)
 
     //ensure  timespan cal be calculated
     let timeLength = DataTime.length; if (timeLength < 20) return
@@ -35,14 +36,13 @@ export function Accelerometer({ multiplier = 10, useGravity = false }: { multipl
     // data point of each seconds should more than 40 points
     let dataPointDenseEnough=timeLength > TimespanWanted *  40
     let DataIntegrity=(timeLength*3) === DataAcceleration.length
+    //alert(".x"+acceleration.x+ " .y"+acceleration.y+" .z"+acceleration.z+" DataAcceleration length"+DataAcceleration.length+" timeSpan"+timeSpan);
     if (!dataPointDenseEnough || !DataIntegrity ) {
       SaveDataAndRestartRecording()
       return
     }
     //压缩时间，第一个值是绝对时间戳，后续是毫秒计数的时间流逝值
     let model = SaveDataAndRestartRecording()
-    for (let i = timeLength - 1; i > 0; i--)
-      model.time[i] = model.time[i] - model.time[i - 1]
     //save to server
     model.Put(null)
   }
