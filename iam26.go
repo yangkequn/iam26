@@ -43,7 +43,6 @@ func ExportAllAccelerometerToRedis(ctx *svc.ServiceContext) {
 	if err == nil {
 		for _, v := range list {
 			RedisClient.RPush(context.Background(), "data_raw:"+v.Id, v.Data)
-			RedisClient.RPush(context.Background(), "data_raw:"+v.Id, v.Time)
 
 		}
 	}

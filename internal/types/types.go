@@ -37,14 +37,12 @@ type MeasureIndex struct {
 	Id   string    `json:"id,optional"`
 	Type string    `json:"type"`
 	Data []float32 `json:"data"`
-	Time []int64   `json:"time"` //time tick
 	List []string  `json:"list"`
 }
 
 type MeasureAccelerometer struct {
 	Id   string   `json:"id,optional"`
 	Data []int64  `json:"data"`
-	Time []int64  `json:"time"` //time tick
 	List []string `json:"list"`
 }
 

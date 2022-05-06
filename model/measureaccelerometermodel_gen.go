@@ -25,8 +25,8 @@ var (
 type (
 	measureAccelerometerModel interface {
 		Insert(ctx context.Context, data *MeasureAccelerometer) (sql.Result, error)
+		FindOne(ctx context.Context, id string) (*MeasureAccelerometer, error)		
 		FindAll(ctx context.Context) ([]*MeasureAccelerometer, error)
-		FindOne(ctx context.Context, id string) (*MeasureAccelerometer, error)
 		Update(ctx context.Context, data *MeasureAccelerometer) error
 		Delete(ctx context.Context, id string) error
 	}
@@ -42,7 +42,6 @@ type (
 		UpdateTime time.Time `db:"update_time"`
 		List       string    `db:"list"`
 		Data       string    `db:"data"` // use float 32 array
-		Time       string    `db:"time"` // JavaScript time in ms. if value less than 1 years, that's time span。every group of data started with absolute time
 	}
 )
 
@@ -54,8 +53,8 @@ func newMeasureAccelerometerModel(conn sqlx.SqlConn) *defaultMeasureAcceleromete
 }
 
 func (m *defaultMeasureAccelerometerModel) Insert(ctx context.Context, data *MeasureAccelerometer) (sql.Result, error) {
-	query := fmt.Sprintf("insert into %s (%s) values ($1, $2, $3, $4)", m.table, measureAccelerometerRowsExpectAutoSet)
-	ret, err := m.conn.ExecCtx(ctx, query, data.Id, data.List, data.Data, data.Time)
+	query := fmt.Sprintf("insert into %s (%s) values ($1, $2, $3)", m.table, measureAccelerometerRowsExpectAutoSet)
+	ret, err := m.conn.ExecCtx(ctx, query, data.Id, data.List, data.Data)
 	return ret, err
 }
 
@@ -75,7 +74,7 @@ func (m *defaultMeasureAccelerometerModel) FindOne(ctx context.Context, id strin
 
 func (m *defaultMeasureAccelerometerModel) Update(ctx context.Context, data *MeasureAccelerometer) error {
 	query := fmt.Sprintf("update %s set %s where id = $1", m.table, measureAccelerometerRowsWithPlaceHolder)
-	_, err := m.conn.ExecCtx(ctx, query, data.Id, data.List, data.Data, data.Time)
+	_, err := m.conn.ExecCtx(ctx, query, data.Id, data.List, data.Data)
 	return err
 }
 

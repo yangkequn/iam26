@@ -3,7 +3,6 @@ package logic
 import (
 	"context"
 	"errors"
-	"strconv"
 	"strings"
 
 	"iam26/internal/svc"
@@ -52,21 +51,8 @@ func (l *MeasureIndexItemPutLogic) MeasureIndexItemPut(req *types.MeasureIndex) 
 		_, err = l.svcCtx.MeasureIndexModel.Insert(l.ctx, indexList)
 	}
 
-	if len(req.Data) != len(req.Time) {
-		return nil, errors.New("data length not equal time length, index table id:" + indexList.Id)
-	}
-	modified := false
-	for i, v := range req.Data {
-		//add data ,but skit data of same time point
-		if Tool.NonRedundantMerge(&indexList.Time, strconv.FormatInt(req.Time[i], 10), true) {
-			indexList.Data = strconv.FormatFloat(float64(v), 'f', 4, 32) + "," + indexList.Data
-			modified = true
-		}
-		// trim last ,
-		indexList.Data = strings.Trim(indexList.Data, ",")
-	}
-	if modified {
-		l.svcCtx.MeasureIndexModel.Update(l.ctx, indexList)
+	if len(req.Data)%3 != 0 {
+		return nil, errors.New("data format corruped:" + indexList.Id)
 	}
 	//if data list too long, save to another row
 	var keptNum = 256
@@ -91,7 +77,6 @@ func (l *MeasureIndexItemPutLogic) MeasureIndexItemPut(req *types.MeasureIndex) 
 		List: Tool.StringSlit(indexList.List),
 		Type: req.Type,
 		Data: Tool.StringToFloat32Array(indexList.Data),
-		Time: Tool.StringToInt64Array(indexList.Time),
 	}, nil
 
 }

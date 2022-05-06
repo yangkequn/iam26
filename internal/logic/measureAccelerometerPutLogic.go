@@ -49,13 +49,10 @@ func (l *MeasureAccelerometerPutLogic) MeasureAccelerometerPut(req *types.Measur
 	}
 	//TIME_STAMP采样每个时刻一个点
 	data := Tool.Int64ArrayToBase10String(req.Data)
-	time := Tool.Int64ArrayToBase10String(req.Time)
-	if len(Tool.StringSlit(data)) != len(Tool.StringSlit(time))*3 {
-		return nil, fmt.Errorf("data and time length not match")
+	if len(Tool.StringSlit(data))%3 != 0 {
+		return nil, fmt.Errorf("data format corrupt")
 	}
 	Tool.MergeStringWithString(&accelerometer.Data, data, false)
-	Tool.MergeStringWithString(&accelerometer.Time, time, false)
-
 	//merge data to the last list, if the last list's data is not too enough
 	if len(accelerometer.Data) > 32*1024 {
 		if len(accelerometer.List) > 0 {
@@ -63,9 +60,7 @@ func (l *MeasureAccelerometerPutLogic) MeasureAccelerometerPut(req *types.Measur
 			last, err := l.svcCtx.MeasureAccelerometerModel.FindOne(l.ctx, ids[len(ids)-1])
 			if err == nil && len(accelerometer.Data) < 2*1024*1024 {
 				Tool.MergeStringWithString(&last.Data, accelerometer.Data, false)
-				Tool.MergeStringWithString(&last.Time, accelerometer.Time, false)
 				accelerometer.Data = ""
-				accelerometer.Time = ""
 				l.svcCtx.MeasureAccelerometerModel.Update(l.ctx, last)
 			}
 		}
@@ -78,12 +73,10 @@ func (l *MeasureAccelerometerPutLogic) MeasureAccelerometerPut(req *types.Measur
 		accelerometer2 := &model.MeasureAccelerometer{
 			Id:   Tool.Int64ToString(rand.Int63()),
 			Data: accelerometer.Data,
-			Time: accelerometer.Time,
 		}
 		_, err = l.svcCtx.MeasureAccelerometerModel.Insert(l.ctx, accelerometer2)
 		if err == nil {
 			accelerometer.Data = ""
-			accelerometer.Time = ""
 			Tool.MergeStringWithString(&accelerometer.List, accelerometer2.Id, false)
 		}
 	}
@@ -93,8 +86,6 @@ func (l *MeasureAccelerometerPutLogic) MeasureAccelerometerPut(req *types.Measur
 	resp = &types.MeasureAccelerometer{
 		Id:   accelerometer.Id,
 		Data: Tool.Base10StringToInt64Array(accelerometer.Data),
-		//decode time
-		Time: Tool.JSTimeSequenceStringToArray(accelerometer.Time),
 		List: Tool.StringSlit(accelerometer.List),
 	}
 	return resp, nil

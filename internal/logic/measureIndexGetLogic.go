@@ -61,6 +61,5 @@ func (l *MeasureIndexGetLogic) MeasureIndexGet(req *types.MeasureIndex) (resp *t
 		List: Tool.StringSlit(indexList.List),
 		Type: req.Type,
 		Data: data,
-		Time: time,
 	}, err
 }
