@@ -3,20 +3,19 @@ import { Get, Load, Put, Delete, ObjectVersionChanged } from "./Webapi";
 export interface IMeasureAccelerometer {
     id: string
     data: Array<number>
-    time: Array<number> // time tick, in milliseconds
     list: Array<string>
 }
 
 
 export class MeasureAccelerometer implements IMeasureAccelerometer {
 
-    constructor(public id: string, public data: Array<number>, public time: Array<number>, public list: Array<string>) {
+    constructor(public id: string, public data: Array<number>, public list: Array<string>) {
     }
 
     public static From(obj: object): MeasureAccelerometer {
         //convert obj to MeasureIndex
         // only properties of MeasureIndex is allowed
-        return new MeasureAccelerometer(obj["id"], obj["data"], obj["time"], obj["list"]);
+        return new MeasureAccelerometer(obj["id"], obj["data"],  obj["list"]);
     }
 
     public LoadCheck = (): boolean => !(!this.id || this.id === "0")
