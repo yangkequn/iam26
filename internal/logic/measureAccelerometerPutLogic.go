@@ -54,15 +54,13 @@ func (l *MeasureAccelerometerPutLogic) MeasureAccelerometerPut(req *types.Measur
 	}
 	Tool.MergeStringWithString(&accelerometer.Data, data, false)
 	//merge data to the last list, if the last list's data is not too enough
-	if len(accelerometer.Data) > 32*1024 {
-		if len(accelerometer.List) > 0 {
-			ids := Tool.StringSlit(accelerometer.List)
-			last, err := l.svcCtx.MeasureAccelerometerModel.FindOne(l.ctx, ids[len(ids)-1])
-			if err == nil && len(accelerometer.Data) < 2*1024*1024 {
-				Tool.MergeStringWithString(&last.Data, accelerometer.Data, false)
-				accelerometer.Data = ""
-				l.svcCtx.MeasureAccelerometerModel.Update(l.ctx, last)
-			}
+	if len(accelerometer.Data) > 32*1024 && len(accelerometer.List) > 0 {
+		ids := Tool.StringSlit(accelerometer.List)
+		last, err := l.svcCtx.MeasureAccelerometerModel.FindOne(l.ctx, ids[len(ids)-1])
+		if err == nil && len(last.Data) < 2*1024*1024 {
+			Tool.MergeStringWithString(&last.Data, accelerometer.Data, false)
+			l.svcCtx.MeasureAccelerometerModel.Update(l.ctx, last)
+			accelerometer.Data = ""
 		}
 	}
 	// try create another list to hold the data. temporary data should be short enough,to speed up reading process
