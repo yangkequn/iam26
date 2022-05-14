@@ -40,6 +40,10 @@ type MeasureIndex struct {
 	List []string  `json:"list"`
 }
 
+type PutMeasureAccelerometer struct {
+	Heartbeat int64 `json:"heartbeat"`
+}
+
 type MeasureAccelerometer struct {
 	Id   string   `json:"id,optional"`
 	Data []int64  `json:"data"`

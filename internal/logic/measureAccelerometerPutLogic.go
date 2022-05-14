@@ -6,7 +6,9 @@ import (
 	"iam26/internal/svc"
 	"iam26/internal/types"
 	"iam26/model"
+	"math"
 	"math/rand"
+	"time"
 
 	"github.com/yangkequn/Tool"
 	"github.com/zeromicro/go-zero/core/logx"
@@ -26,11 +28,60 @@ func NewMeasureAccelerometerPutLogic(ctx context.Context, svcCtx *svc.ServiceCon
 	}
 }
 
-func (l *MeasureAccelerometerPutLogic) MeasureAccelerometerPut(req *types.MeasureAccelerometer) (resp *types.MeasureAccelerometer, err error) {
+const tm1year = 365 * 24 * 60 * 60 * 1000
+const tm1hour = 60 * 60 * 1000
+const tm30seconds = 30 * 1000
+
+func (l *MeasureAccelerometerPutLogic) SyncWithRedis(uid string, data []int64) (saveToDBData string, err error) {
+	startTime, endTime := data[0], data[1]
+	//read old data from redis,if new data is continuous data of the old one, and total data point is more than 30 seconds, then return total data
+	//else remove old data,and reserve new data only
+	oldDataStr, _ := l.svcCtx.RedisClient.Get(l.ctx, "HB:"+uid).Result()
+	oldItems := Tool.Base10StringToInt64Array(oldDataStr)
+	//if current data is not continuous data of the old one,remove old one
+	if len(oldItems) > 3 && (math.Abs(float64(oldItems[1]-startTime)) > 200) {
+		oldItems = []int64{}
+	}
+	//merge current data with old data,else curData unchanged
+	if len(oldItems) > 0 {
+		data = append(oldItems, data[3:]...)
+		data[1] = endTime
+		data[2] = int64(len(data))
+		startTime = data[0]
+	}
+
+	//if total time more than 30 seconds,then return total data
+	if endTime-startTime > (tm30seconds - 200) {
+		l.svcCtx.RedisClient.Del(l.ctx, "HB:"+uid)
+	} else {
+		//save to redis
+		l.svcCtx.RedisClient.Set(l.ctx, "HB:"+uid, Tool.Int64ArrayToBase10String(data), time.Second*30)
+	}
+	return Tool.Int64ArrayToBase10String(data), nil
+}
+
+func (l *MeasureAccelerometerPutLogic) MeasureAccelerometerPut(req *types.MeasureAccelerometer) (resp *types.PutMeasureAccelerometer, err error) {
 	var (
 		accelerometer *model.MeasureAccelerometer
 		uid           string
+		heartbeat     float32
+		DataStr       string
 	)
+	if len(req.Data)%3 != 0 {
+		return nil, fmt.Errorf("data format corrupt")
+	}
+	if len(req.Data) < 30 {
+		return nil, fmt.Errorf("too less data points")
+	}
+	startTime, endTime := req.Data[0], req.Data[1]
+	//时间戳检查
+	if startTime <= 0 || startTime < tm1year {
+		return nil, fmt.Errorf("start time format error")
+	}
+	if endTime < startTime || endTime-startTime > tm1hour || endTime < tm1year {
+		return nil, fmt.Errorf("end time format error")
+	}
+
 	//login is required, get user id from jwt token
 	if uid, err = Tool.UserIdFromContext(l.ctx); err != nil {
 		return nil, err
@@ -39,6 +90,11 @@ func (l *MeasureAccelerometerPutLogic) MeasureAccelerometerPut(req *types.Measur
 	if req.Id == "0" {
 		req.Id = uid
 	}
+
+	//calculate heartbeat before curData is changed
+	heartbeat, _ = Tool.QueryHeartBeat(l.ctx, req.Data)
+	DataStr, err = l.SyncWithRedis(uid, req.Data)
+	req.Data = Tool.Base10StringToInt64Array(DataStr)
 	if accelerometer, err = l.svcCtx.MeasureAccelerometerModel.FindOne(l.ctx, req.Id); err != nil && !NoRowsInResultSet(err) {
 		return nil, err
 	}
@@ -48,12 +104,9 @@ func (l *MeasureAccelerometerPutLogic) MeasureAccelerometerPut(req *types.Measur
 		_, err = l.svcCtx.MeasureAccelerometerModel.Insert(l.ctx, accelerometer)
 	}
 	//TIME_STAMP采样每个时刻一个点
-	data := Tool.Int64ArrayToBase10String(req.Data)
-	if len(Tool.StringSlit(data))%3 != 0 {
-		return nil, fmt.Errorf("data format corrupt")
-	}
-	Tool.MergeStringWithString(&accelerometer.Data, data, false)
+	Tool.MergeStringWithString(&accelerometer.Data, DataStr, false)
 	//merge data to the last list, if the last list's data is not too enough
+	//尝试填充到上一张表，直到记录大小超过2M
 	if len(accelerometer.Data) > 32*1024 && len(accelerometer.List) > 0 {
 		ids := Tool.StringSlit(accelerometer.List)
 		last, err := l.svcCtx.MeasureAccelerometerModel.FindOne(l.ctx, ids[len(ids)-1])
@@ -65,8 +118,6 @@ func (l *MeasureAccelerometerPutLogic) MeasureAccelerometerPut(req *types.Measur
 	}
 	// try create another list to hold the data. temporary data should be short enough,to speed up reading process
 	if len(accelerometer.Data) > 32*1024 {
-		//尝试填充到上一张表，直到记录大小超过1M
-
 		//copy accelerometer to another
 		accelerometer2 := &model.MeasureAccelerometer{
 			Id:   Tool.Int64ToString(rand.Int63()),
@@ -81,10 +132,5 @@ func (l *MeasureAccelerometerPutLogic) MeasureAccelerometerPut(req *types.Measur
 	err = l.svcCtx.MeasureAccelerometerModel.Update(l.ctx, accelerometer)
 
 	//convert to response
-	resp = &types.MeasureAccelerometer{
-		Id:   accelerometer.Id,
-		Data: Tool.Base10StringToInt64Array(accelerometer.Data),
-		List: Tool.StringSlit(accelerometer.List),
-	}
-	return resp, nil
+	return &types.PutMeasureAccelerometer{Heartbeat: int64(heartbeat)}, nil
 }
