@@ -32,7 +32,9 @@ const tm1year = 365 * 24 * 60 * 60 * 1000
 const tm1hour = 60 * 60 * 1000
 const tm30seconds = 30 * 1000
 
-func (l *MeasureAccelerometerPutLogic) SyncWithRedis(uid string, data []int64) (saveToDBData string, err error) {
+//SyncWithRedis 将数据同步到redis.
+//返回的saveToDBData要求保存到数据库，仅仅每30秒需要保存一次
+func (l *MeasureAccelerometerPutLogic) SyncWithRedis(uid string, data []int64) (saveToDBStr string, err error) {
 	startTime, endTime := data[0], data[1]
 	//read old data from redis,if new data is continuous data of the old one, and total data point is more than 30 seconds, then return total data
 	//else remove old data,and reserve new data only
@@ -53,19 +55,21 @@ func (l *MeasureAccelerometerPutLogic) SyncWithRedis(uid string, data []int64) (
 	//if total time more than 30 seconds,then return total data
 	if endTime-startTime > (tm30seconds - 200) {
 		l.svcCtx.RedisClient.Del(l.ctx, "HB:"+uid)
+		saveToDBStr = Tool.Int64ArrayToBase10String(data)
 	} else {
 		//save to redis
 		l.svcCtx.RedisClient.Set(l.ctx, "HB:"+uid, Tool.Int64ArrayToBase10String(data), time.Second*30)
+		saveToDBStr = ""
 	}
-	return Tool.Int64ArrayToBase10String(data), nil
+	return saveToDBStr, nil
 }
 
 func (l *MeasureAccelerometerPutLogic) MeasureAccelerometerPut(req *types.MeasureAccelerometer) (resp *types.PutMeasureAccelerometer, err error) {
 	var (
-		accelerometer *model.MeasureAccelerometer
-		uid           string
-		heartbeat     float32
-		DataStr       string
+		accelerometer           *model.MeasureAccelerometer
+		uid                     string
+		heartbeat               float32
+		DataStrNeededToSaveToDB string
 	)
 	if len(req.Data)%3 != 0 {
 		return nil, fmt.Errorf("data format corrupt")
@@ -93,8 +97,12 @@ func (l *MeasureAccelerometerPutLogic) MeasureAccelerometerPut(req *types.Measur
 
 	//calculate heartbeat before curData is changed
 	heartbeat, _ = Tool.QueryHeartBeat(l.ctx, req.Data)
-	DataStr, err = l.SyncWithRedis(uid, req.Data)
-	req.Data = Tool.Base10StringToInt64Array(DataStr)
+	//if data is save to redis,and no need save to db ,just return heartbeat
+	if DataStrNeededToSaveToDB, err = l.SyncWithRedis(uid, req.Data); DataStrNeededToSaveToDB != "" {
+		return &types.PutMeasureAccelerometer{Heartbeat: int64(heartbeat)}, nil
+	}
+
+	req.Data = Tool.Base10StringToInt64Array(DataStrNeededToSaveToDB)
 	if accelerometer, err = l.svcCtx.MeasureAccelerometerModel.FindOne(l.ctx, req.Id); err != nil && !NoRowsInResultSet(err) {
 		return nil, err
 	}
@@ -104,7 +112,7 @@ func (l *MeasureAccelerometerPutLogic) MeasureAccelerometerPut(req *types.Measur
 		_, err = l.svcCtx.MeasureAccelerometerModel.Insert(l.ctx, accelerometer)
 	}
 	//TIME_STAMP采样每个时刻一个点
-	Tool.MergeStringWithString(&accelerometer.Data, DataStr, false)
+	Tool.MergeStringWithString(&accelerometer.Data, DataStrNeededToSaveToDB, false)
 	//merge data to the last list, if the last list's data is not too enough
 	//尝试填充到上一张表，直到记录大小超过2M
 	if len(accelerometer.Data) > 32*1024 && len(accelerometer.List) > 0 {
