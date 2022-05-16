@@ -11,6 +11,7 @@ export function AppFrame({ children }) {
       <header className="App-header">
         {children}
       </header>
+      <div style={{height:"10px",width:"100%",display:"block",fontSize:"12px"}}>闽ICP备2022003454号</div>
     </div>
   );
 }

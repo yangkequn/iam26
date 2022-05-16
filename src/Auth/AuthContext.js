@@ -64,10 +64,9 @@ export const AuthContextComponent = ({children}) => {
         }
     }
     const SendSMSCode = (check) => {
-        let ok = check();
+        let ok = check(); 
         if (!ok) return
         //to do 开发测试代码，上线前修改
-        setSMSCodeError("偷偷告诉你吧，是145185")
         ModifySMSButtonText(60)
         if (ok) axios.post("/api/userSentSMS", {countryCode, phone}).then(r => {
             if (!!r.data.error && r.data.error === "phone") setPhoneError("该手机已经注册")

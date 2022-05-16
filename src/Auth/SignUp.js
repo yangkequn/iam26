@@ -6,7 +6,6 @@ import { AuthContext } from "./AuthContext";
 import { AuthCss, AuthPages, AuthPanelWidth } from "./index";
 import axios from "axios";
 import "./signUp.css"
-import "./auth.css"
 import { GlobalContext } from "../base/GlobalContext";
 import { cr0 } from "../base/css";
 import { Jwt } from "../models/Jwt";
@@ -58,7 +57,7 @@ export const SignUp = () => {
 
     const signUp = e => {
         let pass = checkAccount(false) && CheckPassword() && checkCountryCode() && checkPhone()
-        pass && axios.post("/api/userSignUp", { countryCode, phone, account, password, SMSCode: parseInt(SMSCode) })
+        pass && axios.post("/api/userSignUp", { countryCode, phone, "account":account.toLowerCase(), password, SMSCode: parseInt(SMSCode) })
             .then((ret) => {
                 const error = ret.data.error
                 if (error === "phone") setPhoneError("该手机号已被注册")
@@ -86,7 +85,7 @@ export const SignUp = () => {
                 <CountrySelect width={200} disableCloseOnSelect countryCodeError={countryCodeError}
                     defaultValue={'CN'}
                     setCountryCode={setCountryCode} key={"signUp-CountrySelect"}> </CountrySelect>
-                {/*填写手机号码*/}
+                {/*填写手机号码*/} 
                 <TextField id="signUp-phone" label={phoneError || info["PhoneNumberTitle"]} size="small"
                     variant="standard"
                     error={!!phoneError} onChange={e => setPhone(e.target.value)}
