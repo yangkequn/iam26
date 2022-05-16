@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, } from "react";
-import { Button, TextField, } from "@mui/material";
+import { Button, Container, TextField, } from "@mui/material";
 import { AuthPages, AuthPanelWidth } from "./index";
 import { cr0 } from "../base/css";
 import CountrySelect from "./countrySelect";
@@ -9,7 +9,7 @@ import { GlobalContext } from "../base/GlobalContext";
 import axios from "axios";
 import "./auth.css"
 import { Jwt } from "../models/Jwt";
-
+import Box from '@mui/material/Box';
 export const Login = () => {
     const { SetAuthPage } = useContext(GlobalContext)
     const ToOneLanguage = (l) => {
@@ -63,69 +63,70 @@ export const Login = () => {
                 }
             })
     }
-    const css={
-        LoginContainer:{
-            display: "flex", flexDirection: "column" , width: AuthPanelWidth, background: "#ffffff",
-            color: "#000", padding: "3em 2em 0em 2em",
+    const css = {
+        LoginContainer: {
+            display: "flex", flexDirection: "column", width: "100%", background: "#ffffff",
+            color: "#000", padding: "1em .5em 0em .5em",
         }
     }
-    return <div className=" login-container">
+    return <div className="login-container">
         <div style={css.LoginContainer}>
-            <div><h2> {info["Title"]} </h2></div>
-
-            <div style={{ ...cr0, display: foreignPhone ? "flex" : "none" }}>
-                {/*选择国家*/}
-                <CountrySelect width={"250px"} disableCloseOnSelect countryCodeError={countryCodeError}
-                    defaultValue={"CN"}
-                    setCountryCode={setCountryCode}> </CountrySelect>
-                {/*填写手机号码*/}
-                <TextField id="signUp-phone" label={phoneError || info["PhoneNumberTitle"]} size="small"
-                    variant="standard"
-                    error={!!phoneError} onChange={e => setPhone(e.target.value)}
-                    style={{ width: "100%" }} />
-            </div>
-
-
-            {!foreignPhone && <TextField id="login-phone" label={accountError || info["AccountTitle"]} size="small"
-                variant="standard"
-                error={!!accountError} onChange={e => setAccount(e.target.value)}
-                style={{ width: "100%" }} />}
-
-            {/*密码框*/}
-            <TextField id="login-password" label={passwordError || info["PasswordTitle"]} size="small" type={"password"}
-                variant="standard"
-                error={!!passwordError} onChange={e => setPassword(e.target.value)}
-                style={{ width: "100%" }} />
-
-            <div style={{ ...cr0, justifyContent: "space-between", color: "#25a", margin: "1.3em 0 1.0em 0" }}
-                key={"user_foreign_phone"}>
-                <Button onClick={e => {
-                    let ToBeForeignMode = !foreignPhone
-                    setCountryCode(ToBeForeignMode ? 1 : 86);
-                    if (ToBeForeignMode) setAccount("")
-                    else setPhone("")
-                    setForeignPhone(!foreignPhone);
-                }}>
-                    {!foreignPhone ? info.ForeignPhoneMode : info.MailAccountLogin}
-                </Button>
-
-
-                <div onClick={e => SetAuthPage(AuthPages.ForgotPassword)} key={"user_forgot_password"}
-                    style={{ color: "#8590a6" }}>
-                    {info.ForgotPassword}
+            <div><h2> {info["Title"]}</h2></div>
+            <Box sx={{width:"100%"}}>
+                <div style={{ ...cr0, display: foreignPhone ? "flex" : "none" }}>
+                    {/*选择国家*/}
+                    <CountrySelect width={"150px"} disableCloseOnSelect countryCodeError={countryCodeError}
+                        defaultValue={"CN"}
+                        setCountryCode={setCountryCode}> </CountrySelect>
+                    {/*填写手机号码*/}
+                    <TextField id="signUp-phone" label={phoneError || info["PhoneNumberTitle"]} size="small"
+                        variant="standard"
+                        error={!!phoneError} onChange={e => setPhone(e.target.value)}
+                        style={{ width: "70%" }} />
                 </div>
-            </div>
 
 
-            <button className={"submit"} key={"login-button"} onClick={e => login(e)}>
-                {info.LoginTitle}
-            </button>
+                {!foreignPhone && <TextField id="login-phone" label={accountError || info["AccountTitle"]} size="small"
+                    variant="standard"
+                    error={!!accountError} onChange={e => setAccount(e.target.value)}
+                    style={{ width: "90%" }} />}
 
-            <div className={"cr0 login_container"}>
-                <div>{info.WithoutAnAccount}</div>
-                <Button onClick={e => SetAuthPage(AuthPages.SignUp)}>{info.Signup}</Button>
-            </div>
+                {/*密码框*/}
+                <TextField id="login-password" label={passwordError || info["PasswordTitle"]} size="small" type={"password"}
+                    variant="standard"
+                    error={!!passwordError} onChange={e => setPassword(e.target.value)}
+                    style={{ width: "90%" }} />
+
+                <Container sx={{...cr0,  justifyContent: "space-between", color: "#25a", margin: "1.3em 0 1.0em 0" }}
+                    key={"user_foreign_phone"}>
+                    <Button onClick={e => {
+                        let ToBeForeignMode = !foreignPhone
+                        setCountryCode(ToBeForeignMode ? 1 : 86);
+                        if (ToBeForeignMode) setAccount("")
+                        else setPhone("")
+                        setForeignPhone(!foreignPhone);
+                    }}>
+                        {!foreignPhone ? info.ForeignPhoneMode : info.MailAccountLogin}
+                    </Button>
+
+
+                    <div onClick={e => SetAuthPage(AuthPages.ForgotPassword)} key={"user_forgot_password"}
+                        style={{ color: "#8590a6" }}>
+                        {info.ForgotPassword}
+                    </div>
+                </Container>
+
+
+                <button className={"submit"} key={"login-button"} onClick={e => login(e)}>
+                    {info.LoginTitle}
+                </button>
+
+                <div className={"cr0 login_container"}>
+                    <div>{info.WithoutAnAccount}</div>
+                    <Button onClick={e => SetAuthPage(AuthPages.SignUp)}>{info.Signup}</Button>
+                </div>
+            </Box>
         </div>
-        <div className={"footer"}>{info.Footer}</div>
+        {/* <div className={"footer"}>{info.Footer}</div> */}
     </div>
 }

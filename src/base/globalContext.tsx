@@ -16,6 +16,9 @@ interface GlobalContextType {
     RedirectUrl: string,
     setRedirectUrl: React.Dispatch<React.SetStateAction<string>>,
 
+    Heartbeat: Number,
+    setHeartbeat: React.Dispatch<React.SetStateAction<Number>>,
+
 }
 export const GlobalContext = React.createContext<GlobalContextType | null>(null)
 
@@ -29,6 +32,7 @@ export const GlobalContextProvider: React.FC<React.ReactNode> = ({ children }) =
 
     const [leftDrawerSize, setLeftDrawerSize] = useState(LeftDrawerSize.Short)
 
+    const [Heartbeat, setHeartbeat] = useState(0)
     useEffect(() => {
         const LoadJwt = (event: Event) => {
             setLoggedIn(Jwt.Get().IsValid())
@@ -52,6 +56,7 @@ export const GlobalContextProvider: React.FC<React.ReactNode> = ({ children }) =
         SetAuthPage,
         RedirectUrl,
         setRedirectUrl,
+        Heartbeat,setHeartbeat
     }
 
     return <GlobalContext.Provider value={store} > {children} </GlobalContext.Provider>

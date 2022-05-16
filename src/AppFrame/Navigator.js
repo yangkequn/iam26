@@ -29,7 +29,7 @@ export const Navigator = () => {
     setSubMenuItems(currentMenu.subMenu)
   }, [])
 
-  const L1MenuItemCss = { color: "#fff", height: "100%", fontSize: 18, borderRadius: 0 ,ml:"-0.3em",mr:"-0.3em"}
+  const L1MenuItemCss = { color: "#fff", height: "100%", fontSize: 18, borderRadius: 0 ,ml:"-0.39em",mr:"-0.39em"}
   return <div style={{ ...cv0 }} id="appnavigator">
 
     <div className="App-Nagivator-l1" >

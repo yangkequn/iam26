@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useContext, useEffect,} from "react";
-import {Button, TextField} from "@mui/material";
+import React, { useContext, useEffect, } from "react";
+import { Box, Button, Container, TextField } from "@mui/material";
 import CountrySelect from "./countrySelect";
-import {AuthContext} from "./AuthContext";
-import {AuthPages, AuthPanelWidth} from "./index";
+import { AuthContext } from "./AuthContext";
+import { AuthCss, AuthPages, AuthPanelWidth } from "./index";
 import axios from "axios";
 import "./signUp.css"
 import "./auth.css"
@@ -12,7 +12,7 @@ import { cr0 } from "../base/css";
 import { Jwt } from "../models/Jwt";
 
 export const SignUp = () => {
-    const {SetAuthPage} = useContext(GlobalContext)
+    const { SetAuthPage } = useContext(GlobalContext)
 
     const ToOneLanguage = language_ind => {
         const info_languages = {
@@ -31,7 +31,8 @@ export const SignUp = () => {
             RegisterTitle: ["Register", "注册"],
             HaveAccountAlready: ["Already have an account?", "已经有账号了？"],
             Login: ["Login", "登录"],
-            Footer: ["Together, life is bigger", "在一起，生命更放大"]
+            //Footer: ["Together, life is bigger", "在一起，生命更放大"]
+            Footer: ["Together, life is bigger", ""]
         }
         let ret = {}
         Object.keys(info_languages).map((k, i) => ret[k] = info_languages[k][language_ind])
@@ -50,14 +51,14 @@ export const SignUp = () => {
     } = useContext(AuthContext)
 
     useEffect(() => !!account && checkAccount(false), [account])
-    useEffect(() => !!password && CheckPassword(), [ password])
-    useEffect(() => !!countryCode && checkCountryCode(), [ countryCode])
-    useEffect(() => !!phone && checkPhone(), [ phone])
+    useEffect(() => !!password && CheckPassword(), [password])
+    useEffect(() => !!countryCode && checkCountryCode(), [countryCode])
+    useEffect(() => !!phone && checkPhone(), [phone])
     useEffect(() => !!SMSCode && checkSMSCode(), [SMSCode])
 
     const signUp = e => {
         let pass = checkAccount(false) && CheckPassword() && checkCountryCode() && checkPhone()
-        pass && axios.post("/api/userSignUp", {countryCode, phone, account, password, SMSCode: parseInt(SMSCode)})
+        pass && axios.post("/api/userSignUp", { countryCode, phone, account, password, SMSCode: parseInt(SMSCode) })
             .then((ret) => {
                 const error = ret.data.error
                 if (error === "phone") setPhoneError("该手机号已被注册")
@@ -68,62 +69,53 @@ export const SignUp = () => {
                 }
             })
     }
+    return <div key={"signUpBox"} style={AuthCss.containerL1}>
+        <div style={AuthCss.containerL2}>
+            <Box sx={{ m: "0 0 0 1em" }}><h2> {info["Title"]} </h2></Box>
 
-    return <div key={"signUpBox"} style={{
-        display: "flex", flexDirection: "column", width: "100%",
-        height: "100%", background: "#f7f9fb", alignItems: "center",
-    }}>
-        <div style={{
-            display: "flex",
-            flexDirection: "column",
-            width: AuthPanelWidth,
-            background: "#ffffff",
-            color: "#000",
-            padding: "2em 2em 0em 2em",
-        }}>
-            <div><h2> {info["Title"]} </h2></div>
 
-            <TextField id="signUp-nickname" type="text" label={accountError || "账户名"}
-                       onChange={e => setAccount(e.target.value)}
-                       error={!!accountError} size={"small"} variant="standard" autoFocus={true}/>
+            <TextField id="signUp-nickname" type="text" style={AuthCss.singleLineInputCss} label={accountError || "账户名"}
+                onChange={e => setAccount(e.target.value)} error={!!accountError} size={"small"} variant="standard" autoFocus={true} />
 
-            <TextField id="signUp-password" type="password" label={info.PasswordTitle} size="small" variant="standard"
-                       error={!!passwordError} helperText={passwordError}
-                       onChange={e => setPassword(e.target.value)}/>
 
-            <div style={{...cr0, margin: "0.5em 0 0.5em 0"}}>
-                {/*选择国家*/}
-                <CountrySelect width={250} disableCloseOnSelect countryCodeError={countryCodeError}
-                               defaultValue={'CN'}
-                               setCountryCode={setCountryCode} key={"signUp-CountrySelect"}> </CountrySelect>
+            <TextField id="signUp-password" type="password" style={AuthCss.singleLineInputCss} label={info.PasswordTitle} size="small"
+                variant="standard" error={!!passwordError} helperText={passwordError} onChange={e => setPassword(e.target.value)} />
+
+
+            <div style={{ ...cr0,...AuthCss.singleLineInputCss,marginTop:"1em"}}>                 {/*选择国家*/}
+                <CountrySelect width={200} disableCloseOnSelect countryCodeError={countryCodeError}
+                    defaultValue={'CN'}
+                    setCountryCode={setCountryCode} key={"signUp-CountrySelect"}> </CountrySelect>
                 {/*填写手机号码*/}
                 <TextField id="signUp-phone" label={phoneError || info["PhoneNumberTitle"]} size="small"
-                           variant="standard"
-                           error={!!phoneError} onChange={e => setPhone(e.target.value)}
-                           style={{width: "100%"}}/>
+                    variant="standard"
+                    error={!!phoneError} onChange={e => setPhone(e.target.value)}
+                    style={{ width: "70%" }} />
             </div>
 
             {/*手机校验码*/}
-            <div className={"cr0 input-container"} key={"input-SMS-code"}>
+            <div style={{ ...cr0,...AuthCss.singleLineInputCss}} key={"input-SMS-code"}>
                 <TextField id="signUp-SMS" type="number" label={info.VerifyCodeTitle} size="small" variant="standard"
-                           helperText={SMSCodeError} onChange={e => setSMSCode(e.target.value)} error={!!SMSCodeError}
-                           fullWidth={true}></TextField>
+                    helperText={SMSCodeError} onChange={e => setSMSCode(e.target.value)} error={!!SMSCodeError}
+                    fullWidth={true}></TextField>
                 <Button onClick={e => SendSMSCode(() => {
                     return checkCountryCode() && checkPhone()
                 })}
-                        style={{width: 200}} disabled={SMSButtonDisabled}>
+                    style={{ width: 200 }} disabled={SMSButtonDisabled}>
                     {SMSButtonText}
                 </Button>
             </div>
-            
-            <button className={"submit"} key={"sign-up-button"} onClick={e => signUp(e)}>{info.RegisterTitle} </button>
 
-            <div className={"cr0 agree_term_Container"} key={"agree-to-term"}>
+            <button className={"submit"} style={{...AuthCss.singleLineInputCss,marginTop:"1em"}} key={"sign-up-button"} onClick={e => signUp(e)}>
+                {info.RegisterTitle} 
+            </button>
+
+            <div className={"cr0 agree_term_Container"} style={{...AuthCss.singleLineInputCss,marginTop:"0.5em"}} key={"agree-to-term"}>
                 <div>{info.TermAgreeTitle}</div>
-                <b style={{margin: "0  0 0 .2em"}}><a href={"."}>{info.TermLinkTitle}</a></b>
+                <b style={{ margin: "0  0 0 .2em" }}><a href={"."}>{info.TermLinkTitle}</a></b>
             </div>
 
-            <div className={"cr0 login_container"}>
+            <div className={"cr0 login_container"} style={{...AuthCss.singleLineInputCss,marginTop:"0.5em"}}>
                 <div>{info.HaveAccountAlready}</div>
                 <Button onClick={e => SetAuthPage(AuthPages.Login)}>{info.Login}</Button>
             </div>

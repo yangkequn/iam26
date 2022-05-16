@@ -11,7 +11,7 @@ import { MeasureItem } from "../models/MeasureItem";
 import { ActItem } from "../models/ActItem";
 import { TraceItem } from "../models/TraceItem";
 import DeleteIcon from '@mui/icons-material/Delete';
-import {Accelerometer} from "../base/Accelerometer";
+import { Accelerometer } from "../base/Accelerometer";
 
 function TraceModelItem({ item }: { item: TraceModel; }) {
 
@@ -21,11 +21,11 @@ function TraceModelItem({ item }: { item: TraceModel; }) {
 
     //autoload from server
     useEffect(() => {
-        !!item.measureId && MeasureItem.From(item).Load(e=>setUpdateTM( new Date().getTime()))
-        !!item.actId && ActItem.From(item).Load(e=>setUpdateTM( new Date().getTime()))
+        !!item.measureId && MeasureItem.From(item).Load(e => setUpdateTM(new Date().getTime()))
+        !!item.actId && ActItem.From(item).Load(e => setUpdateTM(new Date().getTime()))
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [item])
-//    useEffect(() => setUpdateTM(new Date().getTime()), [item.updated])
+    //    useEffect(() => setUpdateTM(new Date().getTime()), [item.updated])
 
 
     let TypeText = (!!item["measureId"] && "效果") || (!!item["actId"] && "方法")
@@ -75,7 +75,6 @@ export const MyTrace = () => {
     }
     useEffect(() => TraceModel.Get(getListCallBack), [])
 
-    const [upload, setUpload] = useState<Boolean>(false)
 
     return (
         //items table ,all columes are sortable, contains a list of items
@@ -87,9 +86,7 @@ export const MyTrace = () => {
                 <Button className="cr0" variant="contained" color="primary" startIcon={<AddIcon />} onClick={AddAction}>添加效果</Button>
                 <div style={{ width: "20%" }}></div>
             </div>
-
-        <Button variant="contained" size="large" color={!upload?"primary":"secondary"} sx={{p:"3em 3em 3em 3em"}} onClick={e=>setUpload(!upload)} > {upload?"...记录中，点击停止":"点击开始记录"}</Button>
-        {upload&&<Accelerometer></Accelerometer>}
+            <Accelerometer ></Accelerometer>            
 
             <div className="cv0" style={{ justifyContent: "flex-start" }} >
                 {traces.map((item, i) => <TraceModelItem key={`trace-${item["traceId"]}-${item["name"]}-${item["updated"]}`} item={item} />)}

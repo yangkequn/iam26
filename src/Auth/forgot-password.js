@@ -2,11 +2,11 @@
 import React, { useContext, useEffect } from "react";
 import axios from "axios";
 import { cr0, cr1, cv0, cv1 } from "../base/css";
-import { AuthPages } from "./index";
+import { AuthCss, AuthPages } from "./index";
 import { AuthContext } from "./AuthContext";
 import CountrySelect from "./countrySelect";
 import { GlobalContext } from "../base/GlobalContext";
-import { Button, TextField } from "@mui/material";
+import { Box, Button, TextField } from "@mui/material";
 
 const ToOneLanguage = (language_ind) => {
     const infoMultiLanguages = {
@@ -34,28 +34,10 @@ const ToOneLanguage = (language_ind) => {
     return ret
 }
 
-const forgetPasswordCss = () => ({
-    inputContainer: { ...cr0, justifyContent: "space-between", margin: "0em 0 1.0em 0", },
-    containerL1: { ...cv0, height: "100%", background: "#f7f9fb", alignItems: "center", },
-    containerL2: { ...cv1, width: "400px", background: "#ffffff", color: "#000", padding: "3em 2em 0em 2em", },
-    button: {
-        margin: "0 0 0 1em",
-        lineHeight: 1.0,
-        border: "0px",
-        width: "120px",
-        color: "#89a",
-        background: "#ffffff"
-    },
-    submit: {
-        ...cr0, margin: "1em 0 0 0em", lineHeight: 1.5, height: "36px",
-        background: "#0066ff", justifyContent: "center", color: "#ffffff", borderRadius: "4px",
-    },
-})
 export const ForgotPassword = () => {
     const { SetAuthPage } = useContext(GlobalContext)
 
     const info = ToOneLanguage(1)
-    const css = forgetPasswordCss()
     const {
         countryCode: [countryCode, setCountryCode, countryCodeError,],
         phone: [phone, setPhone, phoneError,],
@@ -82,10 +64,13 @@ export const ForgotPassword = () => {
         })
 
     }
-    return <div style={css.containerL1}>
-        <div style={css.containerL2}>
-            <div style={cr0}><h2> {info.Title} </h2></div>
-            <div style={{ ...cr0, color: "#99a", margin: "-1em 0 1em 0", fontSize: "14px" }}>{info.Annotation}</div>
+    const singleLineInputCss = { margin: "0 1em 0 1em", width: "90%" }
+    return <div style={AuthCss.containerL1}>
+        <div style={AuthCss.containerL2}>
+            <Box sx={{ margin: "0 0 0 1em" }}>
+                <div style={cr0}><h2> {info.Title} </h2></div>
+                <div style={{ ...cr0, color: "#99a", margin: "-1em 0 1em 0", fontSize: "14px" }}>{info.Annotation}</div>
+            </Box>
 
             {/*{foreignPhone && <div style={css.inputContainer} key={"input-phone-number"}>*/}
             {/*  <div style={{...css.inputContainer, margin: "0 1em 0 0"}}>{info.CountryCodeTitle + countryCode}</div>*/}
@@ -106,12 +91,11 @@ export const ForgotPassword = () => {
             {/*}*/}
 
             {!foreignPhone ?
-                <TextField key="forgotPassword-phone" label={info.AccountTitle} size="small"
+                <TextField key="forgotPassword-phone" label={info.AccountTitle} size="small" style={AuthCss.singleLineInputCss}
                     variant="standard" helperText={accountError}
-                    error={!!accountError} onChange={e => setAccount(e.target.value)}
-                    style={{ width: "100%", }} />
+                    error={!!accountError} onChange={e => setAccount(e.target.value)} />
                 :
-                <div style={{ ...cr0, }}>
+                <div style={{ ...cr0, ...AuthCss.singleLineInputCss }}>
                     <CountrySelect width={"250px"} disableCloseOnSelect countryCodeError={countryCodeError}
                         defaultValue={'CN'}
                         setCountryCode={setCountryCode}
@@ -121,21 +105,20 @@ export const ForgotPassword = () => {
                     <TextField key="forgotPassword-phone" label={info["PhoneNumberTitle"]} size="small"
                         helperText={phoneError}
                         variant="standard" error={!!phoneError} onChange={e => setPhone(e.target.value)}
-                        style={{ width: "100%" }} />
+                        style={{ width: "70%" }} />
                 </div>}
 
 
             {/*密码框*/}
             <TextField key="forgotPassword-password" label={info["PasswordTitle"]} size="small" type={"password"}
-                variant="standard" helperText={passwordError}
-                error={!!passwordError} onChange={e => setPassword(e.target.value)}
-                style={{ width: "100%" }} />
+                variant="standard" helperText={passwordError} style={AuthCss.singleLineInputCss}
+                error={!!passwordError} onChange={e => setPassword(e.target.value)} />
 
 
             {/*手机校验码*/}
-            <div style={css.inputContainer} key={"input-SMS-code"}>
+            <div style={AuthCss.inputContainer} key={"input-SMS-code"}>
                 <TextField key="forgotPassword-SMS" type="text" label={info.VerifyCodeTitle}
-                    size="small" helperText={SMSCodeError} variant="standard"
+                    size="small" helperText={SMSCodeError} variant="standard" style={AuthCss.singleLineInputCss}
                     onChange={e => setSMSCode(e.target.value)} error={!!SMSCodeError}
                     fullWidth={true}></TextField>
                 <Button onClick={e => SendSMSCode(() => {
@@ -144,7 +127,7 @@ export const ForgotPassword = () => {
                 })} style={{ width: 200 }} disabled={SMSButtonDisabled}>{SMSButtonText} </Button>
             </div>
 
-            <Button style={cr0} key={"user_foreign_phone"} onClick={e => {
+            <Button style={{ ...cr0, width: "90%" }} key={"user_foreign_phone"} onClick={e => {
                 setForeignPhone(!foreignPhone);
                 setCountryCode(foreignPhone ? 1 : 86);
                 if (foreignPhone) setAccount("")
@@ -153,8 +136,8 @@ export const ForgotPassword = () => {
                 {!foreignPhone ? info.ForeignPhoneMode : info.MailAccountLogin}
             </Button>
 
-            <Button variant="contained" style={css.submit} key={"login-button"}
-                onClick={e => reset(e)}>{info.ResetTitle} </Button>
+            <button className={"submit"} style={{ ...AuthCss.singleLineInputCss, marginTop: "1em" }} key={"login-button"}
+                onClick={e => reset(e)}>{info.ResetTitle} </button>
 
             <div style={{ ...cr1, margin: "2em 0 0 3em" }}>
                 <div>{info.WithoutAnAccount}</div>
@@ -162,6 +145,6 @@ export const ForgotPassword = () => {
             </div>
         </div>
 
-        <div style={css.footer}>{info.Footer}</div>
+        <div style={AuthCss.footer}>{info.Footer}</div>
     </div>
 }
