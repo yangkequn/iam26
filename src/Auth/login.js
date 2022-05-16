@@ -1,13 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, } from "react";
 import { Button, Container, TextField, } from "@mui/material";
-import { AuthPages, AuthPanelWidth } from "./index";
+import { AuthCss, AuthPages, AuthPanelWidth } from "./index";
 import { cr0 } from "../base/css";
 import CountrySelect from "./countrySelect";
 import { AuthContext } from "./AuthContext";
 import { GlobalContext } from "../base/GlobalContext";
 import axios from "axios";
-import "./auth.css"
 import { Jwt } from "../models/Jwt";
 import Box from '@mui/material/Box';
 export const Login = () => {
@@ -63,43 +62,34 @@ export const Login = () => {
                 }
             })
     }
-    const css = {
-        LoginContainer: {
-            display: "flex", flexDirection: "column", width: "100%", background: "#ffffff",
-            color: "#000", padding: "1em .5em 0em .5em",
-        }
-    }
-    return <div className="login-container">
-        <div style={css.LoginContainer}>
-            <div><h2> {info["Title"]}</h2></div>
-            <Box sx={{width:"100%"}}>
+    return <div style={AuthCss.containerL1}>
+        <div style={AuthCss.containerL2}>
+
+            <Box sx={{ m: "0 0 0 1em" }}><h2> {info["Title"]} </h2></Box>
+
+            <Box sx={{ width: "100%" }}>
                 <div style={{ ...cr0, display: foreignPhone ? "flex" : "none" }}>
                     {/*选择国家*/}
                     <CountrySelect width={"150px"} disableCloseOnSelect countryCodeError={countryCodeError}
                         defaultValue={"CN"}
                         setCountryCode={setCountryCode}> </CountrySelect>
-                    {/*填写手机号码*/}
-                    <TextField id="signUp-phone" label={phoneError || info["PhoneNumberTitle"]} size="small"
-                        variant="standard"
-                        error={!!phoneError} onChange={e => setPhone(e.target.value)}
-                        style={{ width: "70%" }} />
+                    {/*填写手机号码*/} rror} onChange={e => setPhone(e.target.value)}
+                        style={{ widtvvh: "70%" }} />
                 </div>
 
 
                 {!foreignPhone && <TextField id="login-phone" label={accountError || info["AccountTitle"]} size="small"
-                    variant="standard"
-                    error={!!accountError} onChange={e => setAccount(e.target.value)}
-                    style={{ width: "90%" }} />}
+                    variant="standard" style={AuthCss.singleLineInputCss}
+                    error={!!accountError} onChange={e => setAccount(e.target.value)} />}
 
                 {/*密码框*/}
                 <TextField id="login-password" label={passwordError || info["PasswordTitle"]} size="small" type={"password"}
-                    variant="standard"
-                    error={!!passwordError} onChange={e => setPassword(e.target.value)}
-                    style={{ width: "90%" }} />
+                    variant="standard" style={AuthCss.singleLineInputCss} 
+                    error={!!passwordError} onChange={e => setPassword(e.target.value)} />
 
-                <Container sx={{...cr0,  justifyContent: "space-between", color: "#25a", margin: "1.3em 0 1.0em 0" }}
+                <Container sx={{ ...cr0, justifyContent: "space-between", color: "#25a", margin: "1.3em 0 1.0em 0" }}
                     key={"user_foreign_phone"}>
-                    <Button onClick={e => {
+                    <Button  onClick={e => {
                         let ToBeForeignMode = !foreignPhone
                         setCountryCode(ToBeForeignMode ? 1 : 86);
                         if (ToBeForeignMode) setAccount("")
@@ -117,11 +107,11 @@ export const Login = () => {
                 </Container>
 
 
-                <button className={"submit"} key={"login-button"} onClick={e => login(e)}>
+                <button className={"submit"} key={"login-button"}  style={AuthCss.singleLineInputCss}  onClick={e => login(e)}>
                     {info.LoginTitle}
                 </button>
 
-                <div className={"cr0 login_container"}>
+                <div className={"cr0 login_container"}  style={AuthCss.singleLineInputCss} >
                     <div>{info.WithoutAnAccount}</div>
                     <Button onClick={e => SetAuthPage(AuthPages.SignUp)}>{info.Signup}</Button>
                 </div>
