@@ -97,8 +97,9 @@ func (l *MeasureAccelerometerPutLogic) MeasureAccelerometerPut(req *types.Measur
 
 	//calculate heartbeat before curData is changed
 	heartbeat, _ = Tool.QueryHeartBeat(l.ctx, req.Data)
+	l.Logger.Info("heartbeat:", heartbeat)
 	//if data is save to redis,and no need save to db ,just return heartbeat
-	if DataStrNeededToSaveToDB, err = l.SyncWithRedis(uid, req.Data); DataStrNeededToSaveToDB != "" {
+	if DataStrNeededToSaveToDB, err = l.SyncWithRedis(uid, req.Data); DataStrNeededToSaveToDB == "" {
 		return &types.PutMeasureAccelerometer{Heartbeat: int64(heartbeat)}, nil
 	}
 

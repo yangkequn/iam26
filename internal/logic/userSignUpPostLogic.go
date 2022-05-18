@@ -33,7 +33,8 @@ func NewUserSignUpPostLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Us
 
 func (l *UserSignUpPostLogic) UserSignUpPost(r *http.Request, w http.ResponseWriter, req *types.SignUpReq) (resp *types.ErrorRsb, err error) {
 	var (
-		uid string
+		uid     string
+		smsCode string
 	)
 	req.Account = strings.ToLower(req.Account)
 	CountryPhone := req.CountryCode + "|" + req.Phone
@@ -49,7 +50,8 @@ func (l *UserSignUpPostLogic) UserSignUpPost(r *http.Request, w http.ResponseWri
 		return &types.ErrorRsb{Error: "phone"}, nil
 	}
 	// 判断验证码是否有错误
-	if val, ok := SMSCode[CountryPhone]; val != 145185 && (ok && val == req.SMSCode) {
+	smsCode, err = l.svcCtx.RedisClient.Get(l.ctx, "sms:"+CountryPhone).Result()
+	if smsCode != strconv.Itoa(req.SMSCode) {
 		return &types.ErrorRsb{Error: "SMSCode"}, nil
 	}
 
