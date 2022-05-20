@@ -2,14 +2,14 @@ import { Get, Load, Put, Delete, ObjectVersionChanged } from "./Webapi";
 
 export interface IMeasureAccelerometer {
     id: string
-    data: Array<number>
+    data: string
     list: Array<string>
 }
 
 
 export class MeasureAccelerometer implements IMeasureAccelerometer {
 
-    constructor(public id: string, public data: Array<number>, public list: Array<string>) {
+    constructor(public id: string, public data: string, public list: Array<string>) {
     }
 
     public static From(obj: object): MeasureAccelerometer {

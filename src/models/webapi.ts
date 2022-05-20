@@ -49,7 +49,7 @@ export const Delete = (url: string, data: object, setState: Function = null) =>
 
 export const Put = (url: string, data: object, setState: Function = null) => {
     JwtRequest().put(url, data).then(rsb => {
-        Merge(rsb.data, data);
+        !!data&&Merge(rsb.data, data);
         if (typeof setState === "function") setState(rsb.data)
     }).catch(Jwt.SignOut)
 }
