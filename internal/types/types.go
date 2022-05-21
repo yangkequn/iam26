@@ -46,7 +46,7 @@ type PutMeasureAccelerometer struct {
 
 type MeasureAccelerometer struct {
 	Id   string   `json:"id,optional"`
-	Data []int64  `json:"data"`
+	Data string   `json:"data"`
 	List []string `json:"list"`
 }
 

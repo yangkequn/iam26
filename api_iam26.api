@@ -33,6 +33,8 @@ service iam26-api {
 	put /measureIndex(MeasureIndex) returns (MeasureIndex)
 	@handler MeasureAccelerometerPut
 	put /measureAccelerometer(MeasureAccelerometer) returns (PutMeasureAccelerometer)
+	@handler MeasureAccelerometerTrainingPut
+	put /measureAccelerometerTraining(MeasureAccelerometer) returns ()
 	
 	@handler TraceGet
 	get /trace returns ([]TraceItem)
@@ -94,7 +96,7 @@ type PutMeasureAccelerometer{
 
 type MeasureAccelerometer{
 	Id string `json:"id,optional"`
-	Data []int64 `json:"data"`
+	Data string `json:"data"`
 	List []string `json:"list"`
 }
 
