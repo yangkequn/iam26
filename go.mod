@@ -11,7 +11,7 @@ require (
 	github.com/milvus-io/milvus-sdk-go/v2 v2.0.0
 	github.com/nfnt/resize v0.0.0-20180221191011-83c6a9932646
 	github.com/spaolacci/murmur3 v1.1.0
-	github.com/yangkequn/Tool v0.3.3
+	github.com/yangkequn/Tool v0.3.5
 	github.com/yangkequn/q-milvus-driver-for-go v0.0.5
 	github.com/zeromicro/go-zero v1.3.2
 )

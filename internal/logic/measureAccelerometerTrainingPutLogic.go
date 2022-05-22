@@ -1,9 +1,11 @@
 package logic
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"math/rand"
+	"strconv"
 
 	"iam26/internal/svc"
 	"iam26/internal/types"
@@ -26,29 +28,52 @@ func NewMeasureAccelerometerTrainingPutLogic(ctx context.Context, svcCtx *svc.Se
 		svcCtx: svcCtx,
 	}
 }
-
+func DecodeAccelero(data string) string {
+	var buffer bytes.Buffer
+	for i, ie := 0, len(data); i < ie; i++ {
+		v := data[i]
+		skipnum := 0
+		if v == 'v' {
+			skipnum, _ = strconv.Atoi(data[i+1 : i+2])
+			i += 1
+		} else if v == 'w' {
+			skipnum, _ = strconv.Atoi(data[i+1 : i+3])
+			i += 2
+		} else if v == 'x' {
+			skipnum, _ = strconv.Atoi(data[i+1 : i+4])
+			i += 3
+		} else if v == 'y' {
+			skipnum, _ = strconv.Atoi(data[i+1 : i+5])
+			i += 4
+		} else {
+			buffer.WriteString(string(v))
+		}
+		for j := 0; j < skipnum; j++ {
+			buffer.WriteString(",")
+		}
+	}
+	return buffer.String()
+}
 func (l *MeasureAccelerometerTrainingPutLogic) MeasureAccelerometerTrainingPut(req *types.MeasureAccelerometer) (err error) {
 	var (
-		accelerometer           *model.AccelerometerTraining
-		uid                     string
-		data                    []int64
-		DataStrNeededToSaveToDB string
+		accelerometer *model.AccelerometerTraining
+		uid           string
+		data          []int64
 	)
+	//.replace(/,,/g, "a").replace(/aa/g, "b").replace(/bb/g, "c").replace(/cc/g, "d").replace(/dd/g, "e").replace(/ee/g, "f")
 
-	if req.Data, err = Decompress(req.Data, ""); err != nil {
+	if data, err = Tool.Base10StringToInt64Array(DecodeAccelero(req.Data)); err != nil {
 		return err
 	}
-	data = Tool.Base10StringToInt64Array(req.Data)
 
 	//若干格式有效性检查
-	if err != nil {
-		l.Errorf("lzstring.DecompressFromEncodedUriComponent err:%v", err)
-		return err
-	}
 	if len(data) < 30 {
 		return fmt.Errorf("too less data points")
 	}
 	if len(data)%4 != 0 {
+		return fmt.Errorf("data format corrupt")
+	}
+	if len(data) != (4 + int(data[3])*4) {
 		return fmt.Errorf("data format corrupt")
 	}
 	startTime, endTime := data[0], data[1]
@@ -76,9 +101,8 @@ func (l *MeasureAccelerometerTrainingPutLogic) MeasureAccelerometerTrainingPut(r
 		_, err = l.svcCtx.AccelerometerTrainingModel.Insert(l.ctx, accelerometer)
 	}
 
-	DataStrNeededToSaveToDB = Tool.Int64ArrayToBase10String(data)
 	//TIME_STAMP采样每个时刻一个点
-	Tool.MergeStringWithString(&accelerometer.Data, DataStrNeededToSaveToDB, false)
+	Tool.MergeStringWithString(&accelerometer.Data, req.Data, false)
 	//merge data to the last list, if the last list's data is not too enough
 	//尝试填充到上一张表，直到记录大小超过2M
 	if len(accelerometer.Data) > 32*1024 && len(accelerometer.List) > 0 {

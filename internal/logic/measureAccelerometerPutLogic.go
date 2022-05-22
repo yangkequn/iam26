@@ -33,11 +33,17 @@ const tm30seconds = 30 * 1000
 //SyncWithRedis 将数据同步到redis.
 //返回的saveToDBData要求保存到数据库，仅仅每30秒需要保存一次
 func (l *MeasureAccelerometerPutLogic) SyncWithRedis(uid string, data []int64) (saveToDBStr string, err error) {
+	var (
+		oldItems []int64
+	)
 	startTime, endTime := data[0], data[1]
 	//read old data from redis,if new data is continuous data of the old one, and total data point is more than 30 seconds, then return total data
 	//else remove old data,and reserve new data only
 	oldDataStr, _ := l.svcCtx.RedisClient.Get(l.ctx, "HB:"+uid).Result()
-	oldItems := Tool.Base10StringToInt64Array(oldDataStr)
+	if oldItems, err = Tool.Base10StringToInt64Array(oldDataStr); err != nil {
+		return "", err
+	}
+
 	//if current data is not continuous data of the old one,remove old one
 	if len(oldItems) > 3 && (math.Abs(float64(oldItems[1]-startTime)) > 200) {
 		oldItems = []int64{}
