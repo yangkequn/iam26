@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, } from "react";
-import { Box, Button, Container, TextField } from "@mui/material";
+import { Box, Button,  TextField } from "@mui/material";
 import CountrySelect from "./countrySelect";
 import { AuthContext } from "./AuthContext";
-import { AuthCss, AuthPages, AuthPanelWidth } from "./index";
+import { AuthCss, AuthPages } from "./index";
 import axios from "axios";
 import "./signUp.css"
 import { GlobalContext } from "../base/GlobalContext";

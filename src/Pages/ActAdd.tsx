@@ -1,19 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { ActItem } from "../models/ActItem";
-import { BindTextFieldModel as bind } from "../base/BindModelComponent";
-import {Container, Box, Button} from "@mui/material";
-import { useTheme } from '@mui/material/styles';
+import {Container, Box} from "@mui/material";
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import {  Field2DivInnerText} from "../base/BindModelComponent";
-import { Field2RichText, Field2PainText } from "../base/EditorSlate";
+import { Field2RichText } from "../base/EditorSlate";
 
 
 //export interface IActItem { actId: string; name: string; unit: string; detail: string; popularity: number; score: number; }
 export function ActItemComponent({ item }: { item: ActItem }) {
-    const theme = useTheme();
     const [updateTM, setUpdateTM] = useState<number>(new Date().getTime())
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => { item.Load(Refresh) }, [])
@@ -59,7 +56,7 @@ export function Act() {
     useEffect(() => {
         ActItem.Recommend("", list => setItems([...(items.filter((item: ActItem) => item.IsNew())), ...list]))
         return () => { }
-    }, [])
+    })
 
 
     // let Item = (id, name, unit, value, detail) => ({ id, name, unit, value, detail })

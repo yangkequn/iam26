@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { GoalItem } from "../models/GoalItem";
-import { BindTextFieldModel as bind } from "../base/BindModelComponent";
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import {GoalItemComponent} from './goalAdd';

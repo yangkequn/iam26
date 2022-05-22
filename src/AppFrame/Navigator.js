@@ -2,12 +2,10 @@ import React, { useContext, useEffect, useState } from 'react';
 import { cv0 } from '../base/css';
 import { MenuItems, MenuPopup } from './Menu';
 import { GlobalContext } from '../base/GlobalContext';
-import { Link } from "react-router-dom";
 import { AuthPages, AuthPopper } from '../Auth';
 import { UserAvatar } from '../Auth/avatar';
-import { ReactComponent as Logo4 } from './Logo.svg';
 import { Jwt } from '../models/Jwt';
-import {Container, Box, Button} from "@mui/material";
+import {Container,  Button} from "@mui/material";
 
 
 export const Navigator = () => {

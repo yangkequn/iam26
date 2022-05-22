@@ -1,19 +1,15 @@
 import React, { useState, useEffect } from "react";
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import { useTheme } from '@mui/material/styles';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { MeasureItem } from "../models/MeasureItem";
-import { Field2DivInnerHTML, Field2DivInnerText, Field2Draft } from "../base/BindModelComponent";
-import { Field2RichText, Field2PainText } from "../base/EditorSlate";
-import { display } from "@mui/system";
-import { ActItem } from "../models/ActItem";
+import {  Field2DivInnerText } from "../base/BindModelComponent";
+import { Field2RichText } from "../base/EditorSlate";
 //export interface IMeasureItem { measureId: string; name: string; unit: string; detail: string; popularity: number; score: number; }
 export function MeasureItemComponent({ item }: { item: MeasureItem }) {
-    const theme = useTheme();
     const [updateTM, setUpdateTM] = useState<number>(new Date().getTime())
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => { item.Load(Refresh) }, [])

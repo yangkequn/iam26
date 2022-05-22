@@ -1,7 +1,7 @@
 
-import React, { useState, useMemo } from "react";
+import React from "react";
 import { Button, Icon, Toolbar } from './Component'
-import { Editor, Transforms, createEditor, Descendant, Element as SlateElement, } from 'slate'
+import { Editor, Transforms,  Element as SlateElement, } from 'slate'
 
 import FormatBoldIcon from '@mui/icons-material/FormatBold';
 import FormatItalicIcon from '@mui/icons-material/FormatItalic';

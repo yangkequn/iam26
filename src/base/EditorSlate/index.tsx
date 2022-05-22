@@ -1,10 +1,11 @@
 
 
 
-import React, { useState, useMemo, useCallback, Children } from "react";
-import { Editor, Transforms, createEditor, Descendant, Element as SlateElement, } from 'slate'
+import React, { useState, useMemo, useCallback } from "react";
+//import { Editor, Transforms, createEditor, Descendant, Element as SlateElement, } from 'slate'
+import { createEditor, Descendant } from 'slate'
 import isHotkey from 'is-hotkey'
-import { Slate, Editable, withReact, useSlate } from 'slate-react'
+import { Slate, Editable, withReact } from 'slate-react'
 import { withHistory } from 'slate-history'
 import { BaseEditor } from 'slate'
 import { ReactEditor } from 'slate-react'
@@ -12,9 +13,7 @@ import { HistoryEditor } from 'slate-history'
 import escapeHtml from 'escape-html'
 import { Text } from 'slate'
 import { jsx } from 'slate-hyperscript'
-import { Button, Icon, Toolbar } from './Component'
-import { ToolBarO, ToolbarComponent, toggleMark } from './Toolbar'
-import { CompareSharp } from "@mui/icons-material";
+import {  ToolbarComponent, toggleMark } from './Toolbar'
 
 type CustomElement = { type: 'paragraph'; children: CustomText[]; align?: string }
 type CustomText = { text: string; bold?: true; italic?: true; underline?: true; code?: true; }

@@ -1,22 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { GoalItem } from "../models/GoalItem";
-import { BindTextFieldModel as bind } from "../base/BindModelComponent";
-import TextField from '@mui/material/TextField';
-import { Button } from "@mui/material";
-import DeleteIcon from '@mui/icons-material/Delete';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import { useTheme } from '@mui/material/styles';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import SkipPreviousIcon from '@mui/icons-material/SkipPrevious';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import SkipNextIcon from '@mui/icons-material/SkipNext';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import { Field2DivInnerHTML,Field2DivInnerText } from "../base/BindModelComponent";
-import { Field2RichText, Field2PainText } from "../base/EditorSlate";
+import { Field2DivInnerText } from "../base/BindModelComponent";
+import { Field2RichText } from "../base/EditorSlate";
 
 export function GoalItemComponent({ item }: { item: GoalItem }) {
   const [updateTM, setUpdateTM] = useState<number>(new Date().getTime())
@@ -59,7 +50,7 @@ export const GoalAndRisk = () => {
     //merging creating goal and recommend goal
     GoalItem.Recommend("", (list) => setGoalItems([...(goalItems.filter((item: GoalItem) => item.IsNew())), ...list]))
     return () => { }
-  }, [])
+  })
   const [goalItems, setGoalItems] = useState<GoalItem[]>([new GoalItem("0", "", "", "", "", 1, true)])
 
   //display goalItems stored in goalItems in multiple rows

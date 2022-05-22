@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { MeasureAccelerometer } from "../models/MeasureAccelerometer"
 import { GlobalContext } from "../base/GlobalContext"
-import { Box } from '@mui/system';
 import { Button } from "@mui/material";
 var lz = require('lz-string');
 class temporaryAccelerometer {
@@ -10,27 +9,21 @@ class temporaryAccelerometer {
   z: number[];
   start: number;
   end: number;
-  heartrate: number[];
-  constructor(start = 0, end = 0, dataX = [], dataY = [], dataZ = [], heartrate = []) {
+  constructor(start = 0, end = 0, dataX = [], dataY = [], dataZ = []) {
     this.x = dataX;
     this.y = dataY;
     this.z = dataZ;
-    this.heartrate = heartrate;
     this.start = start;
     this.end = end;
   }
   public ToMeasureAccelerometer() {
-    data = [this.start, this.end, 4, this.x.length]
-    data.concat(this.x)
-    data.concat(this.y)
-    data.concat(this.z)
-    data.concat(this.heartrate)
+    var data = [this.start, this.end,  this.x.length].concat(this.x).concat(this.y).concat(this.z)
     return new MeasureAccelerometer("0", lz.compress(data.join(',')), []);
   }
 
 }
 export interface IAcceleration { x: number | null, y: number | null, z: number | null }
-let dataX: Array<number>, dataY: Array<number>, dataZ: Array<number>, heartrate: Array<number> = [], [], [], []
+let dataX: Array<number> = []; let dataY: Array<number> = []; let dataZ: Array<number> = [];
 //let DataAcceleration: number[] = []
 let factor = -1, startTM = 0, endTM = 0
 const SecondsWanted = 6
@@ -42,14 +35,14 @@ export function Accelerometer({ multiplier = 10, useGravity = false }: { multipl
     return () => window.removeEventListener('devicemotion', handleAcceleration)
   })
   const SaveDataAndRestartRecording = () => {
-    let model = new temporaryAccelerometer(startTM, endTM, dataX, dataY, dataZ, heartrate)
-    dataX = []; dataY = []; dataZ = []; heartrate = [];
+    let model = new temporaryAccelerometer(startTM, endTM, dataX, dataY, dataZ)
+    dataX = []; dataY = []; dataZ = [];
     return model
   }
   const saveToHistory = (acceleration: IAcceleration) => {
     if (stopped) {
       if (dataX.length > 0) {
-        dataX = []; dataY = []; dataZ = []; heartrate = []; startTM = 0; endTM = 0
+        dataX = []; dataY = []; dataZ = []; startTM = 0; endTM = 0
       }
       tasksend = 0
       return
@@ -70,7 +63,6 @@ export function Accelerometer({ multiplier = 10, useGravity = false }: { multipl
     dataX.push((acceleration.x * factor) << 0)
     dataY.push((acceleration.y * factor) << 0)
     dataZ.push((acceleration.z * factor) << 0)
-    heartrate.push(Heartbeat)
 
     //ensure  timespan cal be calculated
     if (dataX.length < 20) return
@@ -80,7 +72,7 @@ export function Accelerometer({ multiplier = 10, useGravity = false }: { multipl
 
     // data point of each seconds should more than 40 points
     let dataDensity = dataX.length / SecondsWanted
-    let DataIntegrity = dataX.length === dataY.length && dataY.length === dataZ.length && dataZ.length === heartrate.length
+    let DataIntegrity = dataX.length === dataY.length && dataY.length === dataZ.length
     setLenPerSecond(dataDensity)
     if (dataDensity < 40 || !DataIntegrity) {
       //alert("数据密度不足，采样失败，请更换设备")
@@ -89,22 +81,19 @@ export function Accelerometer({ multiplier = 10, useGravity = false }: { multipl
     }
     endTM = now
     //压缩时间，第一个值是绝对时间戳，后续是毫秒计数的时间流逝值
-    let model = SaveDataAndRestartRecording()
+    let model = SaveDataAndRestartRecording();
     //数据点密度太高，则压缩减半，把两个点压缩为一个点
-    for (let channel = 0; channel < 4; channel++) {
-      let data = [model.x, model.y, model.z, model.heartrate][channel]
+    [model.x, model.y, model.z].forEach((data) => {
       while ((data.length / SecondsWanted) > 350) {
         //把每两个加速度合并为一个加速度
-        let je = (data.length >> 1) << 1;
-        for (let j = 0; j < je; j += 2)  data[j >> 1] = Math.round((data[j] + data[j + 1]) / 2)
-
+        for (let j = 0, je = (data.length >> 1) << 1; j < je; j += 2)  data[j >> 1] = Math.round((data[j] + data[j + 1]) / 2)
         //如果剩一点单点数据，那么单独保存
-        var cnt = (data.length + 1) >> 1
-        if (data.length & 1) data[cnt - 1] = data[je]
+        if (data.length & 1) data[data.length >> 1] = data[data.length - 1]
         //删除缩减后的数据
+        var cnt = (data.length + 1) >> 1
         data.splice(cnt, data.length - cnt)
       }
-    }
+    })
     tasksend += 1
     //save to server
     model.ToMeasureAccelerometer().Put(StartHeartBeatEvent)

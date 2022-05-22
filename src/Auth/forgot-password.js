@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect } from "react";
 import axios from "axios";
-import { cr0, cr1, cv0, cv1 } from "../base/css";
+import { cr0, cr1 } from "../base/css";
 import { AuthCss, AuthPages } from "./index";
 import { AuthContext } from "./AuthContext";
 import CountrySelect from "./countrySelect";
@@ -64,7 +64,6 @@ export const ForgotPassword = () => {
         })
 
     }
-    const singleLineInputCss = { margin: "0 1em 0 1em", width: "90%" }
     return <div style={AuthCss.containerL1}>
         <div style={AuthCss.containerL2}>
             <Box sx={{ margin: "0 0 0 1em" }}>

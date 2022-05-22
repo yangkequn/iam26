@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, } from "react";
 import { Button, Container, TextField, } from "@mui/material";
-import { AuthCss, AuthPages, AuthPanelWidth } from "./index";
+import { AuthCss, AuthPages } from "./index";
 import { cr0 } from "../base/css";
 import CountrySelect from "./countrySelect";
 import { AuthContext } from "./AuthContext";
@@ -36,7 +36,7 @@ export const Login = () => {
 
     const {
         countryCode: [countryCode, setCountryCode, countryCodeError],
-        phone: [phone, setPhone, phoneError],
+        phone: [phone, setPhone],
         account: [account, setAccount, accountError, setAccountError],
         password: [password, setPassword, passwordError],
         foreignPhone: [foreignPhone, setForeignPhone],

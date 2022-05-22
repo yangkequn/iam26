@@ -1,30 +1,28 @@
-import {  Load, Put,  ObjectVersionChanged } from "./Webapi";
+import {  Put,  ObjectVersionChanged } from "./Webapi";
 
-export interface IMeasureAccelerometer {
+export interface IMeasureAccelerometerTraining {
     id: string
     data: string
     list: Array<string>
 }
 
 
-export class MeasureAccelerometer implements IMeasureAccelerometer {
+export class MeasureAccelerometerTraining implements IMeasureAccelerometerTraining {
 
     constructor(public id: string, public data: string, public list: Array<string>) {
     }
 
-    public static From(obj: object): MeasureAccelerometer {
+    public static From(obj: object): MeasureAccelerometerTraining {
         //convert obj to MeasureIndex
         // only properties of MeasureIndex is allowed
-        return new MeasureAccelerometer(obj["id"], obj["data"], obj["list"]);
+        return new MeasureAccelerometerTraining(obj["id"], obj["data"], obj["list"]);
     }
 
     public LoadCheck = (): boolean => !(!this.id || this.id === "0")
-    public Load = (setState) => this.LoadCheck() && Load(`/api/measureAccelerometer?id=${this.id}`, this, setState)
-
-    private PutCheck = (): boolean => !!this.id && (this.data.length % 3 === 0)
+    private PutCheck = (): boolean => !!this.id
     //LocalVersionModified can be call to avoid uncessary update
     public LocalVersionModified = (): boolean => ObjectVersionChanged(this, `measureAccelerometer-${this.id}`)
-    public Put = (setState) => this.PutCheck() && this.LocalVersionModified() && Put(`/api/measureAccelerometer`, this, setState)
+    public Put = (setState) => this.PutCheck() && this.LocalVersionModified() && Put(`/api/measureAccelerometerTraining`, this, setState)
 
     //public Delete = (callback:Function) => !!this.id && Delete(`/api/MeasureIndex`, this, callback )
 

@@ -12,7 +12,7 @@ import { ActItem } from "../models/ActItem";
 import { TraceItem } from "../models/TraceItem";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Accelerometer } from "../base/Accelerometer";
-import { BlueToothHeartRate } from "../base/BlueToothHeartRate";
+import { AccelerometerTrain } from "../base/AccelerometerTrain";
 
 function TraceModelItem({ item }: { item: TraceModel; }) {
 
@@ -88,7 +88,7 @@ export const MyTrace = () => {
                 <div style={{ width: "20%" }}></div>
             </div>
             <Accelerometer key="Accelerometer"></Accelerometer>
-            <BlueToothHeartRate key="BlueToothHeartRate"></BlueToothHeartRate>
+            <AccelerometerTrain key="AccelerometerTrain"></AccelerometerTrain>
 
             <div className="cv0" style={{ justifyContent: "flex-start" }} >
                 {traces.map((item, i) => <TraceModelItem key={`trace-${item["traceId"]}-${item["name"]}-${item["updated"]}`} item={item} />)}

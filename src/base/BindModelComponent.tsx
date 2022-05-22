@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from "react";
+import React  from "react";
 import TextareaAutosize from '@mui/material/TextareaAutosize';
-import { Editor, EditorState, RichUtils ,DraftTextAlignment} from 'draft-js';
+import { Editor, EditorState, RichUtils } from 'draft-js';
 import 'draft-js/dist/Draft.css';
 
 
@@ -54,8 +54,8 @@ export function Field2DivInnerHTML({ model, field, updateKey, callbacks = {}, pl
 
 }
 export function Field2Draft({ model, field, updateKey, callbacks = {}, placeholder = "" }: { model: object, field: string, updateKey: number, callbacks: object, placeholder: string }) {
-    const ValueSet = () => !model[field] ? placeholder : model[field]
-    const ValueGet = (e) => e.currentTarget.innerHTML.replace(placeholder, "")
+    //const ValueSet = () => !model[field] ? placeholder : model[field]
+    //const ValueGet = (e) => e.currentTarget.innerHTML.replace(placeholder, "")
     const handleKeyCommand = (command, editorState) => {
         const newState = RichUtils.handleKeyCommand(editorState, command);
         setEditorState(newState)
@@ -63,18 +63,18 @@ export function Field2Draft({ model, field, updateKey, callbacks = {}, placehold
     const [editorState, setEditorState] = React.useState(() => EditorState.createEmpty(),);
     const SetV = (v:EditorState) => {console.log("v.getCurrentContent()",v.getCurrentContent().getBlocksAsArray()); console.log(v); setEditorState(v) }
     return <Editor editorState={editorState} onChange={SetV} placeholder={placeholder} handleKeyCommand={handleKeyCommand} />;
-    return <div key={updateKey} {...callbacks} contentEditable={true} suppressContentEditableWarning={true} placeholder={placeholder} dangerouslySetInnerHTML={{ __html: model[field] }}
-        onBlur={e => {
-            //AutoSave text to model
-            model[field] = e.currentTarget.innerHTML;
-            //OnBlur callback executed. AutoSave to db and update model is called here
-            if (!!callbacks["onBlur"] && typeof callbacks["onBlur"] === "function") callbacks["onBlur"](e)
-            //
-            e.currentTarget.textContent = ValueSet()
-        }}
+    // return <div key={updateKey} {...callbacks} contentEditable={true} suppressContentEditableWarning={true} placeholder={placeholder} dangerouslySetInnerHTML={{ __html: model[field] }}
+    //     onBlur={e => {
+    //         //AutoSave text to model
+    //         model[field] = e.currentTarget.innerHTML;
+    //         //OnBlur callback executed. AutoSave to db and update model is called here
+    //         if (!!callbacks["onBlur"] && typeof callbacks["onBlur"] === "function") callbacks["onBlur"](e)
+    //         //
+    //         e.currentTarget.textContent = ValueSet()
+    //     }}
 
-        //unfold events items , except item with key "onChange"
-        {...Object.keys(callbacks).filter(k => k !== "onBlur").reduce((acc, k) => ({ ...acc, [k]: callbacks[k] }), {})} />
+    //     //unfold events items , except item with key "onChange"
+    //     {...Object.keys(callbacks).filter(k => k !== "onBlur").reduce((acc, k) => ({ ...acc, [k]: callbacks[k] }), {})} />
 
 }
 
