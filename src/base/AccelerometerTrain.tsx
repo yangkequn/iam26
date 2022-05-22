@@ -46,7 +46,7 @@ const SaveDataAndRestartRecording = (): MeasureAccelerometerTraining | null => {
 
   var data = [startTM, endTM, 4, dataX.length].concat(dataX).concat(dataY).concat(dataZ).concat(heartrate)
   reset()
-  return new MeasureAccelerometerTraining("0", data.join(','), []);
+  return new MeasureAccelerometerTraining("0", data.join(',').replace(",,,","+").replace("+++","=").replace("===","/"), []);
 }
 export function AccelerometerTrain({ multiplier = 10, useGravity = false }: { multiplier?: number, useGravity?: boolean }) {
   const [HeartRate, setHeartRate] = useState<number>(0)
