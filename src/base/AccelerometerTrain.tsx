@@ -17,13 +17,19 @@ let factor = -1, startTM = 0, endTM = 0
 const SecondsWanted = 18
 let tasksend = 0
 const SaveDataAndRestartRecording = (): MeasureAccelerometerTraining | null => {
-  const reset=()=>{
+  const reset = () => {
     dataX = []; dataY = []; dataZ = []; heartrate = [];
     return null
   }
+  //手机离身或者心率变化很小，数据冗余无意义
+  var msex = MSRE(dataX), msey = MSRE(dataY), msez = MSRE(dataZ), msehr = MSRE(heartrate)
+  if (msex < 0.01 * factor || msey < 0.01 * factor || msez < 0.01 * factor || msehr < 0.1) {
+    //alert("msex" + msex + "msey" + msey + "msez" + msez + "msehr" + msehr)
+    return reset()
+  }
 
-  //数据点密度太高，则压缩减半，把两个点压缩为一个点
   var dataToCompress = [dataX, dataY, dataZ, heartrate];
+  //数据点密度太高，则压缩减半，把两个点压缩为一个点
   dataToCompress.forEach((data) => {
     while ((data.length / SecondsWanted) > 350) {
       //把每两个加速度合并为一个加速度
@@ -35,12 +41,8 @@ const SaveDataAndRestartRecording = (): MeasureAccelerometerTraining | null => {
       data.splice(cnt, data.length - cnt)
     }
   })
-  //手机离身或者心率变化很小，数据冗余无意义
-  var msex = MSRE(dataX), msey = MSRE(dataY), msez = MSRE(dataZ), msehr = MSRE(heartrate)  
-  if (msex < 0.01*factor || msey < 0.01*factor || msez < 0.01*factor || msehr < 0.1) {
-    //alert("msex" + msex + "msey" + msey + "msez" + msez + "msehr" + msehr)
-    return reset()
-  }
+  //压缩数据,相同的数据只保留一个分隔符
+  dataToCompress.forEach(data => { for (var i = data.length - 1; i > 1; i--) if (data[i] === data[i - 1]) data[i] = null })
 
   var data = [startTM, endTM, 4, dataX.length].concat(dataX).concat(dataY).concat(dataZ).concat(heartrate)
   reset()
