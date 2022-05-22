@@ -42,11 +42,25 @@ const SaveDataAndRestartRecording = (): MeasureAccelerometerTraining | null => {
     }
   })
   //压缩数据,相同的数据只保留一个分隔符
-  dataToCompress.forEach(data => { for (var i = data.length - 1; i > 1; i--) if (data[i] === data[i - 1]) data[i] = null })
+  dataToCompress.forEach(data => { for (var i = data.length - 1; i >= 1; i--) if (data[i] === data[i - 1]) data[i] = null })
 
   var data = [startTM, endTM, 4, dataX.length].concat(dataX).concat(dataY).concat(dataZ).concat(heartrate)
   reset()
-  return new MeasureAccelerometerTraining("0", data.join(',').replace(",,,","+").replace("+++","=").replace("===","/"), []);
+  return new MeasureAccelerometerTraining("0", encodeAcceleroString(data.join(",")), []);
+}
+function encodeAcceleroString(s: string): string {
+  var r = []
+  for (var i = 0; i < s.length; i++) {
+    if (s[i] !== ",") {
+      r.push(s[i])
+      continue
+    }
+    var j = i + 1; while (j < s.length && s[j] === "," && (j - i) < 10000) j++;
+    var l = j - i;
+    if (l === 1) r.push(","); else if (l < 10) r.push("v" + l); else if (l < 100) r.push("w" + l); else if (l < 1000) r.push("x" + l); else if (l < 10000) r.push("y" + l);
+    i = j - 1
+  }
+  return r.join("")
 }
 export function AccelerometerTrain({ multiplier = 10, useGravity = false }: { multiplier?: number, useGravity?: boolean }) {
   const [HeartRate, setHeartRate] = useState<number>(0)
@@ -118,6 +132,7 @@ export function AccelerometerTrain({ multiplier = 10, useGravity = false }: { mu
     setHeartRate(value.getInt8(1))
   }
   const StartRetrievHeartbeatData = e => {
+
     stopped && navigator.bluetooth.requestDevice({ filters: [{ services: ['heart_rate'] }] })
       .then(device => device.gatt.connect())
       .then(server => server.getPrimaryService('heart_rate'))
