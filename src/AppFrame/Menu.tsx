@@ -25,13 +25,22 @@ export class MenuStruct {
 const home = new MenuStruct("iam26", "/", null, [
   new MenuStruct("关于健康那些最重要的事情 / on Health made of", "/TodoListOnHealth", null, null),
 ])
-const me = new MenuStruct("开始", "/MyTrace", null, [
+const sleep = new MenuStruct("开始睡觉", "/Sleep/Start", null, [
+  new MenuStruct("AI强化睡眠", "/Sleep/Start", null, null),
+  new MenuStruct("检查清单", "/Sleep/Checklist", null, null),
+  //new MenuStruct("选择设备", "/Sleep/Device", null, null),
+])
+const _me = new MenuStruct("开始", "/MyTrace", null, [
   new MenuStruct("我的追踪", "/MyTrace", null, null),
   new MenuStruct("集体调研区", "/MyTrace/similar", null, null),
   new MenuStruct("来自AI的今日建议", "/MyTrace/hiFriend", null, null),
   new MenuStruct("添加微信群", "/MyTrace/feedback", null, null),
 ])
-const goals = new MenuStruct("目标", "/Goals", null, [
+const goals = new MenuStruct("修改目标", "/Goals", null, [
+  new MenuStruct("我的目标", "/Goals/Mine", null, null),
+  new MenuStruct("添加 / 创建", "/Goals", null, null),
+])
+const _goals = new MenuStruct("修改目标", "/Goals", null, [
   new MenuStruct("我的目标", "/Goals/Mine", null, null),
   new MenuStruct("添加 / 创建", "/Goals", null, null),
 ])
@@ -49,7 +58,7 @@ const measure = new MenuStruct("评估", "/Measure", null, [
 //   ...MenuItem("活动", "/activity"),
 //   subMenu: []
 // }
-export const MenuItems: Array<MenuStruct> = [home, me, goals, methods, measure]
+export const MenuItems: Array<MenuStruct> = [home, sleep]
 
 
 

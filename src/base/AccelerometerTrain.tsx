@@ -62,6 +62,7 @@ function encodeAcceleroString(s: string): string {
   }
   return r.join("")
 }
+
 export function AccelerometerTrain({ multiplier = 10, useGravity = false }: { multiplier?: number, useGravity?: boolean }) {
   const [HeartRate, setHeartRate] = useState<number>(0)
   useEffect(() => {

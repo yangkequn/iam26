@@ -14,6 +14,9 @@ import { GoalAndRisk } from './Pages/goalAdd';
 import {MyGoals} from './Pages/goalList';
 import { MyAct } from './Pages/ActMine';
 import { MyMeasure } from './Pages/MeasureMine';
+import {SleepStart } from './Pages/SleepStart';
+import {SleepChecklist } from './Pages/SleepChecklist';
+import { SleepDevice } from './Pages/SleepDevice';
 
 ReactDOM.render(
   <GlobalContextProvider>
@@ -23,6 +26,12 @@ ReactDOM.render(
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<AppFrame children={<Home/>} />} />
+
+
+          <Route path="/Sleep/Start" element={<AppFrame children={<SleepStart/>} />} />
+          <Route path="/Sleep/Checklist" element={<AppFrame children={<SleepChecklist/>} />} />
+          <Route path="/Sleep/Device" element={<AppFrame children={<SleepDevice/>} />} />
+          
           
           <Route path="/MyTrace" element={<AppFrame children={<MyTrace/>} />} />
 
