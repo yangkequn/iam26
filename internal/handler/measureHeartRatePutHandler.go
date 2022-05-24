@@ -18,11 +18,11 @@ func MeasureHeartRatePutHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		}
 
 		l := logic.NewMeasureHeartRatePutLogic(r.Context(), svcCtx)
-		err := l.MeasureHeartRatePut(&req)
+		resp, err := l.MeasureHeartRatePut(&req)
 		if err != nil {
 			httpx.Error(w, err)
 		} else {
-			httpx.Ok(w)
+			httpx.OkJson(w, resp)
 		}
 	}
 }

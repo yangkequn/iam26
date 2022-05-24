@@ -1,4 +1,26 @@
-    
+service iam26-api {
+	//retriev user JWT token
+	//获得用户JWT令牌
+	@handler UserJWTGet
+	get /userJwt (jwtReq) returns (jwtRsp)
+	//获得用户头像
+	@handler UserAvatarGet
+	get /userAvatar (accountID) 
+	//获得用户昵称
+	@handler UserGet
+	get /user (accountID) returns (NameRsp)
+	//退出登录
+	@handler UserSignOutGet
+	get /userSignOut  
+	//查询账号是否已经被注册
+	@handler UserAccountOccupiedGet
+	get /userAccountOccupied (accountOccupiedReq) returns (accountOccupiedRsb)
+	//user sign up
+	//用户注册
+	@handler UserSignUpPost
+	post /userSignUp (signUpReq) returns (errorRsb)
+	//user login
+	//用户登录
 	@handler UserLoginPost
 	post /userLogin (loginReq) returns (errorRsb)
 	//reset password
@@ -6,7 +28,19 @@
 	@handler UserPasswordPost
 	post /userResetPassword (resetReq) returns (errorRsb)
 	//sent user check code, to phone or email
-	//发送注册短信验证码,修改账号邮箱验证码8     
+	//发送注册短信验证码,修改账号邮箱验证码
+	@handler UserSentSMSPost
+	post /userSentSMS (sentCheckCodeReq) returns (errorRsb)
+}
+
+@server(
+	jwt: Auth
+)
+service iam26-api {
+	@handler UserProfileGet
+	get /userProfile returns (myProfileReturn)
+	
+	@handler UserProfilePut
 	put /userProfile (myProfileChangeReq) returns (errorRsb)
 	
 	@handler UserAvatarPut

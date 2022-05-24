@@ -125,4 +125,75 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		},
 		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/userJwt",
+				Handler: UserJWTGetHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/userAvatar",
+				Handler: UserAvatarGetHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/user",
+				Handler: UserGetHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/userSignOut",
+				Handler: UserSignOutGetHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/userAccountOccupied",
+				Handler: UserAccountOccupiedGetHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/userSignUp",
+				Handler: UserSignUpPostHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/userLogin",
+				Handler: UserLoginPostHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/userResetPassword",
+				Handler: UserPasswordPostHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/userSentSMS",
+				Handler: UserSentSMSPostHandler(serverCtx),
+			},
+		},
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/userProfile",
+				Handler: UserProfileGetHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPut,
+				Path:    "/userProfile",
+				Handler: UserProfilePutHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPut,
+				Path:    "/userAvatar",
+				Handler: UserAvatarPutHandler(serverCtx),
+			},
+		},
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+	)
 }
