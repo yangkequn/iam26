@@ -42,7 +42,6 @@ func (l *ActGetLogic) ActGet(r *http.Request, req *types.FormId) (resp *types.Ac
 		uid     string
 		actList *model.ActList
 	)
-	uid, err = GetUserIDFromCookie(r, l.svcCtx.Config.Auth.AccessSecret)
 	if err != nil {
 		return ConvertActToResponse(act, false), err
 	}
