@@ -18,6 +18,7 @@ type ServiceContext struct {
 	MeasureIndexModel          md.MeasureIndexModel
 	AccelerometerTrainingModel md.AccelerometerTrainingModel
 	MeasureAccelerometerModel  md.MeasureAccelerometerModel
+	HeartRateHistory           md.HeartRateHistoryModel
 	GoalModel                  md.GoalModel
 	GoalListModel              md.GoalListModel
 	TraceListModel             md.TraceListModel
@@ -48,5 +49,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		GoalModel:                  md.NewGoalModel(connPostGres),
 		GoalListModel:              md.NewGoalListModel(connPostGres),
 		UserModel:                  md.NewUserModel(connPostGres),
+		HeartRateHistory:           md.NewHeartRateHistoryModel(connPostGres),
 	}
 }

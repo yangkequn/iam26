@@ -25,9 +25,12 @@ service iam26-api {
 	get /measureList returns (List)
 	@handler MeasureRecommendGet
 	get /measureRecommend(TextRequest) returns (List)
-
+	
 	@handler MeasureIndexGet
 	get /measureIndex(MeasureIndex) returns (MeasureIndex)
+	
+	@handler MeasureHeartRatePut
+	put /measureHeartrate(HeartRatePut) returns (HeartRateHistory)
 	
 	@handler measureIndexPut
 	put /measureIndex(MeasureIndex) returns (MeasureIndex)
@@ -82,24 +85,29 @@ type MeasureItem {
 	Score      float32 `json:"score,optional"`
 	Mine       bool    `json:"mine"`
 }
-//when updating a goal, the Data & Time should just be incremention 
-type MeasureIndex{
-	Id string `json:"id,optional"`
-	Type string `json:"type"`
+type HeartRatePut {
+	HeartRate int `json:"heartRate"`
+}
+type HeartRateHistory {
+	history   string `json:"history"`
+}
+//when updating a goal, the Data & Time should just be incremention
+type MeasureIndex {
+	Id   string    `json:"id,optional"`
+	Type string    `json:"type"`
 	Data []float32 `json:"data"`
-	List []string `json:"list"`
+	List []string  `json:"list"`
 }
 
-type PutMeasureAccelerometer{
+type PutMeasureAccelerometer {
 	Heartbeat int64 `json:"heartbeat"`
 }
 
-type MeasureAccelerometer{
-	Id string `json:"id,optional"`
-	Data string `json:"data"`
+type MeasureAccelerometer {
+	Id   string   `json:"id,optional"`
+	Data string   `json:"data"`
 	List []string `json:"list"`
 }
-
 
 type GoalItem {
 	Id         string `json:"id"`

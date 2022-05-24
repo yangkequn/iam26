@@ -33,6 +33,14 @@ type MeasureItem struct {
 	Mine       bool    `json:"mine"`
 }
 
+type HeartRatePut struct {
+	HeartRate int `json:"heartRate"`
+}
+
+type HeartRateHistory struct {
+	History string `json:"history"`
+}
+
 type MeasureIndex struct {
 	Id   string    `json:"id,optional"`
 	Type string    `json:"type"`
