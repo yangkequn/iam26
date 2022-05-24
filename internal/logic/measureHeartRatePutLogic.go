@@ -44,7 +44,7 @@ func (l *MeasureHeartRatePutLogic) MeasureHeartRatePut(req *types.HeartRatePut) 
 	if uid, err = Tool.UserIdFromContext(l.ctx); err != nil {
 		return nil, err
 	}
-	if (req.HeartRate < 30 && req.HeartRate >= 0) || req.HeartRate > 220 {
+	if req.HeartRate < 30 || req.HeartRate > 220 {
 		return nil, fmt.Errorf("心率范围为30-220")
 	}
 
@@ -75,10 +75,6 @@ func (l *MeasureHeartRatePutLogic) MeasureHeartRatePut(req *types.HeartRatePut) 
 	// 为最近24小时数据划线
 	i := MaxInt(0, len(history)-2)
 	for ; i > 0 && (now-history[i] < (24 * 60 * 60 >> 2)); i -= 2 {
-	}
-
-	if req.HeartRate < 0 {
-		return ToHeartRateHistory(history[i:], now), nil
 	}
 
 	//转储数据
@@ -125,13 +121,14 @@ func (l *MeasureHeartRatePutLogic) MeasureHeartRatePut(req *types.HeartRatePut) 
 	}
 
 	//返回最近一天的数据
-	return ToHeartRateHistory(history[i:], now), nil
-}
-func ToHeartRateHistory(history []int64, now int64) (result *types.HeartRateHistory) {
+	if !req.AskHistroy {
+		return &types.HeartRateHistory{History: ""}, nil
+	}
+
 	//改为相对时间
+	history = history[i:]
 	for i := 0; i < len(history); i += 2 {
 		history[i] = history[i] - now
 	}
-	result = &types.HeartRateHistory{History: Tool.Int64ArrayToBase10String(history)}
-	return
+	return &types.HeartRateHistory{History: Tool.Int64ArrayToBase10String(history)}, nil
 }

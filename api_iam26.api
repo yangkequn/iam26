@@ -87,6 +87,8 @@ type MeasureItem {
 }
 type HeartRatePut {
 	HeartRate int `json:"heartRate"`
+	AskHistroy	bool `json:"askHistroy"`
+
 }
 type HeartRateHistory {
 	history   string `json:"history"`
