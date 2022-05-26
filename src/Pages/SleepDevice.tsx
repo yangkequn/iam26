@@ -11,7 +11,6 @@ import { MeasureItem } from "../models/MeasureItem";
 import { ActItem } from "../models/ActItem";
 import { TraceItem } from "../models/TraceItem";
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Accelerometer } from "../base/Accelerometer";
 import { AccelerometerTrain } from "../base/AccelerometerTrain";
 
 function TraceModelItem({ item }: { item: TraceModel; }) {
@@ -87,7 +86,6 @@ export const SleepDevice = () => {
                 <Button className="cr0" variant="contained" color="primary" startIcon={<AddIcon />} onClick={AddAction}>添加效果</Button>
                 <div style={{ width: "20%" }}></div>
             </div>
-            <Accelerometer key="Accelerometer"></Accelerometer>
             <AccelerometerTrain key="AccelerometerTrain"></AccelerometerTrain>
 
             <div className="cv0" style={{ justifyContent: "flex-start" }} >

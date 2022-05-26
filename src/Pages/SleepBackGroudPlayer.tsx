@@ -11,7 +11,6 @@ import { MeasureItem } from "../models/MeasureItem";
 import { ActItem } from "../models/ActItem";
 import { TraceItem } from "../models/TraceItem";
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Accelerometer } from "../base/Accelerometer";
 import { AccelerometerTrain } from "../base/AccelerometerTrain";
 import { SelectBlueToothAccelerometer } from "../device/SelectBlueToothAccelerometer" 
 import { SelectBluetoothHeartrateDevice } from "../device/SelectBluetoothHeartrateDevice";

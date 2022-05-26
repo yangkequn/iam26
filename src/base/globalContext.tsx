@@ -18,6 +18,8 @@ interface GlobalContextType {
 
     HeartRate: number,
     setHeartRate: React.Dispatch<React.SetStateAction<number>>,
+    AcceleroData: number[],
+    setAcceleroData: React.Dispatch<React.SetStateAction<number[]>>,
 
 }
 export const GlobalContext = React.createContext<GlobalContextType | null>(null)
@@ -33,6 +35,7 @@ export const GlobalContextProvider: React.FC<React.ReactNode> = ({ children }) =
     const [leftDrawerSize, setLeftDrawerSize] = useState(LeftDrawerSize.Short)
 
     const [HeartRate, setHeartRate] = useState(0)
+    const [AcceleroData, setAcceleroData] = useState([] as number[])
     useEffect(() => {
         const LoadJwt = (event: Event) => {
             setLoggedIn(Jwt.Get().IsValid())
@@ -56,7 +59,8 @@ export const GlobalContextProvider: React.FC<React.ReactNode> = ({ children }) =
         SetAuthPage,
         RedirectUrl,
         setRedirectUrl,
-        HeartRate,setHeartRate
+        HeartRate,setHeartRate,
+        AcceleroData, setAcceleroData
     }
 
     return <GlobalContext.Provider value={store} > {children} </GlobalContext.Provider>

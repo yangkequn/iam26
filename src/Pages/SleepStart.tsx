@@ -11,7 +11,6 @@ import { MeasureItem } from "../models/MeasureItem";
 import { ActItem } from "../models/ActItem";
 import { TraceItem } from "../models/TraceItem";
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Accelerometer } from "../base/Accelerometer";
 import { AccelerometerTrain } from "../base/AccelerometerTrain";
 import { SelectBlueToothAccelerometer } from "../device/SelectBlueToothAccelerometer"
 import { SelectBluetoothHeartrateDevice } from "../device/SelectBluetoothHeartrateDevice";
@@ -134,7 +133,6 @@ export const SleepStart = () => {
                 {play ? `禁用心跳声音` : "启用心跳声音"}
             </Button>
             {/* <MusicPlayerSlider></MusicPlayerSlider> */}
-            <Accelerometer key="Accelerometer"></Accelerometer>
             <AccelerometerTrain key="AccelerometerTrain"></AccelerometerTrain>
 
             <div className="cv0" style={{ justifyContent: "flex-start" }} >

@@ -1,5 +1,5 @@
 /// <reference types="web-bluetooth" />
-import React, { useState, useEffect,useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { MeasureAccelerometerTraining } from "../models/MeasureAccelerometerTraining"
 import { Button } from "@mui/material";
 import { GlobalContext } from "../base/GlobalContext";
@@ -11,6 +11,20 @@ const MSRE = (data: number[]) => {
   return Math.sqrt(squareSum)
 }
 
+function encodeAcceleroString(s: string): string {
+  var r = []
+  for (var i = 0; i < s.length; i++) {
+    if (s[i] !== ",") {
+      r.push(s[i])
+      continue
+    }
+    var j = i + 1; while (j < s.length && s[j] === "," && (j - i) < 10000) j++;
+    var l = j - i;
+    if (l === 1) r.push(","); else if (l < 10) r.push("v" + l); else if (l < 100) r.push("w" + l); else if (l < 1000) r.push("x" + l); else if (l < 10000) r.push("y" + l);
+    i = j - 1
+  }
+  return r.join("")
+}
 export interface IAcceleration { x: number | null, y: number | null, z: number | null }
 let dataX: Array<number> = []; let dataY: Array<number> = []; let dataZ: Array<number> = []; let heartrate: Array<number> = [];
 //let DataAcceleration: number[] = []
@@ -49,35 +63,18 @@ const SaveDataAndRestartRecording = (): MeasureAccelerometerTraining | null => {
   reset()
   return new MeasureAccelerometerTraining("0", encodeAcceleroString(data.join(",")), []);
 }
-function encodeAcceleroString(s: string): string {
-  var r = []
-  for (var i = 0; i < s.length; i++) {
-    if (s[i] !== ",") {
-      r.push(s[i])
-      continue
-    }
-    var j = i + 1; while (j < s.length && s[j] === "," && (j - i) < 10000) j++;
-    var l = j - i;
-    if (l === 1) r.push(","); else if (l < 10) r.push("v" + l); else if (l < 100) r.push("w" + l); else if (l < 1000) r.push("x" + l); else if (l < 10000) r.push("y" + l);
-    i = j - 1
-  }
-  return r.join("")
-}
 
 
 export function AccelerometerTrain({ multiplier = 10, useGravity = false }: { multiplier?: number, useGravity?: boolean }) {
+  const { AcceleroData, setAcceleroData } = useContext(GlobalContext)
   const { HeartRate, setHeartRate } = useContext(GlobalContext)
-  useEffect(() => {
-    window.addEventListener('devicemotion', handleAcceleration)
-    return () => window.removeEventListener('devicemotion', handleAcceleration)
-  })
-  const saveToHistory = (acceleration: IAcceleration) => {
-    if (stopped || HeartRate === 0) {
+  const saveToHistory = () => {
+    if (stopped || HeartRate === 0 || AcceleroData.length % 3 !== 0||AcceleroData.length===0)  {
       if (dataX.length > 0) {
         dataX = []; dataY = []; dataZ = []; heartrate = []; startTM = 0; endTM = 0
       }
       tasksend = 0
-      if (HeartRate !== 0) setHeartRate(0)
+      factor = -1
       return
     }
     //采用高精度的时间戳，chrome测试精确到0.1ms
@@ -87,15 +84,19 @@ export function AccelerometerTrain({ multiplier = 10, useGravity = false }: { mu
       startTM = now
     }
     if (factor === -1) {
-      if ((acceleration.x * 10.) << 0 === acceleration.x * 10 && (acceleration.y * 10.) << 0 === acceleration.y * 10 && (acceleration.z * 10.) << 0 === acceleration.z * 10)
+      let x=AcceleroData[0],y=AcceleroData[1],z=AcceleroData[2]
+      if ((x * 10.) << 0 === x * 10 && (y * 10.) << 0 === y * 10 && (z * 10.) << 0 === z * 10)
         factor = 10
       else factor = 100
     }
-    //alert("factor"+factor+" acceleration"+acceleration.x+" "+acceleration.y+" "+acceleration.z)
-    dataX.push((acceleration.x * factor) << 0)
-    dataY.push((acceleration.y * factor) << 0)
-    dataZ.push((acceleration.z * factor) << 0)
-    heartrate.push(HeartRate)
+
+    for (var i = 0; i < AcceleroData.length; i++) {
+      let ax= AcceleroData[i], ay= AcceleroData[i+1], az= AcceleroData[i+2]
+      dataX.push((ax * factor) << 0)
+      dataY.push((ay * factor) << 0)
+      dataZ.push((az * factor) << 0)
+      heartrate.push(HeartRate)
+    }
 
     //ensure  timespan cal be calculated
     if (dataX.length < 20) return
@@ -120,17 +121,10 @@ export function AccelerometerTrain({ multiplier = 10, useGravity = false }: { mu
     //save to server
     model.Put(StartHeartRateEvent)
   }
+  useEffect(saveToHistory, [AcceleroData])
   const StartHeartRateEvent = (v) => setHeartRate(v.HeartRate);
-  const handleAcceleration = (event) => {
-    if (stopped) return
-    var acceleration = useGravity ? event.accelerationIncludingGravity : event.acceleration
-    saveToHistory(acceleration as IAcceleration)
-  }
   const [lenPerSecond, setLenPerSecond] = useState(0)
-
   const [stopped, setStopped] = useState<Boolean>(true)
-
-
   return <div>
     <Button variant="contained" size="large" color={stopped ? "primary" : "secondary"} sx={{ p: "3em 3em 3em 3em" }} onClick={e => setStopped(!stopped)} >
       {!stopped ? `发送${tasksend}每秒采样点:${lenPerSecond.toPrecision(3)} 当前心跳:${HeartRate}` : "点击采集心跳加速度训练数据"}
