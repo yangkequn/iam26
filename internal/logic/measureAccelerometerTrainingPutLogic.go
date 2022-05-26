@@ -1,11 +1,9 @@
 package logic
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"math/rand"
-	"strconv"
 
 	"iam26/internal/svc"
 	"iam26/internal/types"
@@ -28,32 +26,6 @@ func NewMeasureAccelerometerTrainingPutLogic(ctx context.Context, svcCtx *svc.Se
 		svcCtx: svcCtx,
 	}
 }
-func DecodeAccelero(data string) string {
-	var buffer bytes.Buffer
-	for i, ie := 0, len(data); i < ie; i++ {
-		v := data[i]
-		skipnum := 0
-		if v == 'v' {
-			skipnum, _ = strconv.Atoi(data[i+1 : i+2])
-			i += 1
-		} else if v == 'w' {
-			skipnum, _ = strconv.Atoi(data[i+1 : i+3])
-			i += 2
-		} else if v == 'x' {
-			skipnum, _ = strconv.Atoi(data[i+1 : i+4])
-			i += 3
-		} else if v == 'y' {
-			skipnum, _ = strconv.Atoi(data[i+1 : i+5])
-			i += 4
-		} else {
-			buffer.WriteString(string(v))
-		}
-		for j := 0; j < skipnum; j++ {
-			buffer.WriteString(",")
-		}
-	}
-	return buffer.String()
-}
 func (l *MeasureAccelerometerTrainingPutLogic) MeasureAccelerometerTrainingPut(req *types.MeasureAccelerometer) (err error) {
 	var (
 		accelerometer *model.AccelerometerTraining
@@ -62,7 +34,7 @@ func (l *MeasureAccelerometerTrainingPutLogic) MeasureAccelerometerTrainingPut(r
 	)
 	//.replace(/,,/g, "a").replace(/aa/g, "b").replace(/bb/g, "c").replace(/cc/g, "d").replace(/dd/g, "e").replace(/ee/g, "f")
 
-	if data, err = Tool.Base10StringToInt64Array(DecodeAccelero(req.Data)); err != nil {
+	if data, err = Tool.Base10StringToInt64Array(Tool.DecodeAccelero(req.Data)); err != nil {
 		return err
 	}
 
