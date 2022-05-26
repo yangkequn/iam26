@@ -11,10 +11,10 @@ import { MeasureItem } from "../models/MeasureItem";
 import { ActItem } from "../models/ActItem";
 import { TraceItem } from "../models/TraceItem";
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Accelerometer } from "../base/Accelerometer";
 import { AccelerometerTrain } from "../base/AccelerometerTrain";
 import { SelectBluetoothHeartrateDevice } from "../device/SelectBluetoothHeartrateDevice";
-
+import {SelectLocalAccelerometer} from "../device/SelectLocalAccelerometer";
+import {SelectBlueToothAccelerometer} from "../device/SelectBlueToothAccelerometer"
 function TraceModelItem({ item }: { item: TraceModel; }) {
 
     //monitor initial value,to avoid unnecessary update
@@ -88,8 +88,10 @@ export const MyTrace = () => {
                 <Button className="cr0" variant="contained" color="primary" startIcon={<AddIcon />} onClick={AddAction}>添加效果</Button>
                 <div style={{ width: "20%" }}></div>
             </div>
+            <SelectLocalAccelerometer></SelectLocalAccelerometer>
             <SelectBluetoothHeartrateDevice></SelectBluetoothHeartrateDevice>
-            <Accelerometer key="Accelerometer"></Accelerometer>
+            <SelectBlueToothAccelerometer></SelectBlueToothAccelerometer>
+            
             <AccelerometerTrain key="AccelerometerTrain"></AccelerometerTrain>
 
             <div className="cv0" style={{ justifyContent: "flex-start" }} >
