@@ -1,5 +1,5 @@
 export const now = (date = new Date()) => date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate()
-export const unixTime = () => Math.floor(new Date().getTime() / 1000)
+export const unixTime = ():number => Math.floor(new Date().getTime() / 1000)
 export const NumberForHuman = v => v > 100000 ? v / 10000 + "万" : v
 //when page is loading, many default empty corpus was created
 //ensure they have different id, avoid their value cache into same key, and mis-recovered

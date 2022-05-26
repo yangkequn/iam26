@@ -58,7 +58,7 @@ const measure = new MenuStruct("评估", "/Measure", null, [
 //   ...MenuItem("活动", "/activity"),
 //   subMenu: []
 // }
-export const MenuItems: Array<MenuStruct> = [home, sleep]
+export const MenuItems: Array<MenuStruct> = [home, sleep,_me]
 
 
 

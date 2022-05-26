@@ -1,7 +1,8 @@
 /// <reference types="web-bluetooth" />
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useContext } from 'react';
 import { MeasureAccelerometerTraining } from "../models/MeasureAccelerometerTraining"
 import { Button } from "@mui/material";
+import { GlobalContext } from "../base/GlobalContext";
 
 //calculate mean squre root error
 const MSRE = (data: number[]) => {
@@ -63,8 +64,9 @@ function encodeAcceleroString(s: string): string {
   return r.join("")
 }
 
+
 export function AccelerometerTrain({ multiplier = 10, useGravity = false }: { multiplier?: number, useGravity?: boolean }) {
-  const [HeartRate, setHeartRate] = useState<number>(0)
+  const { HeartRate, setHeartRate } = useContext(GlobalContext)
   useEffect(() => {
     window.addEventListener('devicemotion', handleAcceleration)
     return () => window.removeEventListener('devicemotion', handleAcceleration)
@@ -116,10 +118,11 @@ export function AccelerometerTrain({ multiplier = 10, useGravity = false }: { mu
     if (model === null) return
     tasksend += 1
     //save to server
-    model.Put(StartHeartBeatEvent)
+    model.Put(StartHeartRateEvent)
   }
-  const StartHeartBeatEvent = (v) => setHeartRate(v.heartbeat);
+  const StartHeartRateEvent = (v) => setHeartRate(v.HeartRate);
   const handleAcceleration = (event) => {
+    if (stopped) return
     var acceleration = useGravity ? event.accelerationIncludingGravity : event.acceleration
     saveToHistory(acceleration as IAcceleration)
   }
@@ -127,29 +130,9 @@ export function AccelerometerTrain({ multiplier = 10, useGravity = false }: { mu
 
   const [stopped, setStopped] = useState<Boolean>(true)
 
-  const handleCharacteristicValueChanged = (event: Event) => {
-    let characteristic = event.target as BluetoothRemoteGATTCharacteristic
-    let value = characteristic.value
-    setHeartRate(value.getInt8(1))
-  }
-  const StartRetrievHeartbeatData = e => {
-
-    stopped && navigator.bluetooth.requestDevice({ filters: [{ services: ['heart_rate'] }] })
-      .then(device => device.gatt.connect())
-      .then(server => server.getPrimaryService('heart_rate'))
-      .then(service => service.getCharacteristic(0x2A37))
-      .then(characteristic => {
-        console.log("characteristicvaluechanged")
-        characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
-        // Reading Battery Level…
-        return characteristic.startNotifications();
-      })
-      .catch(error => { console.error(error); });
-    setStopped(!stopped)
-  }
 
   return <div>
-    <Button variant="contained" size="large" color={stopped ? "primary" : "secondary"} sx={{ p: "3em 3em 3em 3em" }} onClick={StartRetrievHeartbeatData} >
+    <Button variant="contained" size="large" color={stopped ? "primary" : "secondary"} sx={{ p: "3em 3em 3em 3em" }} onClick={e => setStopped(!stopped)} >
       {!stopped ? `发送${tasksend}每秒采样点:${lenPerSecond.toPrecision(3)} 当前心跳:${HeartRate}` : "点击采集心跳加速度训练数据"}
     </Button>
   </div>

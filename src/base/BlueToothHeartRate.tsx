@@ -8,7 +8,7 @@ import { Button } from "@mui/material";
 export interface IAcceleration { x: number | null, y: number | null, z: number | null }
 let tasksend = 0
 export function BlueToothHeartRate({ multiplier = 10, useGravity = false }: { multiplier?: number, useGravity?: boolean }) {
-    const { Heartbeat, setHeartbeat } = useContext(GlobalContext)
+    const { HeartRate, setHeartRate } = useContext(GlobalContext)
     useEffect(() => {
         // window.addEventListener('devicemotion', handleAcceleration)
         // return () => window.removeEventListener('devicemotion', handleAcceleration)
@@ -16,12 +16,14 @@ export function BlueToothHeartRate({ multiplier = 10, useGravity = false }: { mu
     const handleCharacteristicValueChanged = (event: Event) => {
         let characteristic = event.target as BluetoothRemoteGATTCharacteristic
         let value = characteristic.value
-        setHeartbeat(value.getInt8(1))
+        let heartRate = value.getUint8(1)
+        console.log("heartRateheartRate",heartRate) 
+        setHeartRate(heartRate)  
     }
 
     const [stopped, setStopped] = useState<Boolean>(true)
 
-    const StartRetrieveHeartBeat = e => {
+    const StartRetrieveHeartRate = e => {
         navigator.bluetooth.requestDevice({ filters: [{ services: ['heart_rate'] }] })
             .then(device => {
                 console.log("设备预备连接")
@@ -48,8 +50,8 @@ export function BlueToothHeartRate({ multiplier = 10, useGravity = false }: { mu
         setStopped(false)
         //setStopped(!stopped)
     }
-    return <Button variant="contained" size="large" color={stopped ? "primary" : "secondary"} sx={{ p: "3em 3em 3em 3em" }} onClick={StartRetrieveHeartBeat} >
-        {!stopped ? `发送${tasksend} 当前心跳:${Heartbeat}` : "启用蓝牙心率计"}
+    return <Button variant="contained" size="large" color={stopped ? "primary" : "secondary"} sx={{ p: "3em 3em 3em 3em" }} onClick={StartRetrieveHeartRate} >
+        {!stopped ? `发送${tasksend} 当前心跳:${HeartRate}` : "启用蓝牙心率计"}
     </Button>
 
 }

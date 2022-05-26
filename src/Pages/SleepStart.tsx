@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { createRef, useEffect, useState, useContext } from "react";
 import "../base/css.css"
 import "./MyTrace.css";
 import TextField from '@mui/material/TextField';
@@ -13,11 +13,18 @@ import { TraceItem } from "../models/TraceItem";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Accelerometer } from "../base/Accelerometer";
 import { AccelerometerTrain } from "../base/AccelerometerTrain";
-import { BlueToothHeartRate ,BlueToothAccelerometer} from "../device/HeartRate"
+import { SelectBlueToothAccelerometer } from "../device/SelectBlueToothAccelerometer"
+import { SelectBluetoothHeartrateDevice } from "../device/SelectBluetoothHeartrateDevice";
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
+import { BackGroundPlayer } from "./SleepBackGroudPlayer";
+import { MusicPlayerSlider, base64EncodedMp3 } from "./SleepMp3Player";
+import { GlobalContext } from "../base/GlobalContext";
+import { unixTime } from "../base/Fuctions";
+import { time } from "console";
 
-
+let lastPlay = new Date().getTime()
+let lastWaitTime = 0
 function TraceModelItem({ item }: { item: TraceModel; }) {
 
     //monitor initial value,to avoid unnecessary update
@@ -54,7 +61,6 @@ function TraceModelItem({ item }: { item: TraceModel; }) {
     </div>
         : null
 }
-
 export const SleepStart = () => {
     const [traces, setTraces] = useState<TraceModel[]>([])
 
@@ -80,13 +86,54 @@ export const SleepStart = () => {
     }
     useEffect(() => TraceModel.Get(getListCallBack), [])
 
+    const audioref = createRef<HTMLMediaElement>()
 
+    const [volume, setVolume] = useState<number>(0.7)
+    const [play, setPlay] = useState(true)
+    const { HeartRate, setHeartRate } = useContext(GlobalContext)
+    useEffect(() => {
+        if (!!audioref.current && HeartRate > 0 && (new Date().getTime() - lastPlay) > 3000)
+            audioref.current.play()
+    }, [HeartRate, audioref])
+    const Replay = () => {
+        if (HeartRate === 0) return
+        if (!play) return
+        let now = new Date().getTime()
+        let shouldPlay: number = 60000 / Math.max(20, HeartRate) + lastPlay
+        let wait = shouldPlay - now
+        wait = lastWaitTime * 0.2 + wait * 0.8
+        lastWaitTime = wait
+        console.log("wait", wait, "HeartRate", HeartRate, "playbackRate", audioref.current.playbackRate, "span", 60000 / Math.max(20, HeartRate),HeartRate)
+        lastPlay = now
+        audioref.current.volume = volume
+        if (wait <= 0) {
+            audioref.current.playbackRate *= 1.1
+            audioref.current.play()
+        } else {
+            if (wait > 200) {
+                audioref.current.playbackRate *= 0.9
+            }
+            setTimeout(e => (document.getElementById("myAudio") as HTMLMediaElement).play(), wait)
+        }
+    }
     return (
         //items table ,all columes are sortable, contains a list of items
         <div style={{ ...cv0, height: "100%", width: '100%', justifyContent: "space-between" }}>
-            <Container maxWidth="lg"  style={{margin:".5em 0 .5em 0 "}}>
-                <BlueToothHeartRate />    <span style={{margin:"0 1em 0 1em"}}>  </span>                <BlueToothAccelerometer />
+            <Container maxWidth="lg" style={{ margin: ".5em 0 .5em 0 " }}>
+                <SelectBluetoothHeartrateDevice />    <span style={{ margin: "0 1em 0 1em" }}>  </span>  <SelectBlueToothAccelerometer />
             </Container>
+            <audio ref={audioref}
+                id={`myAudio`} key="myAudio"
+                src={base64EncodedMp3}
+                onPause={e => Replay()}
+                preload="true"
+                loop={false}
+            ></audio>
+            <BackGroundPlayer></BackGroundPlayer>
+            <Button variant="contained" size="large" color={!play ? "primary" : "secondary"} sx={{ p: "0.5em 3em 0.5em 3em" }} onClick={e => setPlay(!play)} >
+                {play ? `禁用心跳声音` : "启用心跳声音"}
+            </Button>
+            {/* <MusicPlayerSlider></MusicPlayerSlider> */}
             <Accelerometer key="Accelerometer"></Accelerometer>
             <AccelerometerTrain key="AccelerometerTrain"></AccelerometerTrain>
 

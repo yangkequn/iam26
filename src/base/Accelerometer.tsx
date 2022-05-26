@@ -29,7 +29,7 @@ let factor = -1, startTM = 0, endTM = 0
 const SecondsWanted = 6
 let tasksend = 0
 export function Accelerometer({ multiplier = 10, useGravity = false }: { multiplier?: number, useGravity?: boolean }) {
-  const { Heartbeat, setHeartbeat } = useContext(GlobalContext)
+  const { HeartRate, setHeartRate } = useContext(GlobalContext) 
   useEffect(() => {
     window.addEventListener('devicemotion', handleAcceleration)
     return () => window.removeEventListener('devicemotion', handleAcceleration)
@@ -96,9 +96,9 @@ export function Accelerometer({ multiplier = 10, useGravity = false }: { multipl
     })
     tasksend += 1
     //save to server
-    model.ToMeasureAccelerometer().Put(StartHeartBeatEvent)
+    model.ToMeasureAccelerometer().Put(StartHeartRateEvent)
   }
-  const StartHeartBeatEvent = (v) => setHeartbeat(v.heartbeat);
+  const StartHeartRateEvent = (v) => setHeartRate(v.HeartRate);
   const handleAcceleration = (event) => {
     var acceleration = useGravity ? event.accelerationIncludingGravity : event.acceleration
     saveToHistory(acceleration as IAcceleration)
@@ -109,7 +109,7 @@ export function Accelerometer({ multiplier = 10, useGravity = false }: { multipl
 
 
   return <Button variant="contained" size="large" color={stopped ? "primary" : "secondary"} sx={{ p: "3em 3em 3em 3em" }} onClick={e => setStopped(!stopped)} >
-    {!stopped ? `发送${tasksend}每秒采样点:${lenPerSecond.toPrecision(3)} 当前心跳:${Heartbeat}` : "点击开始记录"}
+    {!stopped ? `发送${tasksend}每秒采样点:${lenPerSecond.toPrecision(3)} 当前心跳:${HeartRate}` : "点击开始记录"}
   </Button>
 
 }
