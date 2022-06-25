@@ -102,7 +102,7 @@ export const SleepStart = () => {
         let wait = shouldPlay - now
         wait = lastWaitTime * 0.2 + wait * 0.8
         lastWaitTime = wait
-        console.log("wait", wait, "HeartRate", HeartRate, "playbackRate", audioref.current.playbackRate, "span", 60000 / Math.max(20, HeartRate),HeartRate)
+        console.log("wait", wait, "HeartRate", HeartRate, "playbackRate", audioref.current.playbackRate, "span", 60000 / Math.max(20, HeartRate), HeartRate)
         lastPlay = now
         audioref.current.volume = volume
         if (wait <= 0) {
@@ -128,7 +128,7 @@ export const SleepStart = () => {
                 preload="true"
                 loop={false}
             ></audio>
-            <BackGroundPlayer></BackGroundPlayer>
+            {/* <BackGroundPlayer></BackGroundPlayer> */}
             <Button variant="contained" size="large" color={!play ? "primary" : "secondary"} sx={{ p: "0.5em 3em 0.5em 3em" }} onClick={e => setPlay(!play)} >
                 {play ? `禁用心跳声音` : "启用心跳声音"}
             </Button>
