@@ -20,6 +20,8 @@ interface GlobalContextType {
     setHeartRate: React.Dispatch<React.SetStateAction<number>>,
     AcceleroData: number[],
     setAcceleroData: React.Dispatch<React.SetStateAction<number[]>>,
+    audioChunk: Blob[],
+    setAudioChunk: React.Dispatch<React.SetStateAction<Blob[]>>,
 
 }
 export const GlobalContext = React.createContext<GlobalContextType | null>(null)
@@ -36,6 +38,7 @@ export const GlobalContextProvider: React.FC<React.ReactNode> = ({ children }) =
 
     const [HeartRate, setHeartRate] = useState(0)
     const [AcceleroData, setAcceleroData] = useState([] as number[])
+    const [audioChunk, setAudioChunk] = useState<Blob[]>()
     useEffect(() => {
         const LoadJwt = (event: Event) => {
             setLoggedIn(Jwt.Get().IsValid())
@@ -49,7 +52,7 @@ export const GlobalContextProvider: React.FC<React.ReactNode> = ({ children }) =
         return () => window.removeEventListener(Jwt.eventName, LoadJwt)
     })
     // if LoggedOut, update Context States
-   
+
 
     const store = {
         LoggedIn,
@@ -59,8 +62,9 @@ export const GlobalContextProvider: React.FC<React.ReactNode> = ({ children }) =
         SetAuthPage,
         RedirectUrl,
         setRedirectUrl,
-        HeartRate,setHeartRate,
-        AcceleroData, setAcceleroData
+        HeartRate, setHeartRate,
+        AcceleroData, setAcceleroData,
+        audioChunk, setAudioChunk
     }
 
     return <GlobalContext.Provider value={store} > {children} </GlobalContext.Provider>

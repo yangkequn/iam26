@@ -19,6 +19,7 @@ import Box from '@mui/material/Box';
 import { BackGroundPlayer } from "./SleepBackGroudPlayer";
 import { MusicPlayerSlider, base64EncodedMp3 } from "./SleepMp3Player";
 import { GlobalContext } from "../base/GlobalContext";
+import {RecorderComponent} from "../device/recorder"; 
 import { unixTime } from "../base/Fuctions";
 import { time } from "console";
 
@@ -121,6 +122,7 @@ export const SleepStart = () => {
             <Container maxWidth="lg" style={{ margin: ".5em 0 .5em 0 " }}>
                 <SelectBluetoothHeartrateDevice />    <span style={{ margin: "0 1em 0 1em" }}>  </span>  <SelectBlueToothAccelerometer />
             </Container>
+            <RecorderComponent></RecorderComponent>
             <audio ref={audioref}
                 id={`myAudio`} key="myAudio"
                 src={base64EncodedMp3}
