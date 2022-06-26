@@ -38,6 +38,9 @@ service iam26-api {
 	put /measureAccelerometer(MeasureAccelerometer) returns (PutMeasureAccelerometer)
 	@handler MeasureAccelerometerTrainingPut
 	put /measureAccelerometerTraining(MeasureAccelerometer) returns ()
+
+	@handler HeartbeatAudioPut
+	put /measureHeartbeatAudio(HeartbeatAudio) returns ()
 	
 	@handler TraceGet
 	get /trace returns ([]TraceItem)
@@ -109,6 +112,10 @@ type MeasureAccelerometer {
 	Id   string   `json:"id,optional"`
 	Data string   `json:"data"`
 	List []string `json:"list"`
+}
+type HeartbeatAudio {
+	Heartbeat string   `form:"heartbeat"`
+	Audio string `form:"list"`
 }
 
 type GoalItem {

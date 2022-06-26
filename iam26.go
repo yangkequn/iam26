@@ -49,7 +49,7 @@ func ExportAllAccelerometerToRedis(ctx *svc.ServiceContext) {
 }
 
 func main() {
-
+	//
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
 

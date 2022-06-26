@@ -59,6 +59,11 @@ type MeasureAccelerometer struct {
 	List []string `json:"list"`
 }
 
+type HeartbeatAudio struct {
+	Heartbeat string `form:"heartbeat"`
+	Audio     string `form:"list"`
+}
+
 type GoalItem struct {
 	Id         string `json:"id"`
 	Name       string `json:"name"`
