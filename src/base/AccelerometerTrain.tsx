@@ -3,28 +3,9 @@ import React, { useState, useEffect, useContext } from 'react';
 import { MeasureAccelerometerTraining } from "../models/MeasureAccelerometerTraining"
 import { Button } from "@mui/material";
 import { GlobalContext } from "../base/GlobalContext";
+import { MSRE } from "./FunctionMath"
+import { CompressString } from "./FunctionCompress"
 
-//calculate mean squre root error
-const MSRE = (data: number[]) => {
-  let sum = data.reduce((a, b) => a + b, 0) / data.length
-  let squareSum = data.reduce((a, b) => a + (b - sum) * (b - sum), 0) / data.length
-  return Math.sqrt(squareSum)
-}
-
-function encodeAcceleroString(s: string): string {
-  var r = []
-  for (var i = 0; i < s.length; i++) {
-    if (s[i] !== ",") {
-      r.push(s[i])
-      continue
-    }
-    var j = i + 1; while (j < s.length && s[j] === "," && (j - i) < 10000) j++;
-    var l = j - i;
-    if (l === 1) r.push(","); else if (l < 10) r.push("v" + l); else if (l < 100) r.push("w" + l); else if (l < 1000) r.push("x" + l); else if (l < 10000) r.push("y" + l);
-    i = j - 1
-  }
-  return r.join("")
-}
 export interface IAcceleration { x: number | null, y: number | null, z: number | null }
 let dataX: Array<number> = []; let dataY: Array<number> = []; let dataZ: Array<number> = []; let heartrate: Array<number> = [];
 //let DataAcceleration: number[] = []
@@ -57,11 +38,10 @@ const SaveDataAndRestartRecording = (): MeasureAccelerometerTraining | null => {
     }
   })
   //压缩数据,相同的数据只保留一个分隔符
-  dataToCompress.forEach(data => { for (var i = data.length - 1; i >= 1; i--) if (data[i] === data[i - 1]) data[i] = null })
-
-  var data = [startTM, endTM, 4, dataX.length].concat(dataX).concat(dataY).concat(dataZ).concat(heartrate)
+  var data: Array<number|null> =[...dataX,...dataY,...dataZ,...heartrate]
+  for (var i = data.length - 1; i >= 1; i--) if (data[i] === data[i - 1]) data[i] = null
   reset()
-  return new MeasureAccelerometerTraining("0", encodeAcceleroString(data.join(",")), []);
+  return new MeasureAccelerometerTraining("0", CompressString([startTM, endTM, 4, dataX.length,...data].join(",")), []);
 }
 
 
@@ -69,7 +49,7 @@ export function AccelerometerTrain({ multiplier = 10, useGravity = false }: { mu
   const { AcceleroData, setAcceleroData } = useContext(GlobalContext)
   const { HeartRate, setHeartRate } = useContext(GlobalContext)
   const saveToHistory = () => {
-    if (stopped || HeartRate === 0 || AcceleroData.length % 3 !== 0||AcceleroData.length===0)  {
+    if (stopped || HeartRate === 0 || AcceleroData.length % 3 !== 0 || AcceleroData.length === 0) {
       if (dataX.length > 0) {
         dataX = []; dataY = []; dataZ = []; heartrate = []; startTM = 0; endTM = 0
       }
@@ -84,14 +64,14 @@ export function AccelerometerTrain({ multiplier = 10, useGravity = false }: { mu
       startTM = now
     }
     if (factor === -1) {
-      let x=AcceleroData[0],y=AcceleroData[1],z=AcceleroData[2]
+      let x = AcceleroData[0], y = AcceleroData[1], z = AcceleroData[2]
       if ((x * 10.) << 0 === x * 10 && (y * 10.) << 0 === y * 10 && (z * 10.) << 0 === z * 10)
         factor = 10
       else factor = 100
     }
 
     for (var i = 0; i < AcceleroData.length; i++) {
-      let ax= AcceleroData[i], ay= AcceleroData[i+1], az= AcceleroData[i+2]
+      let ax = AcceleroData[i], ay = AcceleroData[i + 1], az = AcceleroData[i + 2]
       dataX.push((ax * factor) << 0)
       dataY.push((ay * factor) << 0)
       dataZ.push((az * factor) << 0)
@@ -122,7 +102,7 @@ export function AccelerometerTrain({ multiplier = 10, useGravity = false }: { mu
     model.Put(StartHeartRateEvent)
   }
   useEffect(saveToHistory, [AcceleroData])
-  const StartHeartRateEvent = (v) => setHeartRate(v.HeartRate);
+  const StartHeartRateEvent = (v:any) => setHeartRate(v.HeartRate);
   const [lenPerSecond, setLenPerSecond] = useState(0)
   const [stopped, setStopped] = useState<Boolean>(true)
   return <div>

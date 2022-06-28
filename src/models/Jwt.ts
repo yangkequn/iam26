@@ -10,7 +10,7 @@ export class Jwt implements IJwt {
     public static Get = (jwt = GetStorage("jwt")): Jwt => Object.assign(new Jwt(null, null, null, null), jwt) as Jwt;
     public static Clear = (): void => { SaveStorage("jwt", new Jwt("", "", "", "")); Jwt.LastGetJwtTime = new Date().getTime() + Math.random(); };
     public static Save = (data: Jwt): void => { SaveStorage("jwt", data); Jwt.LastGetJwtTime = new Date().getTime() + Math.random(); };
-    public static SaveOrClear = (data: object): void => {
+    public static SaveOrClear = (data: any): void => {
         let jwt = new Jwt(data["sub"], data["jwt"], data["id"], data["temporaryAccount"])
         jwt.IsValid() ? Jwt.Save(jwt) : Jwt.Clear();
     }
@@ -36,5 +36,5 @@ export class Jwt implements IJwt {
             //case local network corrupted,ignore further operation
             //.catch(e => setLoggedTime(false));
     };
-    public static SignOut = (e: any): void => !!e.response && e.response.status === 401 && Jwt.UpdateJWT(true);
+    public static SignOut = (e: any) => !!e.response && e.response.status === 401 && Jwt.UpdateJWT(true);
 }

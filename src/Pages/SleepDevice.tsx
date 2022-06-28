@@ -6,12 +6,12 @@ import AddIcon from '@mui/icons-material/Add';
 import { Button } from "@mui/material";
 import { cv0 } from "../base/css";
 import { TraceModel } from "../models/TraceModel";
-import { BindTextFieldModel as mt } from "../base/BindModelComponent";
 import { MeasureItem } from "../models/MeasureItem";
 import { ActItem } from "../models/ActItem";
 import { TraceItem } from "../models/TraceItem";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { AccelerometerTrain } from "../base/AccelerometerTrain";
+import { BindTextFieldModel as bind } from "../base/BindModelComponent";
 
 function TraceModelItem({ item }: { item: TraceModel; }) {
 
@@ -21,8 +21,8 @@ function TraceModelItem({ item }: { item: TraceModel; }) {
 
     //autoload from server
     useEffect(() => {
-        !!item.measureId && MeasureItem.From(item).Load(e => setUpdateTM(new Date().getTime()))
-        !!item.actId && ActItem.From(item).Load(e => setUpdateTM(new Date().getTime()))
+        !!item.measureId && MeasureItem.From(item).Load(() => setUpdateTM(new Date().getTime()))
+        !!item.actId && ActItem.From(item).Load(() => setUpdateTM(new Date().getTime()))
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [item])
     //    useEffect(() => setUpdateTM(new Date().getTime()), [item.updated])
@@ -34,18 +34,18 @@ function TraceModelItem({ item }: { item: TraceModel; }) {
         <div className={"traceIcon"} > {TypeText} </div>
         {/* <TextField className="traceText" required label="名称" variant="standard" {...{defaultValue: item["name"]}}  /> */}
         <TextField className="traceText" required label="名称" variant="standard" key={`${updateTM}_name`}
-            {...mt(item, "name", { onBlur: e => item.Save(setUpdateTM) })} />
+            {...bind(item, "name", { onBlur:() => item.Save(setUpdateTM) })} />
         <TextField className="traceText" required label="单位" variant="filled" key={`${updateTM}_unit`}
-            {...mt(item, "unit", { onBlur: e => item.Save(setUpdateTM) })} />
+            {...bind(item, "unit", { onBlur:() => item.Save(setUpdateTM) })} />
         <TextField className="traceText" label="细节" variant="standard" key={`${updateTM}_detail`}
-            {...mt(item, "detail", { onBlur: e => item.Save(setUpdateTM) })} />
+            {...bind(item, "detail", { onBlur:() => item.Save(setUpdateTM) })} />
         <TextField className="traceText" label="值" variant="filled" key={`${updateTM}_value`}
-            {...mt(item, "value", { onBlur: e => item.Save(setUpdateTM) })} />
+            {...bind(item, "value", { onBlur:() => item.Save(setUpdateTM) })} />
         <TextField className="traceText" label="" type="datetime-local" variant="standard" InputLabelProps={{ shrink: true, }}
-            {...mt(item, "time", { onBlur: e => item.Save(setUpdateTM) })} />
+            {...bind(item, "time", { onBlur:() => item.Save(setUpdateTM) })} />
         <TextField className="traceText" label="备注" variant="filled" key={`${updateTM}_memo`}
-            {...mt(item, "memo", { onBlur: e => item.Save(setUpdateTM) })} />
-        <Button onClick={e => item.Delete(update)}> <DeleteIcon></DeleteIcon></Button>
+            {...bind(item, "memo", { onBlur:() => item.Save(setUpdateTM) })} />
+        <Button onClick={() => item.Delete(update)}> <DeleteIcon></DeleteIcon></Button>
     </div>
         : null
 }
@@ -53,13 +53,13 @@ function TraceModelItem({ item }: { item: TraceModel; }) {
 export const SleepDevice = () => {
     const [traces, setTraces] = useState<TraceModel[]>([])
 
-    const AddMeasure = (event) => {
-        MeasureItem.Recommend("", (list) => { setTraces([...list, ...traces]) })
+    const AddMeasure = () => {
+        MeasureItem.Recommend("", (list:any) => { setTraces([...list, ...traces]) })
         var newItem = new TraceModel("0", "", "0")
         setTraces([newItem, ...traces.filter(item => item.traceId !== "0")])
     }
-    const AddAction = (event) => {
-        ActItem.Recommend("", (list) => { setTraces([...list, ...traces]) })
+    const AddAction = () => {
+        ActItem.Recommend("", (list:any) => { setTraces([...list, ...traces]) })
         var newItem = new TraceModel("0", "0", "")
         setTraces([newItem, ...traces.filter(item => item.traceId !== "0")])
     }
@@ -89,7 +89,7 @@ export const SleepDevice = () => {
             <AccelerometerTrain key="AccelerometerTrain"></AccelerometerTrain>
 
             <div className="cv0" style={{ justifyContent: "flex-start" }} >
-                {traces.map((item, i) => <TraceModelItem key={`trace-${item["traceId"]}-${item["name"]}-${item["updated"]}`} item={item} />)}
+                {traces.map((item:TraceModel, i:number) => <TraceModelItem key={`trace-${item["traceId"]}-${item["name"]}`} item={item} />)}
             </div>
         </div>
     );

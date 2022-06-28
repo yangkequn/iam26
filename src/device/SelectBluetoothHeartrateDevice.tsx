@@ -12,14 +12,15 @@ export function SelectBluetoothHeartrateDevice() {
     const handleCharacteristicValueChanged = (event: Event) => {
         let characteristic = event.target as BluetoothRemoteGATTCharacteristic;
         let value = characteristic.value;
-        setHeartRate(value.getUint8(1));
+        setHeartRate(!value ? 0 : value.getUint8(1));
     };
-    const StartRetrievHeartRateData = e => {
+    const StartRetrievHeartRateData = (e: React.MouseEvent) => {
         stopped && navigator.bluetooth.requestDevice({ filters: [{ services: ['heart_rate'] }] })
-            .then(device => device.gatt.connect())
-            .then(server => server.getPrimaryService('heart_rate'))
-            .then(service => service.getCharacteristic(0x2A37))
+            .then(device => !device.gatt ? null : device.gatt.connect())
+            .then(server => !server ? null : server.getPrimaryService('heart_rate'))
+            .then(service => !service ? null : service.getCharacteristic(0x2A37))
             .then(characteristic => {
+                if (!characteristic) return
                 characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
                 // Reading Battery Level…
                 return characteristic.startNotifications();

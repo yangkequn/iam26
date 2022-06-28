@@ -3,12 +3,12 @@ import { GetStorage, SaveStorage } from '../base/Storage';
 import { Jwt } from "./Jwt";
 import { CallbackProduce, CallbackCancel, CallbackComsum } from "./Webapi.callback";
 
-export const JwtRequest = (headers = {}, jwt = Jwt.Get()) => {
+export const JwtRequest = (headers: any = {}, jwt: any = Jwt.Get()) => {
     if (jwt.IsValid()) headers["Authorization"] = jwt.jwt;
     return axios.create({ headers });
 };
 //{ setState, transformer }: { setState: Function; transformer: Function }
-export const Get = (url: string, setState: Function = null, dataTransform: Function = null, exceptionCallBack: Function = Jwt.SignOut, useCache: boolean = true) => {
+export const Get = (url: string, setState: Function | null = null, dataTransform: Function | null = null, exceptionCallBack: Function = Jwt.SignOut, useCache: boolean = true) => {
     //已经有参数，则返回参数
     if (useCache) {
         let data = GetStorage(url, setState);
@@ -23,7 +23,7 @@ export const Get = (url: string, setState: Function = null, dataTransform: Funct
             let data = rsb.data
             if (!!dataTransform && (typeof (dataTransform) === "function")) data = dataTransform(data);
 
-            CallbackComsum(url, setState, data);
+            CallbackComsum(url, data);
             useCache && SaveStorage(url, data);
         }
     ).catch(e => {
@@ -36,32 +36,37 @@ export const Get = (url: string, setState: Function = null, dataTransform: Funct
 export const Load = (url: string, data: object, setState: Function) => {
     JwtRequest().get(url).then(rsb => {
         Merge(rsb.data, data);
-        if (typeof setState === "function") setState(rsb.data)
+        if (!!setState) setState(rsb.data)
     }).catch(Jwt.SignOut);
     return null;
 };
 
-export const Delete = (url: string, data: object, setState: Function = null) =>
+export const Delete = (url: string, data: object, setState: Function | null = null) =>
     JwtRequest().delete(url, { data }).then(rsb => {
         Merge(rsb.data, data);
-        if (typeof setState === "function") setState(rsb.data)
+        if (!!setState) setState(rsb.data)
     }).catch(Jwt.SignOut)
 
-export const Put = (url: string, data: object, setState: Function = null) => {
+export const Put = (url: string, data: object, setState: Function | null = null) => {
     JwtRequest().put(url, data).then(rsb => {
-        !!data&&Merge(rsb.data, data);
-        if (typeof setState === "function") setState(rsb.data)
+        !!data && Merge(rsb.data, data);
+        if (!!setState) setState(rsb.data)
+    }).catch(Jwt.SignOut)
+}
+export const PutForm = (url: string, form: FormData, setState: Function | null = null) => {
+    JwtRequest().put(url, form).then(rsb => {
+        if (!!setState) setState(rsb.data)
     }).catch(Jwt.SignOut)
 }
 
-export const Post = (url: string, data: object, setState: Function = null) =>
+export const Post = (url: string, data: object, setState: Function | null = null) =>
     JwtRequest().post(url, data).then(rsb => {
         Merge(rsb.data, data);
-        if (typeof setState === "function") setState(rsb.data)
+        if (!!setState) setState(rsb.data)
     }).catch(Jwt.SignOut)
 //check whether 
-const ObjectOfLastState = {}
-export function ObjectVersionChanged(currentObject: object, key): boolean {
+const ObjectOfLastState: any = {}
+export function ObjectVersionChanged(currentObject: object, key: string): boolean {
     const RefreshLocal = () => !!(ObjectOfLastState[key] = Object.assign({}, currentObject))
 
     if (!ObjectOfLastState[key]) return RefreshLocal()
@@ -69,7 +74,7 @@ export function ObjectVersionChanged(currentObject: object, key): boolean {
     return JSON.stringify(ObjectOfLastState[key]) !== JSON.stringify(currentObject) && RefreshLocal()
 }
 
-export function Merge(src: object, target: object) {
+export function Merge(src: any, target: any) {
     if (!src || !target) return;
     //assign properties of obj to this of type GoalItem
     //only properties of GoalItem is allowed

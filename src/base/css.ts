@@ -9,7 +9,7 @@ export const cv1:CSS.Properties = {
     maxWidth: "100%", fontFamily: "Roboto, Arial, sans-serif"
 }
 export const cv0:CSS.Properties = { ...cv1, width: "100%" }
-export const mr = (r) => ({ marginRight: r + "em" })
-export const mb = (b) => ({ marginBottom: b + "em" })
+export const mr = (r:number) => ({ marginRight: r + "em" })
+export const mb = (b:number) => ({ marginBottom: b + "em" })
 
 

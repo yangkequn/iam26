@@ -13,7 +13,7 @@ export function MeasureItemComponent({ item }: { item: MeasureItem }) {
     const [updateTM, setUpdateTM] = useState<number>(new Date().getTime())
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => { item.Load(Refresh) }, [])
-    const Refresh = e => setUpdateTM(new Date().getTime())
+    const Refresh = (e:Event) => setUpdateTM(new Date().getTime())
     const Events = {
         onBlur: function (event: Event): void { item.Put(Refresh); },
     }
@@ -51,7 +51,7 @@ export const Measure = () => {
     const [measureItems, setMeasureItems] = useState<MeasureItem[]>([new MeasureItem("0", "", "", "", 0, 0, false)])
 
     useEffect(() => {
-        MeasureItem.Recommend("", list => setMeasureItems([...(measureItems.filter((item: MeasureItem) => item.IsNew())), ...list]))
+        MeasureItem.Recommend("", (list:any) => setMeasureItems([...(measureItems.filter((item: MeasureItem) => item.IsNew())), ...list]))
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 

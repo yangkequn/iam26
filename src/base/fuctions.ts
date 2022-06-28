@@ -1,6 +1,6 @@
 export const now = (date = new Date()) => date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate()
-export const unixTime = ():number => Math.floor(new Date().getTime() / 1000)
-export const NumberForHuman = v => v > 100000 ? v / 10000 + "万" : v
+export const unixTime = (): number => Math.floor(new Date().getTime() / 1000)
+export const NumberForHuman = (v: number) => v > 100000 ? v / 10000 + "万" : v
 //when page is loading, many default empty corpus was created
 //ensure they have different id, avoid their value cache into same key, and mis-recovered
 export const TimePassed = (time: number): string => {
@@ -19,11 +19,11 @@ export const TimePassed = (time: number): string => {
 
 export const IsASCII = (str: string): boolean => (/^[\x0-\x7F]*$/.test(str))
 
-export const ParseQuery = (key: string = null, queryString: string = window.location.search): string | object => {
-    var query = {};
+export const ParseQuery = (key: string | null = null, queryString: string = window.location.search): string | object => {
+    var query: any = {};
     var pairs = (queryString[0] === '?' ? queryString.substr(1) : queryString).split('&');
     for (var i = 0; i < pairs.length; i++) {
-        var pair = pairs[i].split('=');
+        var pair: any = pairs[i].split('=');
         query[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1] || '');
     }
     if (key != null) {
@@ -49,5 +49,5 @@ export class TimeConverter {
         return tm.getTime() / 1000;
     }
 
-    public static TimePropertyFromUnix2ISO = obj => { if (!!obj["time"]) obj["time"] = TimeConverter.LocalISONowToUnixTime(obj["time"]); }
+    public static TimePropertyFromUnix2ISO = (obj: any) => { if (!!obj["time"]) obj["time"] = TimeConverter.LocalISONowToUnixTime(obj["time"]); }
 }

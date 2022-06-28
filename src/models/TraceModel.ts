@@ -21,18 +21,17 @@ export interface ITraceModel {
 }
 
 export class TraceModel implements ITraceModel {
-    constructor(public traceId: string, public actId: string = "", public measureId: string = "",
+    constructor(public traceId: string, public actId: string | null = "", public measureId: string | null = "",
         public name: string = "", public unit: string = "", public value: number = 5.6, public detail: string = "",
         public memo: string = "", public time: string = TimeConverter.ISONow(), public popularity: number = 0, public score: number = 0) {
     }
 
-    Merge(obj: object) {
+    Merge(obj: any) {
         //assign properties of obj to this of type TraceModel
         //only properties of TraceModel is allowed
         for (let key in obj) {
-            if (this.hasOwnProperty(key)) {
-                this[key] = obj[key];
-            }
+            if (this.hasOwnProperty(key)) (this as any)[key] = obj[key];
+
         }
     }
 
@@ -40,7 +39,7 @@ export class TraceModel implements ITraceModel {
     public static Get = (setState: Function): void => {
 
         const Transformer = (list: TraceItem[]): TraceModel[] => {
-            var list_ = list.map(item => {
+            var list_ = list.map((item: TraceItem) => {
                 var trace = new TraceModel(item.traceId, item.actId, item.measureId)
                 trace.value = item.value
                 trace.time = TimeConverter.UnixTime2ISO(item.time)
@@ -51,13 +50,13 @@ export class TraceModel implements ITraceModel {
         }
         Get(TraceModel.getUrl, setState, Transformer, Jwt.SignOut, false)
     }
-    public Save = setUpdateTM => {
+    public Save = (setUpdateTM: Function) => {
         const Merge = (o: MeasureItem | ActItem | TraceItem) => { this.Merge(o); setUpdateTM(new Date().getTime()); }
         !!this.measureId && MeasureItem.From(this).Put(Merge)
         !!this.actId && ActItem.From(this).Put(Merge)
         !!this.traceId && TraceItem.From(this).Put(Merge)
     }
-    public Delete = callback =>  !!this.traceId && TraceItem.From(this).Delete(callback)
+    public Delete = (callback: Function) => !!this.traceId && TraceItem.From(this).Delete(callback)
 
 
 }

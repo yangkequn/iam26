@@ -12,7 +12,7 @@ export class MeasureAccelerometerTraining implements IMeasureAccelerometerTraini
     constructor(public id: string, public data: string, public list: Array<string>) {
     }
 
-    public static From(obj: object): MeasureAccelerometerTraining {
+    public static From(obj: any): MeasureAccelerometerTraining {
         //convert obj to MeasureIndex
         // only properties of MeasureIndex is allowed
         return new MeasureAccelerometerTraining(obj["id"], obj["data"], obj["list"]);
@@ -22,7 +22,7 @@ export class MeasureAccelerometerTraining implements IMeasureAccelerometerTraini
     private PutCheck = (): boolean => !!this.id
     //LocalVersionModified can be call to avoid uncessary update
     public LocalVersionModified = (): boolean => ObjectVersionChanged(this, `measureAccelerometer-${this.id}`)
-    public Put = (setState) => this.PutCheck() && this.LocalVersionModified() && Put(`/api/measureAccelerometerTraining`, this, setState)
+    public Put = (setState:Function) => this.PutCheck() && this.LocalVersionModified() && Put(`/api/measureAccelerometerTraining`, this, setState)
 
     //public Delete = (callback:Function) => !!this.id && Delete(`/api/MeasureIndex`, this, callback )
 

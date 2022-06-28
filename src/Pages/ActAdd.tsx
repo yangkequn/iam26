@@ -14,7 +14,7 @@ export function ActItemComponent({ item }: { item: ActItem }) {
     const [updateTM, setUpdateTM] = useState<number>(new Date().getTime())
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => { item.Load(Refresh) }, [])
-    const Refresh = e => setUpdateTM(new Date().getTime())
+    const Refresh = (e:Event) => setUpdateTM(new Date().getTime())
     const Events = {
         onBlur: function (event: Event): void { item.Put(Refresh); },
     }
@@ -54,7 +54,7 @@ export function Act() {
     const [items, setItems] = useState<ActItem[]>([new ActItem("0", "", "", "", 0, 0, false)])
 
     useEffect(() => {
-        ActItem.Recommend("", list => setItems([...(items.filter((item: ActItem) => item.IsNew())), ...list]))
+        ActItem.Recommend("", (list:any) => setItems([...(items.filter((item: ActItem) => item.IsNew())), ...list]))
         return () => { }
     })
 

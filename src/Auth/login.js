@@ -36,7 +36,7 @@ export const Login = () => {
 
     const {
         countryCode: [countryCode, setCountryCode, countryCodeError],
-        phone: [phone, setPhone],
+        phone: [phone, setPhone,phoneError, setPhoneError],
         account: [account, setAccount, accountError, setAccountError],
         password: [password, setPassword, passwordError],
         foreignPhone: [foreignPhone, setForeignPhone],
@@ -73,8 +73,12 @@ export const Login = () => {
                     <CountrySelect width={"150px"} disableCloseOnSelect countryCodeError={countryCodeError}
                         defaultValue={"CN"}
                         setCountryCode={setCountryCode}> </CountrySelect>
-                    {/*填写手机号码*/} rror} onChange={e => setPhone(e.target.value)}
-                        style={{ widtvvh: "70%" }} />
+                        {/*填写手机号码*/}
+                <TextField id="signUp-phone" label={phoneError || info["PhoneNumberTitle"]} size="small"
+                    variant="standard"
+                    error={!!phoneError} onChange={e => setPhone(e.target.value)}
+                    style={{ width: "70%" }} />
+
                 </div>
 
 
@@ -94,7 +98,7 @@ export const Login = () => {
                         setCountryCode(ToBeForeignMode ? 1 : 86);
                         if (ToBeForeignMode) setAccount("")
                         else setPhone("")
-                        setForeignPhone(!foreignPhone);
+                        setForeignPhone(!foreignPhone); 
                     }}>
                         {!foreignPhone ? info.ForeignPhoneMode : info.MailAccountLogin}
                     </Button>

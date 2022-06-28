@@ -10,12 +10,12 @@ import { withHistory } from 'slate-history'
 import { BaseEditor } from 'slate'
 import { ReactEditor } from 'slate-react'
 import { HistoryEditor } from 'slate-history'
-import escapeHtml from 'escape-html'
 import { Text } from 'slate'
 import { jsx } from 'slate-hyperscript'
-import {  ToolbarComponent, toggleMark } from './Toolbar'
+import { ToolbarComponent, toggleMark } from './Toolbar'
+import escapeHtml from 'escape-html'
 
-type CustomElement = { type: 'paragraph'; children: CustomText[]; align?: string }
+export type CustomElement = { type: 'paragraph'; children: CustomText[]; align?: string }
 type CustomText = { text: string; bold?: true; italic?: true; underline?: true; code?: true; }
 
 declare module 'slate' {
@@ -27,8 +27,8 @@ declare module 'slate' {
 }
 const HOTKEYS = { 'mod+b': 'bold', 'mod+i': 'italic', 'mod+u': 'underline', 'mod+`': 'code', }
 
-
-const Element = ({ attributes, children, element }) => {
+// tslint:disable-next-line: no-any
+const Element = ({ attributes, children, element }: { attributes: any, children: any, element: any }) => {
     const style = { textAlign: element.align }
     switch (element.type) {
         case 'block-quote':
@@ -55,7 +55,7 @@ const Element = ({ attributes, children, element }) => {
     }
 }
 
-const Leaf = ({ attributes, children, leaf }) => {
+const Leaf = ({ attributes, children, leaf }: { attributes: any, children: any, leaf: any }) => {
     if (leaf.bold) { children = <strong>{children}</strong> }
 
     if (leaf.code) { children = <code>{children}</code> }
@@ -68,7 +68,7 @@ const Leaf = ({ attributes, children, leaf }) => {
 }
 
 //https://docs.slatejs.org/concepts/10-serializing
-const serialize = node => {
+const serialize = (node: any) => {
     if (Text.isText(node)) {
         let string = escapeHtml(node.text)
         if (node.bold) {
@@ -77,7 +77,7 @@ const serialize = node => {
         return string
     }
 
-    const children = node.children.map(n => serialize(n)).join('')
+    const children = node.children.map((n: any) => serialize(n)).join('')
 
     switch (node.type) {
         case 'quote':
@@ -91,14 +91,14 @@ const serialize = node => {
     }
 }
 
-const deserialize = (el, markAttributes = {}) => {
+const deserialize = (el: any, markAttributes = {}): any => {
     if (el.nodeType === Node.TEXT_NODE) {
         return jsx('text', markAttributes, el.textContent)
     } else if (el.nodeType !== Node.ELEMENT_NODE) {
         return null
     }
 
-    const nodeAttributes = { ...markAttributes }
+    const nodeAttributes = { ...markAttributes } as any
 
     // define attibutes for text nodes
     switch (el.nodeName) {
@@ -128,10 +128,10 @@ const deserialize = (el, markAttributes = {}) => {
     }
 }
 export function Field2RichText({ model, field, updateKey, callbacks = {}, placeholder = "", autoFocus = false }:
-    { model: object, field: string, updateKey: number, callbacks: object, placeholder: string, autoFocus: boolean }) {
+    { model: any, field: string, updateKey: number, callbacks: any, placeholder: string, autoFocus: boolean }) {
     const editor = useMemo(() => withHistory(withReact(createEditor())), [])
     const [readonly, setReadonly] = useState(true)
-    const onChange = (state) => {
+    const onChange = (state: any) => {
         var html = serialize({ children: state })
         model[field] = html
         setValue(state)
@@ -147,7 +147,7 @@ export function Field2RichText({ model, field, updateKey, callbacks = {}, placeh
     }
     const [value, setValue] = useState<Descendant[]>(GetEditValue(model[field]))
     //const [value, setValue] = useState<Descendant[]>([{ type: 'paragraph', children: [{ text: '' },], }])
-    const onBlur = value => {
+    const onBlur = (value: any) => {
         if (!!callbacks["onBlur"]) callbacks["onBlur"](value);
         setReadonly(true)
     }
@@ -187,7 +187,7 @@ export function Field2RichText({ model, field, updateKey, callbacks = {}, placeh
                 for (const hotkey in HOTKEYS) {
                     if (isHotkey(hotkey, event as any)) {
                         event.preventDefault()
-                        const mark = HOTKEYS[hotkey]
+                        const mark = (HOTKEYS as any)[hotkey] 
                         toggleMark(editor, mark)
                     }
                 }
@@ -196,15 +196,15 @@ export function Field2RichText({ model, field, updateKey, callbacks = {}, placeh
     </Slate>
 }
 export function Field2PainText({ model, field, updateKey, callbacks = {}, placeholder = "", autoFocus = false }:
-    { model: object, field: string, updateKey: number, callbacks: object, placeholder: string, autoFocus: boolean }) {
+    { model: any, field: string, updateKey: number, callbacks: any, placeholder: string, autoFocus: boolean }) {
     const editor = useMemo(() => withHistory(withReact(createEditor())), [])
-    const onChange = (state) => {
+    const onChange = (state:any) => {
         var html = serialize({ children: state })
         model[field] = html
         setValue(state)
     }
     const [value, setValue] = useState<Descendant[]>(!!model[field] ? deserialize(model[field]) : [{ type: 'paragraph', children: [{ text: '' },], }])
-    const onBlur = value => {
+    const onBlur = (value:any) => {
         if (!!callbacks["onBlur"]) callbacks["onBlur"](value);
     }
     const renderElement = useCallback(props => <Element {...props} />, [])

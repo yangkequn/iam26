@@ -38,7 +38,7 @@ export const AuthCss = {
         background: "#0066ff", justifyContent: "center", color: "#ffffff", borderRadius: "4px",
     },
 }
-export const AuthPages = { None: null, SignUp: "SignUp", MyProfile: "MyProfile", ForgotPassword: "ForgotPassword", Login: "Login" }
+export const AuthPages = { None: "None", SignUp: "SignUp", MyProfile: "MyProfile", ForgotPassword: "ForgotPassword", Login: "Login" }
 export const AuthPopper = () => {
     const { AuthBoxPage: page, SetAuthPage } = useContext(GlobalContext)
 

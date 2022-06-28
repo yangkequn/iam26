@@ -13,7 +13,7 @@ export function GoalItemComponent({ item }: { item: GoalItem }) {
   const [updateTM, setUpdateTM] = useState<number>(new Date().getTime())
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { item.Load(Refresh) }, [])
-  const Refresh = e => setUpdateTM(new Date().getTime())
+  const Refresh = (e:Event) => setUpdateTM(new Date().getTime())
   const Events = {
       onBlur: function (event: Event): void { item.Put(Refresh); },
   }
@@ -48,7 +48,7 @@ export const GoalAndRisk = () => {
 
   useEffect(() => {
     //merging creating goal and recommend goal
-    GoalItem.Recommend("", (list) => setGoalItems([...(goalItems.filter((item: GoalItem) => item.IsNew())), ...list]))
+    GoalItem.Recommend("", (list:any) => setGoalItems([...(goalItems.filter((item: GoalItem) => item.IsNew())), ...list]))
     return () => { }
   })
   const [goalItems, setGoalItems] = useState<GoalItem[]>([new GoalItem("0", "", "", "", "", 1, true)])

@@ -2,7 +2,7 @@
 
 export const SaveStorage = (url: string, data: any) => localStorage.setItem(url, JSON.stringify(data));
 export const DelStorage = (key: string) => localStorage.removeItem(key);
-export const GetStorage = (key, setState = null): object | null => {
+export const GetStorage = (key: string, setState: Function | null = null): object | null => {
     let data = localStorage.getItem(key);
     let ret: object | null = null;
     if (data == null)
@@ -12,7 +12,6 @@ export const GetStorage = (key, setState = null): object | null => {
     } catch (e) {
         return ret;
     }
-    if (!!setState && setState instanceof Function)
-        setState(ret);
+    if (!!setState) setState(ret);
     return ret;
 };

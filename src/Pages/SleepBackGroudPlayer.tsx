@@ -6,7 +6,6 @@ import AddIcon from '@mui/icons-material/Add';
 import { Button } from "@mui/material";
 import { cv0 } from "../base/css";
 import { TraceModel } from "../models/TraceModel";
-import { BindTextFieldModel as mt } from "../base/BindModelComponent";
 import { MeasureItem } from "../models/MeasureItem";
 import { ActItem } from "../models/ActItem";
 import { TraceItem } from "../models/TraceItem";
@@ -31,10 +30,12 @@ export const BackGroundPlayer = () => {
     const [play, setPlay] = useState(true)
     const { HeartRate, setHeartRate } = useContext(GlobalContext)
     useEffect(() => {
+        if(!audioref.current) return 
         if (audioref.current.ended && HeartRate > 0 && (new Date().getTime() - lastPlay) > 3000)
             audioref.current.play()
     }, [HeartRate, audioref])
     const Replay = () => {
+        if(!audioref.current) return 
         if (HeartRate === 0) return
         if (!play) return
         let now = new Date().getTime()

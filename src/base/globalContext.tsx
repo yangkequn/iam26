@@ -9,8 +9,8 @@ interface GlobalContextType {
     LoggedIn: boolean,
     leftDrawerSize: number,
     setLeftDrawerSize: React.Dispatch<React.SetStateAction<number>>,
-    AuthBoxPage: AuthPages,
-    SetAuthPage: React.Dispatch<React.SetStateAction<AuthPages>>,
+    AuthBoxPage: string,
+    SetAuthPage: React.Dispatch<React.SetStateAction<string>>,
     // UpdateJWT: (removeJWT?: boolean) => void;
     // SignOut: (e: any) => void;
     RedirectUrl: string,
@@ -19,12 +19,10 @@ interface GlobalContextType {
     HeartRate: number,
     setHeartRate: React.Dispatch<React.SetStateAction<number>>,
     AcceleroData: number[],
-    setAcceleroData: React.Dispatch<React.SetStateAction<number[]>>,
-    audioChunk: Blob[],
-    setAudioChunk: React.Dispatch<React.SetStateAction<Blob[]>>,
+    setAcceleroData: React.Dispatch<React.SetStateAction<number[]>>
 
 }
-export const GlobalContext = React.createContext<GlobalContextType | null>(null)
+export const GlobalContext = React.createContext<GlobalContextType>({} as GlobalContextType);
 
 //这两个方法会被替换成正确的方法
 
@@ -38,9 +36,8 @@ export const GlobalContextProvider: React.FC<React.ReactNode> = ({ children }) =
 
     const [HeartRate, setHeartRate] = useState(0)
     const [AcceleroData, setAcceleroData] = useState([] as number[])
-    const [audioChunk, setAudioChunk] = useState<Blob[]>()
     useEffect(() => {
-        const LoadJwt = (event: Event) => {
+        const LoadJwt = (event: Event | null) => {
             setLoggedIn(Jwt.Get().IsValid())
         }
         //check if localstorage has jwt
@@ -64,7 +61,6 @@ export const GlobalContextProvider: React.FC<React.ReactNode> = ({ children }) =
         setRedirectUrl,
         HeartRate, setHeartRate,
         AcceleroData, setAcceleroData,
-        audioChunk, setAudioChunk
     }
 
     return <GlobalContext.Provider value={store} > {children} </GlobalContext.Provider>

@@ -1,7 +1,26 @@
 {
-    "allowJS":true,
-    "compilerOptions": {    
-      "esModuleInterop": true,
-      "jsx": "react"
-    }
+  "allowJS": true,
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "jsx": "preserve",
+    "target": "es5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true
+  },
+  "include": [
+    "src"
+  ]
 }
