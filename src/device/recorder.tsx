@@ -29,10 +29,10 @@ export const RecorderComponent = () => {
         audioChunk.splice(0, audioChunk.length)
     }
     const onDataAvailable = (e: BlobEvent) => {
+        setMessage("录音片段" + audioChunk.length)
         //因为心跳标签不存在，所以放弃相应音频
         if (HeartRate === 0) return ClearData()
         if (e.data.size === 0) return ClearData()
-        if (audioChunk.length < 10) setMessage("录音片段" + audioChunk.length)
         //确保标签和样本等长
         if (heartrate.length !== audioChunk.length) return ClearData()
 
@@ -66,7 +66,10 @@ export const RecorderComponent = () => {
         })
     }
     return <div>
-        {!!mediaRecorder ? <Button style={{ margin: "0 2em 0 1em" }} onClick={e => !!mediaRecorder && mediaRecorder.stop()}>
+        {!!mediaRecorder ? <Button style={{ margin: "0 2em 0 1em" }} onClick={() => {
+            !!mediaRecorder && mediaRecorder.stop()
+            setMediaRecorder(null)
+        }}>
             <Tooltip title={"声音录制中，停止录制"} placement={"top"}>
                 <StopIcon htmlColor={!!mediaRecorder ? "red" : "#888"} fontSize="medium"                   ></StopIcon>
             </Tooltip>停止录制 {messege}</Button>
