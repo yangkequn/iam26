@@ -115,7 +115,7 @@ type MeasureAccelerometer {
 }
 type HeartbeatAudio {
 	Heartbeat string   `form:"heartbeat"`
-	Audio string `form:"list"`
+	Audio string `form:"audio"`
 }
 
 type GoalItem {

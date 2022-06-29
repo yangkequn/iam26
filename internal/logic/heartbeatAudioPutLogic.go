@@ -40,10 +40,7 @@ func (l *HeartbeatAudioPutLogic) HeartbeatAudioPut(req *types.HeartbeatAudio) (e
 		//if record not exist, create a new one
 		if NoRowsInResultSet(err) {
 			//create new
-			heartbeatAudioUser = &model.HeartbeatAudioUser{
-				Id:   uid,
-				List: "",
-			}
+			heartbeatAudioUser = &model.HeartbeatAudioUser{Id: uid, List: ""}
 			_, err = l.svcCtx.HeartbeatAudioUserModel.Insert(l.ctx, heartbeatAudioUser)
 		}
 		if err != nil {
@@ -52,22 +49,14 @@ func (l *HeartbeatAudioPutLogic) HeartbeatAudioPut(req *types.HeartbeatAudio) (e
 	}
 
 	//create model to hold ogg audio, and insert into db
-	heartbeatAudio := &model.HeartbeatAudioOgg{
-		Id:   id,
-		Data: req.Audio,
-	}
-	_, err = l.svcCtx.HeartbeatAudioOggModel.Insert(l.ctx, heartbeatAudio)
-	if err != nil {
+	heartbeatAudio := &model.HeartbeatAudioOgg{Id: id, Data: string(req.Audio)}
+	if _, err = l.svcCtx.HeartbeatAudioOggModel.Insert(l.ctx, heartbeatAudio); err != nil {
 		return err
 	}
 
 	//create model to hold heartbeat string, and insert into db
-	heartbeat := &model.HeartbeatAudioHeartbeat{
-		Id:   id,
-		Data: req.Heartbeat,
-	}
-	_, err = l.svcCtx.HeartbeatAudioHeartbeatModel.Insert(l.ctx, heartbeat)
-	if err != nil {
+	heartbeat := &model.HeartbeatAudioHeartbeat{Id: id, Data: req.Heartbeat}
+	if _, err = l.svcCtx.HeartbeatAudioHeartbeatModel.Insert(l.ctx, heartbeat); err != nil {
 		return err
 	}
 	//add heartbeatAudio and  heartbeat to user model's list

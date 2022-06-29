@@ -61,7 +61,7 @@ type MeasureAccelerometer struct {
 
 type HeartbeatAudio struct {
 	Heartbeat string `form:"heartbeat"`
-	Audio     string `form:"list"`
+	Audio     string `form:"audio"`
 }
 
 type GoalItem struct {
