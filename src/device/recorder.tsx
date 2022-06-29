@@ -8,46 +8,30 @@ import { MSRE } from "../base/FunctionMath"
 
 //每秒一条心跳
 const heartrate: number[] = []
-const audioChunk: Blob[] = []
+const audiodDuration = 60 * 1000
 export const RecorderComponent = () => {
     const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
     const { HeartRate, setHeartRate } = useContext(GlobalContext)
     const [messege, setMessage] = useState("")
 
-    const saveToHistory = () => {
+    setTimeout(() => heartrate.push(HeartRate), 1000);
+    const onDataAvailable = (e: BlobEvent) => {
+        //因为心跳标签不存在，所以放弃相应音频
+        if (e.data.size === 0) {
+            setMessage("录音片段e.data.size === 0")
+        }
+        //确保标签和样本等长
+        heartrate.splice(0, heartrate.length - audiodDuration / 1000)
+
         var heartreateMSE = MSRE(heartrate)
         setMessage("heartreateMSE" + heartreateMSE)
         //if (heartreateMSE < 0.1) return ClearData()
 
-        var model = new HeartbeatAudioModel(heartrate.join(","), [...audioChunk])
-        setMessage("开始上传" + audioChunk.length)
+        var model = new HeartbeatAudioModel(heartrate.join(","), e.data)
+        //清空数据
+        heartrate.splice(0, heartrate.length)
         //save to server
         model.Put()
-    }
-    const ClearData = () => {
-        heartrate.splice(0, heartrate.length)
-        audioChunk.splice(0, audioChunk.length)
-    }
-    const onDataAvailable = (e: BlobEvent) => {
-        setMessage("录音片段" + audioChunk.length)
-        //因为心跳标签不存在，所以放弃相应音频
-        if (HeartRate === 0) return ClearData()
-        if (e.data.size === 0) return ClearData()
-        //确保标签和样本等长
-        if (heartrate.length !== audioChunk.length) return ClearData()
-
-        // pop the oldest chunk
-        if (audioChunk.length > 1000) {
-            audioChunk.shift()
-            heartrate.shift()
-        }
-        heartrate.push(HeartRate)
-        audioChunk.push(e.data)
-        if (audioChunk.length > 5) {
-            saveToHistory()
-            return ClearData()
-        }
-
     }
     //启用麦克风录制声音
     const startRecording = (e: any) => {
@@ -58,7 +42,7 @@ export const RecorderComponent = () => {
             const mediaRecorder = new MediaRecorder(stream);
 
             mediaRecorder.ondataavailable = onDataAvailable;
-            mediaRecorder.start(1000);
+            mediaRecorder.start(audiodDuration);
 
             mediaRecorder.onstop = e => null
             setMediaRecorder(mediaRecorder)

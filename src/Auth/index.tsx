@@ -40,16 +40,15 @@ export const AuthCss = {
 }
 export const AuthPages = { None: "None", SignUp: "SignUp", MyProfile: "MyProfile", ForgotPassword: "ForgotPassword", Login: "Login" }
 export const AuthPopper = () => {
-    const { AuthBoxPage: page, SetAuthPage } = useContext(GlobalContext)
-
+    const { AuthBoxPage, SetAuthPage } = useContext(GlobalContext)
     const popoverCSS = { top: 200, left: (window.innerWidth - AuthPanelWidth) / 2 }
-    const Close = e => SetAuthPage(AuthPages.None)
+    const Close = () => SetAuthPage(AuthPages.None)
     return <AuthContextComponent>
-        <Popover id={"authPop"} open={!!page} onClose={Close} anchorReference="anchorPosition" anchorPosition={popoverCSS}>
-            {page === AuthPages.SignUp && <SignUp />}
-            {page === AuthPages.MyProfile && <MyProfile />}
-            {page === AuthPages.ForgotPassword && <ForgotPassword />}
-            {page === AuthPages.Login && <Login />}
+        <Popover id={"authPop"} open={AuthBoxPage!=="None"} onClose={Close} anchorReference="anchorPosition" anchorPosition={popoverCSS}>
+            {AuthBoxPage === AuthPages.SignUp && <SignUp />}
+            {AuthBoxPage === AuthPages.MyProfile && <MyProfile />}
+            {AuthBoxPage === AuthPages.ForgotPassword && <ForgotPassword />}
+            {AuthBoxPage === AuthPages.Login && <Login />}
         </Popover>
     </AuthContextComponent>
 }

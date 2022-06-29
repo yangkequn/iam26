@@ -129,7 +129,7 @@ export const SleepStart = () => {
             <audio ref={audioref}
                 id={`myAudio`} key="myAudio"
                 src={base64EncodedMp3}
-                onPause={e => Replay()}
+                onPause={Replay}
                 preload="true"
                 loop={false}
             ></audio>

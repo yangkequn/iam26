@@ -22,7 +22,7 @@ interface GlobalContextType {
     setAcceleroData: React.Dispatch<React.SetStateAction<number[]>>
 
 }
-export const GlobalContext = React.createContext<GlobalContextType>({} as GlobalContextType);
+export const GlobalContext = React.createContext<GlobalContextType>(null as any);
 
 //这两个方法会被替换成正确的方法
 
@@ -30,7 +30,7 @@ export const GlobalContextProvider: React.FC<React.ReactNode> = ({ children }) =
     const [LoggedIn, setLoggedIn] = useState(false)
 
     const [RedirectUrl, setRedirectUrl] = useState("")
-    const [AuthBoxPage, SetAuthPage] = useState(AuthPages.None)
+    const [AuthBoxPage, SetAuthPage] = useState<string>(AuthPages.None)
 
     const [leftDrawerSize, setLeftDrawerSize] = useState(LeftDrawerSize.Short)
 
