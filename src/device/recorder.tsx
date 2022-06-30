@@ -10,16 +10,9 @@ import { MSRE } from "../base/FunctionMath"
 const heartrate: number[] = []
 const dataBlobs: Blob[] = []
 const audiodDurati2onSeconds: number = 300
-let lastHeartbeat: number = 0
 let mediaRecorder: MediaRecorder | null = null
+let lastHeartbeat = 0
 const audioFormat = MediaRecorder.isTypeSupported("audio/ogg") ? "audio/ogg" : "audio/webm"
-setInterval(() => {
-    if (lastHeartbeat === 0) {
-        console.warn("HeartRate is 0")
-        heartrate.splice(0, heartrate.length)
-    }
-    else heartrate.push(lastHeartbeat)
-}, 1000)
 export const RecorderComponent = () => {
     const { HeartRate, setHeartRate } = useContext(GlobalContext)
     const [messege, setMessage] = useState("")
@@ -31,6 +24,7 @@ export const RecorderComponent = () => {
             console.error("录音片段e.data.size === 0")
             return
         }
+        heartrate.push(lastHeartbeat)
         dataBlobs.push(e.data)
         setMessage("录音片段已经存放" + dataBlobs.length + "个" + (dataBlobs.length > audiodDurati2onSeconds) + "," + !!mediaRecorder)
         //stop data
