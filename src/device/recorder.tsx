@@ -9,30 +9,28 @@ import { MSRE } from "../base/FunctionMath"
 //每秒一条心跳
 const heartrate: number[] = []
 const dataBlobs: Blob[] = []
-const audiodDurati2onSeconds: number = 10
+const audiodDurati2onSeconds: number = 300
 let lastHeartbeat: number = 0
 let mediaRecorder: MediaRecorder | null = null
 const audioFormat = MediaRecorder.isTypeSupported("audio/ogg") ? "audio/ogg" : "audio/webm"
+setInterval(() => {
+    if (lastHeartbeat === 0) {
+        console.warn("HeartRate is 0")
+        heartrate.splice(0, heartrate.length)
+    }
+    else heartrate.push(lastHeartbeat)
+}, 1000)
 export const RecorderComponent = () => {
     const { HeartRate, setHeartRate } = useContext(GlobalContext)
     const [messege, setMessage] = useState("")
     const [recording, setRecording] = useState(false)
     useEffect(() => { lastHeartbeat = HeartRate }, [HeartRate])
-    useEffect(() => {
-        const interval = setInterval(() => {
-            if (lastHeartbeat === 0) console.warn("HeartRate is 0")
-            heartrate.push(lastHeartbeat)
-        }, 1000)
-
-        return () => clearInterval(interval);
-    }, []);
     const onDataAvailable = (e: BlobEvent) => {
         //因为心跳标签不存在，所以放弃相应音频
         if (e.data.size === 0) {
             console.error("录音片段e.data.size === 0")
             return
         }
-        heartrate.push(HeartRate)
         dataBlobs.push(e.data)
         setMessage("录音片段已经存放" + dataBlobs.length + "个" + (dataBlobs.length > audiodDurati2onSeconds) + "," + !!mediaRecorder)
         //stop data
@@ -52,6 +50,11 @@ export const RecorderComponent = () => {
             var model = new HeartbeatAudioModel(heartrate.join(","), blob)
             //save to server
             model.Put()
+        } else {
+            //out put now string
+            var now = new Date().toLocaleString()
+            console.error("心跳不够稳定，放弃录音", now)
+            setRecording(false)
         }
         if (!!mediaRecorder && setRecording) mediaRecorder.start(1000);
     }
