@@ -17,40 +17,35 @@ export function BlueToothHeartRate({ multiplier = 10, useGravity = false }: { mu
     const handleCharacteristicValueChanged = (event: Event) => {
         let characteristic = event.target as BluetoothRemoteGATTCharacteristic
         let value = characteristic.value
-        if (!value){
-            setHeartRate(0)
-            return     
-        }
-        let heartRate = value.getUint8(1) 
-        console.log("heartRateheartRate",heartRate) 
-        setHeartRate(heartRate)   
+        let heartRate = !value ? 0 : value.getUint8(1)
+        setHeartRate(heartRate)
     }
 
     const [stopped, setStopped] = useState<Boolean>(true)
 
-    const StartRetrieveHeartRate = (e: React.MouseEvent<HTMLButtonElement, MouseEvent> )=> {
+    const StartRetrieveHeartRate = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         navigator.bluetooth.requestDevice({ filters: [{ services: ['heart_rate'] }] })
             .then(device => {
                 console.log("设备预备连接")
-                if (device.gatt===undefined) return
+                if (device.gatt === undefined) return
                 return device.gatt.connect()
 
             })
             .then(server => {
                 console.log("设备已经连接")
-                if (server===undefined) return
+                if (server === undefined) return
                 // Getting Battery Service…
                 return server.getPrimaryService('heart_rate');
             })
             .then(service => {
                 console.log("getCharacteristic")
-                if (service===undefined) return
+                if (service === undefined) return
                 // Getting Battery Level Characteristic…
                 return service.getCharacteristic(0x2A37);
             })
             .then(characteristic => {
                 console.log("characteristicvaluechanged")
-                if (characteristic===undefined) return
+                if (characteristic === undefined) return
                 characteristic.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
                 // Reading Battery Level…
                 return characteristic.startNotifications();

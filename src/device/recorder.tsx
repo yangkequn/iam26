@@ -10,15 +10,20 @@ import { MSRE } from "../base/FunctionMath"
 const heartrate: number[] = []
 const dataBlobs: Blob[] = []
 const audiodDurati2onSeconds: number = 10
+let lastHeartbeat: number = 0
 let mediaRecorder: MediaRecorder | null = null
 const audioFormat = MediaRecorder.isTypeSupported("audio/ogg") ? "audio/ogg" : "audio/webm"
 export const RecorderComponent = () => {
     const { HeartRate, setHeartRate } = useContext(GlobalContext)
     const [messege, setMessage] = useState("")
     const [recording, setRecording] = useState(false)
-
+    useEffect(() => { lastHeartbeat = HeartRate }, [HeartRate])
     useEffect(() => {
-        const interval = setInterval(() => heartrate.push(HeartRate), 1000);
+        const interval = setInterval(() => {
+            if (lastHeartbeat === 0) console.warn("HeartRate is 0")
+            heartrate.push(lastHeartbeat)
+        }, 1000)
+
         return () => clearInterval(interval);
     }, []);
     const onDataAvailable = (e: BlobEvent) => {
@@ -27,30 +32,27 @@ export const RecorderComponent = () => {
             console.error("录音片段e.data.size === 0")
             return
         }
+        heartrate.push(HeartRate)
+        dataBlobs.push(e.data)
+        setMessage("录音片段已经存放" + dataBlobs.length + "个" + (dataBlobs.length > audiodDurati2onSeconds) + "," + !!mediaRecorder)
+        //stop data
+        if (dataBlobs.length < audiodDurati2onSeconds || !mediaRecorder || mediaRecorder.state === "inactive") return
+        mediaRecorder.stop()
+    }
+    const onMediaRecorderStop = (e: Event) => {
         //确保标签和样本等长
         var numToRemove = heartrate.length - audiodDurati2onSeconds
         if (numToRemove > 0) heartrate.splice(0, numToRemove)
 
-        dataBlobs.push(e.data)
-        setMessage("录音片段已经存放" + dataBlobs.length + "个" + (dataBlobs.length > audiodDurati2onSeconds) + "," + !!mediaRecorder)
-        //stop data
-        if (dataBlobs.length < audiodDurati2onSeconds) return
-
-        if (!mediaRecorder || mediaRecorder.state === "inactive") return
-
-        mediaRecorder.stop()
-    }
-    const onMediaRecorderStop = (e: Event) => {
-        console.error("onMediaRecorderStop")
         var heartreateMSE = MSRE(heartrate)
-        //convert  e.data to mp3 file    
-        var blob = new Blob(dataBlobs, { 'type': audioFormat })
-        var model = new HeartbeatAudioModel(heartrate.join(","), blob)
-        //save to server
-        model.Put()
-
-        //clear dataBlobs,and restart recorder
-        dataBlobs.splice(0, dataBlobs.length)
+        console.error("onMediaRecorderStop,heartreateMSE", heartreateMSE, heartrate)
+        if (heartreateMSE > 0.01) {
+            //convert  e.data to mp3 file    
+            var blob = new Blob(dataBlobs, { 'type': audioFormat })
+            var model = new HeartbeatAudioModel(heartrate.join(","), blob)
+            //save to server
+            model.Put()
+        }
         if (!!mediaRecorder && setRecording) mediaRecorder.start(1000);
     }
 
@@ -64,6 +66,10 @@ export const RecorderComponent = () => {
 
             mediaRecorder.ondataavailable = onDataAvailable;
             mediaRecorder.onstop = onMediaRecorderStop
+            mediaRecorder.onstart = () => {
+                dataBlobs.splice(0, dataBlobs.length)
+                heartrate.slice(0, heartrate.length)
+            }
             mediaRecorder.start(1000);
             setRecording(true)
 
