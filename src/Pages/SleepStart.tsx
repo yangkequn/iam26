@@ -15,16 +15,14 @@ import { SelectBlueToothAccelerometer } from "../device/SelectBlueToothAccelerom
 import { SelectBluetoothHeartrateDevice } from "../device/SelectBluetoothHeartrateDevice";
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
-import { BackGroundPlayer } from "./SleepBackGroudPlayer";
-import { MusicPlayerSlider, base64EncodedMp3 } from "./SleepMp3Player";
+import { BackGroundPlayer } from "../device/SleepBackGroudPlayer"; 
 import { GlobalContext } from "../base/GlobalContext";
 import {RecorderComponent} from "../device/recorder"; 
 import { unixTime } from "../base/Fuctions";
 import { time } from "console";
 import { BindTextFieldModel as bind } from "../base/BindModelComponent";
+import { HearbeatPlayer } from "../device/HearbeatPlayer";
 
-let lastPlay = new Date().getTime()
-let lastWaitTime = 0
 function TraceModelItem({ item }: { item: TraceModel; }) {
 
     //monitor initial value,to avoid unnecessary update
@@ -86,37 +84,6 @@ export const SleepStart = () => {
     }
     useEffect(() => TraceModel.Get(getListCallBack), [])
 
-    const audioref = createRef<HTMLMediaElement>()
-
-    const [volume, setVolume] = useState<number>(0.7)
-    const [play, setPlay] = useState(true)
-    const { HeartRate, setHeartRate } = useContext(GlobalContext)
-    useEffect(() => {
-        if (!!audioref.current && HeartRate > 0 && (new Date().getTime() - lastPlay) > 3000)
-            audioref.current.play()
-    }, [HeartRate, audioref])
-    const Replay = () => {
-        if(!audioref.current) return
-        if (HeartRate === 0) return
-        if (!play) return
-        let now = new Date().getTime()
-        let shouldPlay: number = 60000 / Math.max(20, HeartRate) + lastPlay
-        let wait = shouldPlay - now
-        wait = lastWaitTime * 0.2 + wait * 0.8
-        lastWaitTime = wait
-        console.log("wait", wait, "HeartRate", HeartRate, "playbackRate", audioref.current.playbackRate, "span", 60000 / Math.max(20, HeartRate), HeartRate)
-        lastPlay = now
-        audioref.current.volume = volume
-        if (wait <= 0) {
-            audioref.current.playbackRate *= 1.1
-            audioref.current.play()
-        } else {
-            if (wait > 200) {
-                audioref.current.playbackRate *= 0.9
-            }
-            setTimeout(() => (document.getElementById("myAudio") as HTMLMediaElement).play(), wait)
-        }
-    }
     return (
         //items table ,all columes are sortable, contains a list of items
         <div style={{ ...cv0, height: "100%", width: '100%', justifyContent: "space-between" }}>
@@ -125,18 +92,7 @@ export const SleepStart = () => {
             </Container>
 
             <RecorderComponent></RecorderComponent>
-            
-            <audio ref={audioref}
-                id={`myAudio`} key="myAudio"
-                src={base64EncodedMp3}
-                onPause={Replay}
-                preload="true"
-                loop={false}
-            ></audio>
-            {/* <BackGroundPlayer></BackGroundPlayer> */}
-            <Button variant="contained" size="large" color={!play ? "primary" : "secondary"} sx={{ p: "0.5em 3em 0.5em 3em" }} onClick={e => setPlay(!play)} >
-                {play ? `禁用心跳声音` : "启用心跳声音"}
-            </Button>
+            <HearbeatPlayer></HearbeatPlayer>
             {/* <MusicPlayerSlider></MusicPlayerSlider> */}
             <AccelerometerTrain key="AccelerometerTrain"></AccelerometerTrain>
 

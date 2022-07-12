@@ -11,11 +11,11 @@ import { ActItem } from "../models/ActItem";
 import { TraceItem } from "../models/TraceItem";
 import DeleteIcon from '@mui/icons-material/Delete';
 import { AccelerometerTrain } from "../base/AccelerometerTrain";
-import { SelectBlueToothAccelerometer } from "../device/SelectBlueToothAccelerometer" 
-import { SelectBluetoothHeartrateDevice } from "../device/SelectBluetoothHeartrateDevice";
+import { SelectBlueToothAccelerometer } from "./SelectBlueToothAccelerometer" 
+import { SelectBluetoothHeartrateDevice } from "./SelectBluetoothHeartrateDevice";
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
-import { MusicPlayerSlider, base64EncodedMp3 } from "./SleepMp3Player";
+import { MusicPlayerSlider } from "../Pages/SleepMp3Player";
 import { GlobalContext } from "../base/GlobalContext";
 import { unixTime } from "../base/Fuctions";
 import { time } from "console";
